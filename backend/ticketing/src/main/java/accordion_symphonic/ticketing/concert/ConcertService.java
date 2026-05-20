@@ -14,7 +14,14 @@ public class ConcertService {
     }
 
     public List<ConcertResponse> getPublishedConcerts() {
-        return concertRepository.findByStatus(ConcertStatus.PUBLISHED)
+        return this.concertRepository.findByStatus(ConcertStatus.PUBLISHED)
+                .stream()
+                .map(ConcertResponse::fromEntity)
+                .toList();
+    }
+
+    public List<ConcertResponse> getAllConcerts() {
+        return this.concertRepository.findAll()
                 .stream()
                 .map(ConcertResponse::fromEntity)
                 .toList();
@@ -28,8 +35,41 @@ public class ConcertService {
                 request.location()
         );
 
-        Concert savedConcert = concertRepository.save(concert);
+        Concert savedConcert = this.concertRepository.save(concert);
 
         return ConcertResponse.fromEntity(savedConcert);
+    }
+
+    public ConcertResponse updateConcert(Long id, ConcertRequest request) {
+        Concert concert = this.concertRepository.findById(id)
+                .orElseThrow(() -> new ConcertNotFoundException(id));
+
+        concert.updateConcert(request);
+
+        Concert updatedConcert = this.concertRepository.save(concert);
+
+        return ConcertResponse.fromEntity(updatedConcert);
+    }
+
+    public ConcertResponse publishConcert(Long id) {
+        Concert concert = this.concertRepository.findById(id)
+                .orElseThrow(() -> new ConcertNotFoundException(id));
+
+        concert.publish();
+
+        Concert publishedConcert = this.concertRepository.save(concert);
+
+        return ConcertResponse.fromEntity(publishedConcert);
+    }
+
+    public ConcertResponse archiveConcert(Long id) {
+        Concert concert = this.concertRepository.findById(id)
+                .orElseThrow(() -> new ConcertNotFoundException(id));
+
+        concert.archive();
+
+        Concert archivedConcert = this.concertRepository.save(concert);
+
+        return ConcertResponse.fromEntity(archivedConcert);
     }
 }

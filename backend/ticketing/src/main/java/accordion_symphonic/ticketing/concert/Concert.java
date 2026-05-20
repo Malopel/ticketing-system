@@ -33,6 +33,13 @@ public class Concert {
         this.status = ConcertStatus.DRAFT;
     }
 
+    public void updateConcert(ConcertRequest update) {
+        this.title = update.title();
+        this.description = update.description();
+        this.startTime = update.startTime();
+        this.location = update.location();
+    }
+
     public Long getId() {
         return this.id;
     }
@@ -55,5 +62,13 @@ public class Concert {
 
     public ConcertStatus getStatus() {
         return this.status;
+    }
+
+    public void publish() {
+        this.status = ConcertStatus.PUBLISHED;
+    }
+
+    public void archive() {
+        this.status = ConcertStatus.ARCHIVED;
     }
 }

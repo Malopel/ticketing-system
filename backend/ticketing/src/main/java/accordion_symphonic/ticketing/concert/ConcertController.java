@@ -18,9 +18,4 @@ public class ConcertController {
     public List<ConcertResponse> getConcerts() {
         return concertService.getPublishedConcerts();
     }
-
-    @PostMapping
-    public ConcertResponse addConcert(@RequestBody ConcertRequest concertRequest) {
-        return concertService.createConcert(concertRequest);
-    }
 }
