@@ -1,4 +1,10 @@
 package accordion_symphonic.ticketing.concert;
 
-public class ConcertRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ConcertRepository extends JpaRepository<Concert, Long> {
+
+    List<Concert> findByStatus(ConcertStatus status);
 }
