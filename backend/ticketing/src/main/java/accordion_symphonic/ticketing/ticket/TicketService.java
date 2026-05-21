@@ -60,4 +60,33 @@ public class TicketService {
                 .map(TicketResponse::fromEntity)
                 .toList();
     }
+
+    public TicketResponse validateTicket(Long concertId, String qrToken) {
+        Ticket ticket = findTicketForConcert(concertId, qrToken);
+
+        return TicketResponse.fromEntity(ticket);
+    }
+
+    public TicketResponse useTicket(Long concertId, String qrToken) {
+        Ticket ticket  = findTicketForConcert(concertId, qrToken);
+
+        if (ticket.getStatus() != TicketStatus.VALID) {
+            throw new TicketIsNotValidException(qrToken);
+        }
+
+        ticket.useTicket();
+
+        Ticket savedTicket = ticketRepository.save(ticket);
+
+        return TicketResponse.fromEntity(savedTicket);
+    }
+
+    private Ticket findTicketForConcert(Long concertId, String qrToken) {
+        if (!conRepo.existsById(concertId)) {
+            throw new ConcertNotFoundException(concertId);
+        }
+
+        return ticketRepository.findByQrTokenAndOrderConcertId(qrToken, concertId)
+                .orElseThrow(() -> new TicketNotFoundException(qrToken));
+    }
 }

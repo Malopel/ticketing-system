@@ -9,7 +9,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findByOrderId(Long orderId);
 
-    Optional<Ticket> findByQrToken(String qrToken);
+    Optional<Ticket> findByQrTokenAndOrderConcertId(String qrToken, Long concertId);
 
     boolean existsByOrderId(Long orderId);
 }

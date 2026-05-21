@@ -5,6 +5,7 @@ import accordion_symphonic.ticketing.order.OrderIsExpiredOrCancelledException;
 import accordion_symphonic.ticketing.order.OrderIsPaidOrExpiredException;
 import accordion_symphonic.ticketing.order.OrderNotFoundException;
 import accordion_symphonic.ticketing.ticket.TicketIsNotValidException;
+import accordion_symphonic.ticketing.ticket.TicketNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -80,6 +81,17 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleTicketIsNotValidException(
             TicketIsNotValidException exception
     ) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(TicketNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleTicketNotFound(TicketNotFoundException exception) {
         return new ErrorResponse(
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
