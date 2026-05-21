@@ -6,14 +6,16 @@ public record TicketCategoryResponse(
         Long id,
         String name,
         BigDecimal price,
-        int capacity
+        int capacity,
+        int available
 ) {
-    public static TicketCategoryResponse fromEntity(TicketCategory category) {
+    public static TicketCategoryResponse fromEntity(TicketCategory category, int available) {
         return new TicketCategoryResponse(
                 category.getId(),
                 category.getName(),
                 category.getPrice(),
-                category.getCapacity()
+                category.getCapacity(),
+                available
         );
     }
 }

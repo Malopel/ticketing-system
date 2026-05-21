@@ -1,6 +1,7 @@
 package accordion_symphonic.ticketing.common;
 
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
+import accordion_symphonic.ticketing.availability.NotEnoughTicketsAvailableException;
 import accordion_symphonic.ticketing.order.OrderIsExpiredOrCancelledException;
 import accordion_symphonic.ticketing.order.OrderIsPaidOrExpiredException;
 import accordion_symphonic.ticketing.order.OrderNotFoundException;
@@ -57,7 +58,7 @@ public class GlobalExceptionHandler {
     ) {
         return new ErrorResponse(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.CONFLICT.value(),
                 "Not Found",
                 exception.getMessage()
         );
@@ -70,7 +71,7 @@ public class GlobalExceptionHandler {
     ) {
         return new ErrorResponse(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.CONFLICT.value(),
                 "Not Found",
                 exception.getMessage()
         );
@@ -83,7 +84,7 @@ public class GlobalExceptionHandler {
     ) {
         return new ErrorResponse(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.CONFLICT.value(),
                 "Not Found",
                 exception.getMessage()
         );
@@ -96,6 +97,17 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(NotEnoughTicketsAvailableException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleNotEnoughTicketsAvailable(NotEnoughTicketsAvailableException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
                 exception.getMessage()
         );
     }

@@ -1,5 +1,7 @@
 package accordion_symphonic.ticketing.order;
 
+import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
+import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.ticket.TicketService;
@@ -19,17 +21,19 @@ public class OrderService {
     private final ConcertRepository concertRepository;
 
     private final TicketService ticketService;
+    private final TicketAvailabilityService ticketAvailabilityService;
 
     public OrderService(
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
             ConcertRepository concertRepository,
-            TicketService ticketService
+            TicketService ticketService, TicketAvailabilityService ticketAvailabilityService
     ) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
         this.ticketService = ticketService;
+        this.ticketAvailabilityService = ticketAvailabilityService;
     }
 
     public OrderResponse getOrderByConcertIdAndId(Long concertId, Long orderId) {
@@ -43,12 +47,11 @@ public class OrderService {
     }
 
     public OrderResponse createOrder(long concertId, OrderRequest request) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new ConcertNotFoundException(concertId);
-        }
+        Concert concert = concertRepository.findById(concertId)
+                .orElseThrow(() -> new ConcertNotFoundException(concertId));
 
         Order order = new Order(
-                this.concertRepository.getReferenceById(concertId),
+                concert,
                 request.customerEmail(),
                 LocalDateTime.now()
         );
@@ -57,6 +60,12 @@ public class OrderService {
             TicketCategory category = ticketCategoryRepository
                     .findByIdAndConcertId(itemRequest.ticketCategoryId(), concertId)
                     .orElseThrow(() -> new TicketCategoryNotFoundException(itemRequest.ticketCategoryId()));
+
+            this.ticketAvailabilityService.ensureTicketsAvailable(
+                    category.getId(),
+                    category.getCapacity(),
+                    itemRequest.quantity()
+            );
 
             OrderItem item = new OrderItem(
                     category,

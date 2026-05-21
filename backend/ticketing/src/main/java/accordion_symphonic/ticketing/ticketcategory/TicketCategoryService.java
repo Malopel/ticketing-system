@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.ticketcategory;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,13 +13,15 @@ public class TicketCategoryService {
 
     private final TicketCategoryRepository ticketCategoryRepository;
     private final ConcertRepository concertRepository;
+    private final TicketAvailabilityService ticketAvailabilityService;
 
     public TicketCategoryService(
             TicketCategoryRepository ticketCategoryRepository,
-            ConcertRepository concertRepository
+            ConcertRepository concertRepository, TicketAvailabilityService ticketAvailabilityService
     ) {
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
+        this.ticketAvailabilityService = ticketAvailabilityService;
     }
 
     public List<TicketCategoryResponse> getCategoriesForConcert(Long concertId) {
@@ -28,7 +31,13 @@ public class TicketCategoryService {
 
         return ticketCategoryRepository.findByConcertId(concertId)
                 .stream()
-                .map(TicketCategoryResponse::fromEntity)
+                .map(category -> TicketCategoryResponse.fromEntity(
+                        category,
+                        ticketAvailabilityService.getAvailableTickets(
+                                category.getId(),
+                                category.getCapacity()
+                        )
+                ))
                 .toList();
     }
 
@@ -45,7 +54,7 @@ public class TicketCategoryService {
 
         TicketCategory savedCategory = ticketCategoryRepository.save(category);
 
-        return TicketCategoryResponse.fromEntity(savedCategory);
+        return TicketCategoryResponse.fromEntity(savedCategory, savedCategory.getCapacity());
     }
 
     public TicketCategoryResponse updateCategory(
@@ -65,7 +74,9 @@ public class TicketCategoryService {
 
         TicketCategory savedCategory = ticketCategoryRepository.save(category);
 
-        return TicketCategoryResponse.fromEntity(savedCategory);
+        int available = ticketAvailabilityService.getAvailableTickets(savedCategory.getId(), savedCategory.getCapacity());
+
+        return TicketCategoryResponse.fromEntity(savedCategory, available);
     }
 
     public void deleteCategory(Long concertId, Long categoryId) {
