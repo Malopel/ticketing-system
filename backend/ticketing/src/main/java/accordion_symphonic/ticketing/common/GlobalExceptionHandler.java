@@ -1,6 +1,9 @@
 package accordion_symphonic.ticketing.common;
 
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
+import accordion_symphonic.ticketing.order.OrderIsExpiredOrCancelledException;
+import accordion_symphonic.ticketing.order.OrderIsPaidOrExpiredException;
+import accordion_symphonic.ticketing.order.OrderNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +29,41 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TicketCategoryNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleTicketCategoryNotFound(TicketCategoryNotFoundException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleOrderNotFound(OrderNotFoundException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(OrderIsExpiredOrCancelledException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOrderIsExpiredOrCancelledException(
+            OrderIsExpiredOrCancelledException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(OrderIsPaidOrExpiredException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOrderIsPaidOrExpiredException(
+            OrderIsPaidOrExpiredException exception) {
         return new ErrorResponse(
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
