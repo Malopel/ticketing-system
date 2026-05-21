@@ -57,6 +57,7 @@ public class Order {
         this.status = OrderStatus.RESERVED;
         this.totalAmount = BigDecimal.ZERO;
         this.createdAt = createdAt;
+        //TODO das überdenken
         this.expiresAt = createdAt.plusDays(7);
     }
 
