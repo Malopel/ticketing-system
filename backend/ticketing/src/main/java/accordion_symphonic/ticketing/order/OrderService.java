@@ -2,6 +2,7 @@ package accordion_symphonic.ticketing.order;
 
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
@@ -17,14 +18,18 @@ public class OrderService {
     private final TicketCategoryRepository ticketCategoryRepository;
     private final ConcertRepository concertRepository;
 
+    private final TicketService ticketService;
+
     public OrderService(
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
-            ConcertRepository concertRepository
+            ConcertRepository concertRepository,
+            TicketService ticketService
     ) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
+        this.ticketService = ticketService;
     }
 
     public OrderResponse getOrderByConcertIdAndId(Long concertId, Long orderId) {
@@ -94,13 +99,16 @@ public class OrderService {
                 .findByIdAndConcertId(orderId, concertId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
-        if(order.isCancelledOrExpired()) {
+        if (order.isCancelledOrExpired()) {
             throw new OrderIsExpiredOrCancelledException(orderId);
         }
 
         order.markAsPaid();
 
         Order savedOrder = this.orderRepository.save(order);
+
+        this.ticketService.createTicketsForOrder(order);
+
         return OrderResponse.fromEntity(savedOrder);
     }
 }
