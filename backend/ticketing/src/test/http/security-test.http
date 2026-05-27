@@ -1,0 +1,15 @@
+### Öffentliche Konzerte ohne Login
+GET http://localhost:8080/api/concerts
+
+### Admin-Konzerte ohne Login
+GET http://localhost:8080/api/admin/concerts
+
+### Admin-Konzerte mit Admin-Login
+GET http://localhost:8080/api/admin/concerts
+Authorization: Basic admin test-password
+
+### Bestellung ohne Zugriffstoken abrufen
+GET http://localhost:8080/api/concerts/1/orders/1
+
+### Bestellung ohne Zugriffstoken stornieren
+PATCH http://localhost:8080/api/concerts/1/orders/1/cancel
