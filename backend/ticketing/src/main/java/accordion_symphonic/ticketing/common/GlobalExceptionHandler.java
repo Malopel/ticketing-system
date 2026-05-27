@@ -2,6 +2,7 @@ package accordion_symphonic.ticketing.common;
 
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.availability.NotEnoughTicketsAvailableException;
+import accordion_symphonic.ticketing.order.DuplicateTicketCategoryException;
 import accordion_symphonic.ticketing.order.OrderIsExpiredOrCancelledException;
 import accordion_symphonic.ticketing.order.OrderIsPaidOrExpiredException;
 import accordion_symphonic.ticketing.order.OrderNotFoundException;
@@ -59,7 +60,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
-                "Not Found",
+                "Conflict",
                 exception.getMessage()
         );
     }
@@ -72,7 +73,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
-                "Not Found",
+                "Conflict",
                 exception.getMessage()
         );
     }
@@ -85,7 +86,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
-                "Not Found",
+                "Conflict",
                 exception.getMessage()
         );
     }
@@ -104,6 +105,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotEnoughTicketsAvailableException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleNotEnoughTicketsAvailable(NotEnoughTicketsAvailableException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(DuplicateTicketCategoryException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDuplicateTicketCategory(DuplicateTicketCategoryException exception) {
         return new ErrorResponse(
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),

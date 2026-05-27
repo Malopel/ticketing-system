@@ -8,9 +8,13 @@ import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class OrderService {
@@ -56,7 +60,13 @@ public class OrderService {
                 LocalDateTime.now()
         );
 
+        Set<Long> requestedCategoryIds = new HashSet<>();
+
         for (OrderItemRequest itemRequest : request.items()) {
+            if (!requestedCategoryIds.add(itemRequest.ticketCategoryId())) {
+                throw new DuplicateTicketCategoryException(itemRequest.ticketCategoryId());
+            }
+
             TicketCategory category = ticketCategoryRepository
                     .findByIdAndConcertId(itemRequest.ticketCategoryId(), concertId)
                     .orElseThrow(() -> new TicketCategoryNotFoundException(itemRequest.ticketCategoryId()));
@@ -119,5 +129,24 @@ public class OrderService {
         this.ticketService.createTicketsForOrder(order);
 
         return OrderResponse.fromEntity(savedOrder);
+    }
+
+    @Transactional
+    public List<OrderResponse> getOrdersForConcert(Long concertId) {
+        if (!concertRepository.existsById(concertId)) {
+            throw new ConcertNotFoundException(concertId);
+        }
+
+        List<Order> orders = orderRepository.findByConcertId(concertId);
+
+        for (Order order : orders) {
+            if (order.shouldExpire()) {
+                order.expire();
+            }
+        }
+
+        return orders.stream()
+                .map(OrderResponse::fromEntity)
+                .toList();
     }
 }

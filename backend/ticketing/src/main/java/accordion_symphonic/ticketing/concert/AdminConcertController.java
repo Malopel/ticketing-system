@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.concert;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,12 +31,12 @@ public class AdminConcertController {
     }
 
     @PostMapping
-    public ConcertResponse addConcert(@RequestBody ConcertRequest concertRequest) {
+    public ConcertResponse addConcert(@Valid @RequestBody ConcertRequest concertRequest) {
         return concertService.createConcert(concertRequest);
     }
 
     @PutMapping("/{id}")
-    public ConcertResponse updateConcert(@RequestBody ConcertRequest concertRequest, @PathVariable Long id) {
+    public ConcertResponse updateConcert(@Valid @RequestBody ConcertRequest concertRequest, @PathVariable Long id) {
         return concertService.updateConcert(id, concertRequest);
     }
 

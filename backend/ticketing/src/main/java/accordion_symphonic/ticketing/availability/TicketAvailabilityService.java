@@ -4,6 +4,7 @@ import accordion_symphonic.ticketing.order.OrderItemRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -14,14 +15,13 @@ public class TicketAvailabilityService {
     public TicketAvailabilityService(OrderItemRepository orderItemRepository) {
         this.orderItemRepository = orderItemRepository;
     }
-
     public int getAvailableTickets(Long ticketCategoryId, int capacity) {
-        int reservedOrPaid = orderItemRepository.countByTicketCategoryIdAndOrderStatusIn(
+        int blockingTickets = orderItemRepository.countBlockingTicketsByTicketCategoryId(
                 ticketCategoryId,
-                List.of(OrderStatus.RESERVED, OrderStatus.PAID)
+                LocalDateTime.now()
         );
 
-        return capacity - reservedOrPaid;
+        return capacity - blockingTickets;
     }
 
     public void ensureTicketsAvailable(Long ticketCategoryId, int capacity, int requestedQuantity) {

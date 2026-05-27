@@ -3,12 +3,12 @@ package accordion_symphonic.ticketing.ticket;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/concerts/{concertId}/tickets")
-public class TicketValidationController {
+@RequestMapping("/api/admin/concerts/{concertId}/tickets")
+public class AdminTicketValidationController {
 
     private final TicketService ticketService;
 
-    public TicketValidationController(TicketService ticketService) {
+    public AdminTicketValidationController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
 

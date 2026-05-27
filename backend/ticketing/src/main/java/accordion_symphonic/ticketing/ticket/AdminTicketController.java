@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/concerts/{concertId}/orders/{orderId}/tickets")
-public class TicketController {
+@RequestMapping("/api/admin/concerts/{concertId}/orders/{orderId}/tickets")
+public class AdminTicketController {
 
     private final TicketService ticketService;
 
-    public TicketController(TicketService ticketService) {
+    public AdminTicketController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
 

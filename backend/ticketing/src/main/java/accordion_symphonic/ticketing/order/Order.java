@@ -123,20 +123,19 @@ public class Order {
     }
 
     public boolean isCancelledOrExpired() {
-        return (this.status == OrderStatus.CANCELLED)||(isExpired());
+        return (this.status == OrderStatus.CANCELLED)||(shouldExpire());
     }
 
     public boolean isPaidOrExpired() {
-        return (this.status == OrderStatus.PAID)||(isExpired());
+        return (this.status == OrderStatus.PAID)||(shouldExpire());
     }
 
-    private boolean isExpired() {
-        if (this.expiresAt.isBefore(LocalDateTime.now())) {
-            this.expire();
+    public boolean shouldExpire() {
+        return this.status == OrderStatus.RESERVED
+                && this.expiresAt.isBefore(LocalDateTime.now());
+    }
 
-            return true;
-        }
-
-        return false;
+    public boolean isExpired() {
+        return this.status == OrderStatus.EXPIRED;
     }
 }

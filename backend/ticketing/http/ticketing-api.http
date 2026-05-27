@@ -1,0 +1,84 @@
+### Variablen
+@baseUrl = http://localhost:8080
+@concertId = 1
+@categoryId = 1
+@orderId = 1
+@qrToken = 5f50a80f-b73d-4102-82db-1bc238640e47
+
+---CONCERTS---
+### Alle öffentlichen Konzerte anzeigen
+GET {{baseUrl}}/api/concerts
+
+
+### Konzert als Admin erstellen
+POST {{baseUrl}}/api/admin/concerts
+Content-Type: application/json
+
+{
+  "title": "Accordion Symphonic",
+  "description": "Großes Konzert des Orchesters",
+  "startTime": "2026-11-14T19:30:00",
+  "location": "Konzertsaal"
+}
+
+
+### Alle Konzerte als Admin anzeigen
+GET {{baseUrl}}/api/admin/concerts
+
+
+### Konzert veröffentlichen
+PATCH {{baseUrl}}/api/admin/concerts/{{concertId}}/publish
+
+
+### Ticketkategorie anlegen
+POST {{baseUrl}}/api/admin/concerts/{{concertId}}/ticket-categories
+Content-Type: application/json
+
+{
+  "name": "Erwachsene",
+  "price": 25.00,
+  "capacity": 100
+}
+
+
+### Kategorien mit Verfügbarkeit anzeigen
+GET {{baseUrl}}/api/admin/concerts/{{concertId}}/ticket-categories
+
+
+### Order erstellen
+POST {{baseUrl}}/api/concerts/{{concertId}}/orders
+Content-Type: application/json
+
+{
+  "customerEmail": "test@example.com",
+  "items": [
+    {
+      "ticketCategoryId": {{categoryId}},
+      "quantity": 2
+    }
+  ]
+}
+
+
+### Order anzeigen
+GET {{baseUrl}}/api/concerts/{{concertId}}/orders/{{orderId}}
+
+
+### Alle Orders eines Konzerts als Admin anzeigen
+GET {{baseUrl}}/api/admin/concerts/{{concertId}}/orders
+
+
+### Order als bezahlt markieren
+PATCH {{baseUrl}}/api/admin/concerts/{{concertId}}/orders/{{orderId}}/paid
+
+
+### Tickets einer Order anzeigen
+GET {{baseUrl}}/api/admin/concerts/{{concertId}}/orders/{{orderId}}/tickets
+
+
+### Ticket validieren
+GET {{baseUrl}}/api/admin/concerts/{{concertId}}/tickets/validate/{{qrToken}}
+
+
+### Ticket entwerten
+PATCH {{baseUrl}}/api/admin/concerts/{{concertId}}/tickets/{{qrToken}}/use

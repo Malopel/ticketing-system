@@ -27,12 +27,6 @@ public class AdminTicketCategoryController {
         this.ticketCategoryService = ticketCategoryService;
     }
 
-    @GetMapping
-    public List<TicketCategoryResponse> getCategoriesForConcert(@PathVariable Long concertId) {
-
-        return ticketCategoryService.getCategoriesForConcert(concertId);
-    }
-
     @PostMapping
     public TicketCategoryResponse createCategory(
             @PathVariable Long concertId,
