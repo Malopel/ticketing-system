@@ -45,21 +45,35 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Öffentliche Konzertübersicht
                         .requestMatchers(HttpMethod.GET,
                                 "/api/concerts",
-                                "/api/concerts/*/ticket-categories")
+                                "/api/concerts/{concertId}/ticket-categories")
                         .permitAll()
 
+                        // Kunden dürfen eine Bestellung erstellen
                         .requestMatchers(HttpMethod.POST,
-                                "/api/concerts/*/orders")
+                                "/api/concerts/{concertId}/orders")
                         .permitAll()
 
+                        // Kunden dürfen ihre Bestellung mit Access-Token abrufen
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/concerts/{concertId}/orders/{orderId}")
+                        .permitAll()
+
+                        // Kunden dürfen ihre Bestellung mit Access-Token stornieren
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/concerts/{concertId}/orders/{orderId}/cancel")
+                        .permitAll()
+
+                        // Admin-Bereich
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
 
                         .requestMatchers("/error")
                         .permitAll()
 
+                        // Alles andere bleibt gesperrt
                         .anyRequest()
                         .denyAll()
                 )

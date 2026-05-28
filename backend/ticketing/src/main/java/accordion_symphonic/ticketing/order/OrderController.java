@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/concerts/{concertId}/orders")
 public class OrderController {
 
+    private static final String ORDER_ACCESS_TOKEM_HEADER = "X-Order-Access-Token";
+
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
@@ -14,12 +16,19 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    public OrderResponse getOrder(@PathVariable Long concertId, @PathVariable Long orderId) {
-        return orderService.getOrderByConcertIdAndId(concertId, orderId);
+    public OrderResponse getOrder(
+            @PathVariable Long concertId,
+            @PathVariable Long orderId,
+            @RequestHeader(
+                    name = ORDER_ACCESS_TOKEM_HEADER,
+                    required = false
+            ) String accessToken
+    ) {
+        return orderService.getCustomerOrder(concertId, orderId, accessToken);
     }
 
     @PostMapping
-    public OrderResponse createOrder(
+    public CreatedOrderResponse createOrder(
             @PathVariable Long concertId,
             @Valid @RequestBody OrderRequest order
     ) {
@@ -27,7 +36,14 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/cancel")
-    public OrderResponse cancelOrder(@PathVariable Long concertId,  @PathVariable Long orderId) {
-        return orderService.cancelOrder(concertId, orderId);
+    public OrderResponse cancelOrder(
+            @PathVariable Long concertId,
+            @PathVariable Long orderId,
+            @RequestHeader(
+                    name = ORDER_ACCESS_TOKEM_HEADER,
+                    required = false
+            ) String accessToken
+    ) {
+        return orderService.cancelOrder(concertId, orderId, accessToken);
     }
 }

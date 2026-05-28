@@ -3,7 +3,7 @@
 @concertId = 1
 @categoryId = 1
 @orderId = 1
-@qrToken = 5f50a80f-b73d-4102-82db-1bc238640e47
+@qrToken = DeinToken
 
 ---CONCERTS---
 ### Alle öffentlichen Konzerte anzeigen
@@ -12,30 +12,34 @@ GET {{baseUrl}}/api/concerts
 
 ### Konzert als Admin erstellen
 POST {{baseUrl}}/api/admin/concerts
+Authorization: Basic admin test-password
 Content-Type: application/json
 
 {
   "title": "Accordion Symphonic",
-  "description": "Großes Konzert des Orchesters",
-  "startTime": "2026-11-14T19:30:00",
-  "location": "Konzertsaal"
+  "description": "Von Drachen zu Vulkanausbrüchen - eine musikalische Reise durch die Naturgewalten",
+  "startTime": "2027-11-27T16:00:00",
+  "location": "Kongresszentrum Heidelberg"
 }
 
 
 ### Alle Konzerte als Admin anzeigen
 GET {{baseUrl}}/api/admin/concerts
+Authorization: Basic admin test-password
 
 
 ### Konzert veröffentlichen
 PATCH {{baseUrl}}/api/admin/concerts/{{concertId}}/publish
+Authorization: Basic admin test-password
 
 
 ### Ticketkategorie anlegen
 POST {{baseUrl}}/api/admin/concerts/{{concertId}}/ticket-categories
+Authorization: Basic admin test-password
 Content-Type: application/json
 
 {
-  "name": "Erwachsene",
+  "name": "Normal",
   "price": 25.00,
   "capacity": 100
 }
@@ -43,6 +47,7 @@ Content-Type: application/json
 
 ### Kategorien mit Verfügbarkeit anzeigen
 GET {{baseUrl}}/api/admin/concerts/{{concertId}}/ticket-categories
+Authorization: Basic admin test-password
 
 
 ### Order erstellen
@@ -60,25 +65,45 @@ Content-Type: application/json
 }
 
 
-### Order anzeigen
+### Order anzeigen ohne Token
 GET {{baseUrl}}/api/concerts/{{concertId}}/orders/{{orderId}}
+
+
+### Order anzeigen mit falschem Token
+GET {{baseUrl}}/api/concerts/{{concertId}}/orders/{{orderId}}
+X-Order-Access-Token: ReBSy_2_e9JNHuaoY9jbWVhYSaGgK_geMQ14wfW5XXX
+
+
+### Order anzeigen mit Token
+GET {{baseUrl}}/api/concerts/{{concertId}}/orders/{{orderId}}
+X-Order-Access-Token: ReBSy_2_e9JNHuaoY9jbWVhYSaGgK_geMQ14wfW5bXk
 
 
 ### Alle Orders eines Konzerts als Admin anzeigen
 GET {{baseUrl}}/api/admin/concerts/{{concertId}}/orders
+Authorization: Basic admin test-password
+
+
+### Eigene Bestellung stornieren
+PATCH {{baseUrl}}/api/concerts/{{concertId}}/orders/{{orderId}}/cancel
+X-Order-Access-Token:
 
 
 ### Order als bezahlt markieren
 PATCH {{baseUrl}}/api/admin/concerts/{{concertId}}/orders/{{orderId}}/paid
+Authorization: Basic admin test-password
 
 
 ### Tickets einer Order anzeigen
 GET {{baseUrl}}/api/admin/concerts/{{concertId}}/orders/{{orderId}}/tickets
+Authorization: Basic admin test-password
 
 
 ### Ticket validieren
 GET {{baseUrl}}/api/admin/concerts/{{concertId}}/tickets/validate/{{qrToken}}
+Authorization: Basic admin test-password
 
 
 ### Ticket entwerten
 PATCH {{baseUrl}}/api/admin/concerts/{{concertId}}/tickets/{{qrToken}}/use
+Authorization: Basic admin test-password

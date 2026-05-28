@@ -23,6 +23,9 @@ public class Order {
     @Column(nullable = false)
     private String customerEmail;
 
+    @Column(nullable = false, unique = true, length = 64)
+    private String accessTokenHash;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
@@ -49,11 +52,13 @@ public class Order {
 
     public Order(
             Concert concert,
-            String CustomerEmail,
+            String customerEmail,
+            String accessTokenHash,
             LocalDateTime createdAt
     ) {
         this.concert = concert;
-        this.customerEmail = CustomerEmail;
+        this.customerEmail = customerEmail;
+        this.accessTokenHash = accessTokenHash;
         this.status = OrderStatus.RESERVED;
         this.totalAmount = BigDecimal.ZERO;
         this.createdAt = createdAt;
@@ -96,6 +101,10 @@ public class Order {
 
     public String getCustomerEmail() {
         return this.customerEmail;
+    }
+
+    public String getAccessTokenHash() {
+        return this.accessTokenHash;
     }
 
     public OrderStatus getStatus() {
