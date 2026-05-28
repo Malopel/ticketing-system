@@ -1,4 +1,5 @@
 package accordion_symphonic.ticketing.payment;
 
-public record PaymentStatus() {
+public enum PaymentStatus {
+    PAID
 }
