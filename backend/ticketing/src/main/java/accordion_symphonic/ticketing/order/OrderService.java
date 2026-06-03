@@ -8,14 +8,11 @@ import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -28,58 +25,48 @@ public class OrderService {
     private final TicketService ticketService;
     private final TicketAvailabilityService ticketAvailabilityService;
 
-    private final OrderAccessTokenService orderAccessTokenService;
-
     public OrderService(
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
             ConcertRepository concertRepository,
-            TicketService ticketService,
-            TicketAvailabilityService ticketAvailabilityService,
-            OrderAccessTokenService orderAccessTokenService
+            TicketService ticketService, TicketAvailabilityService ticketAvailabilityService
     ) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
         this.ticketService = ticketService;
         this.ticketAvailabilityService = ticketAvailabilityService;
-        this.orderAccessTokenService = orderAccessTokenService;
     }
 
-    public OrderResponse getCustomerOrder(Long concertId, Long orderId, String accessToken) {
+    public List<OrderResponse> getOrderForConcert(Long concertId) {
         if (!concertRepository.existsById(concertId)) {
             throw new ConcertNotFoundException(concertId);
         }
 
-        Order order = this.orderRepository.findByIdAndConcertId(orderId, concertId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        return orderRepository.findByConcertId(concertId)
+                .stream()
+                .peek(this::expireIfNecessary)
+                .map(OrderResponse::fromEntity)
+                .toList();
+    }
 
-        ensureCustomerHasAccess(order, accessToken);
+    public OrderResponse getOrderByConcertIdAndId(Long concertId, Long orderId) {
+        Order order = getOrderForConcert(concertId, orderId);
 
         return OrderResponse.fromEntity(order);
     }
 
-    public CreatedOrderResponse createOrder(long concertId, OrderRequest request) {
+    public OrderResponse createOrder(long concertId, OrderRequest request) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() -> new ConcertNotFoundException(concertId));
-
-        OrderAccessTokenService.GeneratedOrderAccessToken accessToken =
-                orderAccessTokenService.generateToken();
 
         Order order = new Order(
                 concert,
                 request.customerEmail(),
-                accessToken.tokenHash(),
                 LocalDateTime.now()
         );
 
-        Set<Long> requestedCategoryIds = new HashSet<>();
-
         for (OrderItemRequest itemRequest : request.items()) {
-            if (!requestedCategoryIds.add(itemRequest.ticketCategoryId())) {
-                throw new DuplicateTicketCategoryException(itemRequest.ticketCategoryId());
-            }
-
             TicketCategory category = ticketCategoryRepository
                     .findByIdAndConcertId(itemRequest.ticketCategoryId(), concertId)
                     .orElseThrow(() -> new TicketCategoryNotFoundException(itemRequest.ticketCategoryId()));
@@ -101,21 +88,13 @@ public class OrderService {
 
         Order savedOrder = this.orderRepository.save(order);
 
-        return CreatedOrderResponse.fromEntity(savedOrder, accessToken.token());
+        return OrderResponse.fromEntity(savedOrder);
     }
 
-    public OrderResponse cancelOrder(Long concertId, Long orderId, String accessToken) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new ConcertNotFoundException(concertId);
-        }
+    public OrderResponse cancelOrder(Long concertId, Long orderId) {
+        Order order = getOrderForConcert(concertId, orderId);
 
-        Order order = this.orderRepository
-                .findByIdAndConcertId(orderId, concertId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-
-        ensureCustomerHasAccess(order, accessToken);
-
-        if(order.isPaidOrExpired()) {
+        if(order.isPaid() || order.isExpired()) {
             throw new OrderIsPaidOrExpiredException(orderId);
         }
         order.cancel();
@@ -125,13 +104,7 @@ public class OrderService {
     }
 
     public OrderResponse markOrderAsPaid(Long concertId, Long orderId) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new ConcertNotFoundException(concertId);
-        }
-
-        Order order = this.orderRepository
-                .findByIdAndConcertId(orderId, concertId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        Order order = getOrderForConcert(concertId, orderId);
 
         if (order.isCancelledOrExpired()) {
             throw new OrderIsExpiredOrCancelledException(orderId);
@@ -146,33 +119,23 @@ public class OrderService {
         return OrderResponse.fromEntity(savedOrder);
     }
 
-    @Transactional
-    public List<OrderResponse> getOrdersForConcert(Long concertId) {
+    private Order getOrderForConcert(Long concertId, Long orderId) {
         if (!concertRepository.existsById(concertId)) {
             throw new ConcertNotFoundException(concertId);
         }
 
-        List<Order> orders = orderRepository.findByConcertId(concertId);
+        Order order = orderRepository.findByIdAndConcertId(orderId, concertId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
 
-        for (Order order : orders) {
-            if (order.shouldExpire()) {
-                order.expire();
-            }
-        }
+        expireIfNecessary(order);
 
-        return orders.stream()
-                .map(OrderResponse::fromEntity)
-                .toList();
+        return order;
     }
 
-    private void ensureCustomerHasAccess(Order order, String accessToken) {
-        boolean hasAccess = orderAccessTokenService.matches(
-                accessToken,
-                order.getAccessTokenHash()
-        );
-
-        if ((!hasAccess)) {
-            throw new OrderNotFoundException(order.getId());
+    private void expireIfNecessary(Order order) {
+        if (order.shouldExpire()) {
+            order.expire();
+            orderRepository.save(order);
         }
     }
 }

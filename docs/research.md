@@ -9,3 +9,7 @@
 - Mollie
 - Stripe
 - Überweisung mit CSV-Abgleich
+
+## Tipps von Siemen
+- Mapstruct mb
+- 
