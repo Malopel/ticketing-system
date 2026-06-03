@@ -1,10 +1,6 @@
 package accordion_symphonic.ticketing.order;
 
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,8 +15,8 @@ public class AdminOrderController {
     }
 
     @GetMapping
-    public List<OrderResponse> getOrdersForConcert(@PathVariable Long concertId) {
-        return orderService.getOrdersForConcert(concertId);
+    public List<OrderResponse> getOrders(@PathVariable Long concertId) {
+        return orderService.getOrderForConcert(concertId);
     }
 
     @PatchMapping("/{orderId}/paid")
