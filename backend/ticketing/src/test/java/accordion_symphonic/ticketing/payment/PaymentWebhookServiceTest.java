@@ -145,4 +145,38 @@ class PaymentWebhookServiceTest {
         verifyNoInteractions(orderService);
         verify(paymentEventRepository, never()).save(any());
     }
+
+    @Test
+    void duplicateWebhookOnlyMarksOrderPaidOnce() {
+        PaymentWebhookRequest request = new PaymentWebhookRequest(
+                "evt_001",
+                42L,
+                PaymentStatus.PAID
+        );
+
+        when(signatureService.isValid(RAW_BODY, SIGNATURE))
+                .thenReturn(true);
+
+        when(paymentEventRepository.existsByEventId("evt_001"))
+                .thenReturn(false)
+                .thenReturn(true);
+
+        when(orderService.markOrderPaidFromPayment(42L))
+                .thenReturn(paidOrder);
+
+        paymentWebhookService.processWebhook(
+                RAW_BODY,
+                SIGNATURE,
+                request
+        );
+
+        paymentWebhookService.processWebhook(
+                RAW_BODY,
+                SIGNATURE,
+                request
+        );
+
+        verify(orderService, times(1)).markOrderPaidFromPayment(42L);
+        verify(paymentEventRepository, times(1)).save(any(PaymentEvent.class));
+    }
 }

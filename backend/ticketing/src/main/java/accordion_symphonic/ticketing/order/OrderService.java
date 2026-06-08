@@ -4,7 +4,10 @@ import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
+import accordion_symphonic.ticketing.ticket.Ticket;
+import accordion_symphonic.ticketing.ticket.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
@@ -29,6 +32,7 @@ public class OrderService {
     private final TicketAvailabilityService ticketAvailabilityService;
 
     private final OrderAccessTokenService orderAccessTokenService;
+    private final TicketEmailService ticketEmailService;
 
     public OrderService(
             OrderRepository orderRepository,
@@ -36,14 +40,15 @@ public class OrderService {
             ConcertRepository concertRepository,
             TicketService ticketService,
             TicketAvailabilityService ticketAvailabilityService,
-            OrderAccessTokenService orderAccessTokenService
-    ) {
+            OrderAccessTokenService orderAccessTokenService,
+            TicketEmailService ticketEmailService) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
         this.ticketService = ticketService;
         this.ticketAvailabilityService = ticketAvailabilityService;
         this.orderAccessTokenService = orderAccessTokenService;
+        this.ticketEmailService = ticketEmailService;
     }
 
     public OrderResponse getCustomerOrder(Long concertId, Long orderId, String accessToken) {
@@ -187,7 +192,8 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        ticketService.createTicketsForOrder(savedOrder);
+        List<TicketResponse> tickets = ticketService.createTicketsForOrder(savedOrder);
+        ticketEmailService.sendEmail(savedOrder, tickets);
 
         return savedOrder;
     }

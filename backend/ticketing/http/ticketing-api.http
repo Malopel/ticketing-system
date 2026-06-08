@@ -76,7 +76,7 @@ X-Order-Access-Token: ReBSy_2_e9JNHuaoY9jbWVhYSaGgK_geMQ14wfW5XXX
 
 ### Order anzeigen mit Token
 GET {{baseUrl}}/api/concerts/{{concertId}}/orders/{{orderId}}
-X-Order-Access-Token: ReBSy_2_e9JNHuaoY9jbWVhYSaGgK_geMQ14wfW5bXk
+X-Order-Access-Token: CJNEPMUJhvZjC_34N0-QrOolkXduv_lSa5EyHRT7py4
 
 
 ### Alle Orders eines Konzerts als Admin anzeigen
@@ -111,6 +111,6 @@ Authorization: Basic admin test-password
 ### Payment Webhook
 POST http://localhost:8080/api/webhooks/payments
 Content-Type: application/json
-X-Webhook-Signature: 0f9f1001663a82e723416145ed5723c08165978fc5b12782cd0d15a32b9d5399
+X-Webhook-Signature: d723a9f1151d3805ef0e72667394638abccf7bb3bc3ba1ffb9873cff35a380c0
 
-{"eventId":"evt_001","orderId":42,"status":"PAID"}
+{"eventId":"evt_mailpit_002","orderId":2,"status":"PAID"}

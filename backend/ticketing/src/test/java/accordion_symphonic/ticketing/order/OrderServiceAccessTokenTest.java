@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.order;
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,9 @@ class OrderServiceAccessTokenTest {
     private OrderAccessTokenService orderAccessTokenService;
     private OrderService orderService;
 
+    @Mock
+    private TicketEmailService ticketEmailService;
+
     private Order order;
     private String validAccessToken;
 
@@ -58,7 +62,8 @@ class OrderServiceAccessTokenTest {
                 concertRepository,
                 ticketService,
                 ticketAvailabilityService,
-                orderAccessTokenService
+                orderAccessTokenService,
+                ticketEmailService
         );
 
         OrderAccessTokenService.GeneratedOrderAccessToken generatedToken =
