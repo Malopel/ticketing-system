@@ -107,3 +107,10 @@ Authorization: Basic admin test-password
 ### Ticket entwerten
 PATCH {{baseUrl}}/api/admin/concerts/{{concertId}}/tickets/{{qrToken}}/use
 Authorization: Basic admin test-password
+
+### Payment Webhook
+POST http://localhost:8080/api/webhooks/payments
+Content-Type: application/json
+X-Webhook-Signature: 0f9f1001663a82e723416145ed5723c08165978fc5b12782cd0d15a32b9d5399
+
+{"eventId":"evt_001","orderId":42,"status":"PAID"}

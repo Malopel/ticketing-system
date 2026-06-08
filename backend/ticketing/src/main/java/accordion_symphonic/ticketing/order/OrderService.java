@@ -4,6 +4,7 @@ import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 @Service
@@ -129,19 +129,10 @@ public class OrderService {
             throw new ConcertNotFoundException(concertId);
         }
 
-        Order order = this.orderRepository
-                .findByIdAndConcertId(orderId, concertId)
+        Order order = orderRepository.findByIdAndConcertId(orderId, concertId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
-        if (order.isCancelledOrExpired()) {
-            throw new OrderIsExpiredOrCancelledException(orderId);
-        }
-
-        order.markAsPaid();
-
-        Order savedOrder = this.orderRepository.save(order);
-
-        this.ticketService.createTicketsForOrder(order);
+        Order savedOrder = markOrderPaid(order);
 
         return OrderResponse.fromEntity(savedOrder);
     }
@@ -165,6 +156,13 @@ public class OrderService {
                 .toList();
     }
 
+    public Order markOrderPaidFromPayment(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+
+        return markOrderPaid(order);
+    }
+
     private void ensureCustomerHasAccess(Order order, String accessToken) {
         boolean hasAccess = orderAccessTokenService.matches(
                 accessToken,
@@ -174,5 +172,23 @@ public class OrderService {
         if ((!hasAccess)) {
             throw new OrderNotFoundException(order.getId());
         }
+    }
+
+    private Order markOrderPaid(Order order) {
+        if (order.getStatus() == OrderStatus.PAID) {
+            return order;
+        }
+
+        if (order.getStatus() != OrderStatus.RESERVED) {
+            throw new OrderCannotBePaidException(order.getId());
+        }
+
+        order.markAsPaid();
+
+        Order savedOrder = orderRepository.save(order);
+
+        ticketService.createTicketsForOrder(savedOrder);
+
+        return savedOrder;
     }
 }

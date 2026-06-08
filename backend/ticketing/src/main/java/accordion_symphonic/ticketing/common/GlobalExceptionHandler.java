@@ -6,6 +6,9 @@ import accordion_symphonic.ticketing.order.DuplicateTicketCategoryException;
 import accordion_symphonic.ticketing.order.OrderIsExpiredOrCancelledException;
 import accordion_symphonic.ticketing.order.OrderIsPaidOrExpiredException;
 import accordion_symphonic.ticketing.order.OrderNotFoundException;
+import accordion_symphonic.ticketing.payment.InvalidPaymentWebhookSignatureException;
+import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
+import accordion_symphonic.ticketing.payment.UnsupportedPaymentStatusException;
 import accordion_symphonic.ticketing.ticket.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticket.TicketNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
@@ -122,5 +125,43 @@ public class GlobalExceptionHandler {
                 "Conflict",
                 exception.getMessage()
         );
+    }
+
+    @ExceptionHandler(InvalidPaymentWebhookSignatureException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidPaymentWebhookSignature(
+            InvalidPaymentWebhookSignatureException exception
+    ) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(UnsupportedPaymentStatusException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUnsupportedPaymentStatus(
+            UnsupportedPaymentStatusException exception
+    ) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(OrderCannotBePaidException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOrderCannotBePaid(
+            OrderCannotBePaidException exception
+    ) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                exception.getMessage());
     }
 }

@@ -1,11 +1,9 @@
 package accordion_symphonic.ticketing.availability;
 
 import accordion_symphonic.ticketing.order.OrderItemRepository;
-import accordion_symphonic.ticketing.order.OrderStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class TicketAvailabilityService {

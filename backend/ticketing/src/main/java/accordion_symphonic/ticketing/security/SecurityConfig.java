@@ -66,6 +66,10 @@ public class SecurityConfig {
                                 "/api/concerts/{concertId}/orders/{orderId}/cancel")
                         .permitAll()
 
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/webhooks/payments")
+                        .permitAll()
+
                         // Admin-Bereich
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
