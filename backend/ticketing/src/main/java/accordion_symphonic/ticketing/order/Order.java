@@ -23,6 +23,9 @@ public class Order {
     @Column(nullable = false)
     private String customerEmail;
 
+    @Column(nullable = false, unique = true, length = 64)
+    private String accessTokenHash;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
@@ -49,16 +52,18 @@ public class Order {
 
     public Order(
             Concert concert,
-            String CustomerEmail,
+            String customerEmail,
+            String accessTokenHash,
             LocalDateTime createdAt
     ) {
         this.concert = concert;
-        this.customerEmail = CustomerEmail;
+        this.customerEmail = customerEmail;
+        this.accessTokenHash = accessTokenHash;
         this.status = OrderStatus.RESERVED;
         this.totalAmount = BigDecimal.ZERO;
         this.createdAt = createdAt;
         //TODO das überdenken
-        this.expiresAt = createdAt.plusSeconds(10);
+        this.expiresAt = createdAt.plusDays(7);
     }
 
     public void addItem(OrderItem item) {
@@ -98,6 +103,10 @@ public class Order {
         return this.customerEmail;
     }
 
+    public String getAccessTokenHash() {
+        return this.accessTokenHash;
+    }
+
     public OrderStatus getStatus() {
         return this.status;
     }
@@ -122,22 +131,20 @@ public class Order {
         return this.items;
     }
 
-    public boolean shouldExpire() {
-        return this.status.equals(OrderStatus.RESERVED)&&LocalDateTime.now().isAfter(this.expiresAt);
-    }
-    public boolean isExpired() {
-        return this.status.equals(OrderStatus.EXPIRED);
-    }
-
-    public boolean isReserved() {
-        return this.status.equals(OrderStatus.RESERVED);
-    }
-
     public boolean isCancelledOrExpired() {
-        return this.status.equals(OrderStatus.CANCELLED) || this.isExpired();
+        return (this.status == OrderStatus.CANCELLED)||(shouldExpire());
     }
 
-    public boolean isPaid() {
-        return this.status.equals(OrderStatus.PAID);
+    public boolean isPaidOrExpired() {
+        return (this.status == OrderStatus.PAID)||(shouldExpire());
+    }
+
+    public boolean shouldExpire() {
+        return this.status == OrderStatus.RESERVED
+                && this.expiresAt.isBefore(LocalDateTime.now());
+    }
+
+    public boolean isExpired() {
+        return this.status == OrderStatus.EXPIRED;
     }
 }
