@@ -1,0 +1,143 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f4f1ea;
+    color: #222;
+}
+
+.page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px;
+}
+
+header {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 8px;
+    font-size: 36px;
+}
+
+header p {
+    margin: 0;
+    color: #666;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+button {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 20px;
+    background: #5b2f1f;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #7a3f2a;
+}
+
+.list {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.item {
+    border: 2px solid #eee;
+    border-radius: 14px;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.item:hover {
+    border-color: #5b2f1f;
+}
+
+.item.selected {
+    border-color: #5b2f1f;
+    background: #fff7f0;
+}
+
+.item h3 {
+    margin: 0 0 8px 0;
+}
+
+.item p {
+    margin: 4px 0;
+    color: #555;
+}
+
+label {
+    display: block;
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+input {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.hidden {
+    display: none;
+}
+
+.success {
+    border-left: 6px solid #2e7d32;
+}
+
+.error {
+    border-left: 6px solid #c62828;
+}
+
+.result-box {
+    background: #f7f7f7;
+    padding: 16px;
+    border-radius: 12px;
+    overflow-wrap: anywhere;
+}
+
+code {
+    display: block;
+    background: #222;
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.ticket-category-form {
+     border: 1px solid #eee;
+     border-radius: 14px;
+     padding: 16px;
+     margin-bottom: 16px;
+     background: #fafafa;
+ }
+
+.hint {
+    color: #666;
+}

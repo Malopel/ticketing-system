@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Adminbereich | Accordion Symphonic</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+    <header>
+        <h1>Adminbereich</h1>
+        <p>Interne Verwaltung für Konzerte, Bestellungen und Tickets</p>
+        <p><a href="/">Zur Kundenansicht</a></p>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>Admin-Zugang</h2>
+
+            <label>
+                Benutzername
+                <input id="adminUsername" value="admin">
+            </label>
+
+            <label>
+                Passwort
+                <input id="adminPassword" type="password" value="test-password">
+            </label>
+
+            <p class="hint">
+                Für die Demo wird HTTP Basic Auth verwendet. Später kann daraus ein echter Login werden.
+            </p>
+        </section>
+
+        <section class="card">
+            <h2>Konzerte</h2>
+            <button id="loadAdminConcertsButton">Admin-Konzerte laden</button>
+            <div id="adminConcerts" class="list"></div>
+        </section>
+
+        <section class="card">
+            <h2>Neues Konzert erstellen</h2>
+            <label>
+                Konzertname
+                <input id="newConcertTitle" placeholder="z. B. Die pikanten Produktionen Piazollas">
+            </label>
+            <label>
+                Beschreibung
+                <input id="newConcertDescription" placeholder="z. B. Libertango in Dauerschleife">
+            </label>
+            <label>
+                Ort
+                <input id="newConcertLocation" placeholder="z. B. Kulturhaus Heidelberg">
+            </label>
+            <label>
+                Startzeitpunkt
+                <input id="newConcertStartTime" type="datetime-local">
+            </label>
+            <h3>Ticketkategorien</h3>
+            <div id="newTicketCategories">
+                <div class="ticket-category-form">
+                    <label>
+                        Name
+                        <input class="ticketCategoryName" placeholder="z. B. Normalpreis">
+                    </label>
+                    <label>
+                        Preis
+                        <input class="ticketCategoryPrice" type="number" step="0.01" min="0" placeholder="25.00">
+                    </label>
+                    <label>
+                        Kapazität
+                        <input class="ticketCategoryCapacity" type="number" min="1" placeholder="100">
+                    </label>
+                </div>
+            </div>
+
+            <button id="addTicketCategoryButton" type="button">Weitere Kategorie hinzufügen</button>
+            <button id="createConcertButton" type="button">Konzert mit Kategorien erstellen</button>
+        </section>
+
+        <section class="card">
+            <h2>Bestellungen anzeigen</h2>
+
+            <label>
+                Konzert-ID
+                <input id="ordersConcertId" type="number" min="1" placeholder="z. B. 1">
+            </label>
+
+            <button id="loadOrdersButton">Bestellungen laden</button>
+
+            <div id="orders" class="list"></div>
+        </section>
+
+        <section class="card">
+            <h2>Zahlung simulieren</h2>
+
+            <p>
+                In der späteren Version kommt die Zahlungsbestätigung vom Zahlungsanbieter.
+                Für die Demo simulieren wir diesen Schritt über einen signierten Webhook.
+            </p>
+
+            <label>
+                Order-ID
+                <input id="paymentOrderId" type="number" min="1" placeholder="z. B. 2">
+            </label>
+
+            <button id="showWebhookBodyButton">Webhook-Body anzeigen</button>
+
+            <div class="result-box hidden" id="webhookBox">
+                <p><strong>Webhook-Body:</strong></p>
+                <code id="webhookBody"></code>
+
+                <p class="hint">
+                    Die Signatur erzeugen wir aktuell noch im Terminal. Später kommt dieser Request automatisch vom Payment-Anbieter.
+                </p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Geplante Admin-Funktionen</h2>
+
+            <div class="list">
+                <div class="item">
+                    <h3>Saalplan</h3>
+                    <p>Plätze visuell auswählen und blockieren.</p>
+                </div>
+
+                <div class="item">
+                    <h3>QR-Code-Scan</h3>
+                    <p>Tickets am Einlass prüfen und entwerten.</p>
+                </div>
+
+                <div class="item">
+                    <h3>Statistiken</h3>
+                    <p>Verkaufte Tickets, Umsatz und Auslastung pro Konzert anzeigen.</p>
+                </div>
+
+                <div class="item">
+                    <h3>E-Mail-Verwaltung</h3>
+                    <p>Ticketmails erneut senden und Kundenkommunikation nachvollziehen.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card hidden error" id="adminErrorSection">
+            <h2>Fehler</h2>
+            <p id="adminErrorMessage"></p>
+        </section>
+    </main>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

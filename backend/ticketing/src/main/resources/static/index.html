@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Accordion Symphonic Ticketshop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+    <header>
+        <h1>Accordion Symphonic Ticketshop</h1>
+        <p>Demo-Bestellung für Konzerttickets</p>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>1. Konzert auswählen</h2>
+            <button id="loadConcertsButton">Konzerte laden</button>
+            <div id="concerts" class="list"></div>
+        </section>
+
+        <section class="card hidden" id="ticketCategorySection">
+            <h2>2. Tickets auswählen</h2>
+            <div id="ticketCategories" class="list"></div>
+        </section>
+
+        <section class="card hidden" id="orderSection">
+            <h2>3. Bestellung</h2>
+
+            <label>
+                E-Mail-Adresse
+                <input id="customerEmail" type="email" placeholder="kunde@example.com">
+            </label>
+
+            <label>
+                Anzahl Tickets
+                <input id="quantity" type="number" min="1" value="1">
+            </label>
+
+            <button id="createOrderButton">Bestellung erstellen</button>
+        </section>
+
+        <section class="card hidden success" id="resultSection">
+            <h2>Bestellung erstellt</h2>
+
+            <p>
+                Die Bestellung wurde reserviert. In einem echten Shop würde der Kunde jetzt zur Zahlung weitergeleitet.
+            </p>
+
+            <div class="result-box">
+                <p><strong>Order-ID:</strong> <span id="orderId"></span></p>
+                <p><strong>Access Token:</strong></p>
+                <code id="accessToken"></code>
+            </div>
+
+            <p class="hint">
+                Für die Demo kannst du jetzt den Payment-Webhook mit dieser Order-ID auslösen.
+            </p>
+        </section>
+
+        <section class="card hidden error" id="errorSection">
+            <h2>Fehler</h2>
+            <p id="errorMessage"></p>
+        </section>
+    </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

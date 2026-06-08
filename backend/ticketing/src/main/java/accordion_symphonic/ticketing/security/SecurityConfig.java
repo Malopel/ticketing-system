@@ -45,6 +45,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+
+                        // Statische Dateien
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/admin.html",
+                                "/app.js",
+                                "/admin.js",
+                                "/style.css",
+                                "/favicon.ico"
+                        ).permitAll()
+
                         // Öffentliche Konzertübersicht
                         .requestMatchers(HttpMethod.GET,
                                 "/api/concerts",

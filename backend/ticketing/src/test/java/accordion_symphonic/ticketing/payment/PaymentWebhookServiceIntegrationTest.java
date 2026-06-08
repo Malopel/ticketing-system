@@ -2,6 +2,7 @@ package accordion_symphonic.ticketing.payment;
 
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.order.*;
 import accordion_symphonic.ticketing.ticket.TicketRepository;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -24,6 +26,11 @@ import java.time.LocalDateTime;
 import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @Testcontainers
 @SpringBootTest
@@ -55,6 +62,9 @@ class PaymentWebhookServiceIntegrationTest {
 
     @Autowired
     private TicketRepository ticketRepository;
+
+    @MockitoBean
+    private TicketEmailService ticketEmailService;
 
     @Test
     @Transactional
@@ -126,6 +136,7 @@ class PaymentWebhookServiceIntegrationTest {
         );
 
         assertEquals(2, ticketRepository.findByOrderId(savedOrder.getId()).size());
+        verify(ticketEmailService, times(1)).sendEmail(any(Order.class), anyList());
     }
 
     private String sign(String rawBody) {
