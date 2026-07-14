@@ -34,6 +34,8 @@ public class OrderService {
     private final OrderAccessTokenService orderAccessTokenService;
     private final TicketEmailService ticketEmailService;
 
+    private final OrderProperties orderProperties;
+
     public OrderService(
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
@@ -41,7 +43,8 @@ public class OrderService {
             TicketService ticketService,
             TicketAvailabilityService ticketAvailabilityService,
             OrderAccessTokenService orderAccessTokenService,
-            TicketEmailService ticketEmailService) {
+            TicketEmailService ticketEmailService,
+            OrderProperties orderProperties) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
@@ -49,17 +52,20 @@ public class OrderService {
         this.ticketAvailabilityService = ticketAvailabilityService;
         this.orderAccessTokenService = orderAccessTokenService;
         this.ticketEmailService = ticketEmailService;
+        this.orderProperties = orderProperties;
     }
 
+    @Transactional
     public OrderResponse getCustomerOrder(Long concertId, Long orderId, String accessToken) {
         if (!concertRepository.existsById(concertId)) {
             throw new ConcertNotFoundException(concertId);
         }
 
-        Order order = this.orderRepository.findByIdAndConcertId(orderId, concertId)
+        Order order = orderRepository.findByIdAndConcertId(orderId, concertId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         ensureCustomerHasAccess(order, accessToken);
+        expireOrderIfNeeded(order);
 
         return OrderResponse.fromEntity(order);
     }
@@ -73,11 +79,14 @@ public class OrderService {
         OrderAccessTokenService.GeneratedOrderAccessToken accessToken =
                 orderAccessTokenService.generateToken();
 
+        LocalDateTime createdAt = LocalDateTime.now();
+
         Order order = new Order(
                 concert,
                 request.customerEmail(),
                 accessToken.tokenHash(),
-                LocalDateTime.now()
+                createdAt,
+                createdAt.plus(orderProperties.reservationDuration())
         );
 
         Set<Long> requestedCategoryIds = new HashSet<>();
@@ -121,6 +130,7 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         ensureCustomerHasAccess(order, accessToken);
+        expireOrderIfNeeded(order);
 
         if(order.isPaidOrExpired()) {
             throw new OrderIsPaidOrExpiredException(orderId);
@@ -153,9 +163,7 @@ public class OrderService {
         List<Order> orders = orderRepository.findByConcertId(concertId);
 
         for (Order order : orders) {
-            if (order.shouldExpire()) {
-                order.expire();
-            }
+            expireOrderIfNeeded(order);
         }
 
         return orders.stream()
@@ -182,6 +190,8 @@ public class OrderService {
     }
 
     private Order markOrderPaid(Order order) {
+        expireOrderIfNeeded(order);
+
         if (order.getStatus() == OrderStatus.PAID) {
             return order;
         }
@@ -191,12 +201,17 @@ public class OrderService {
         }
 
         order.markAsPaid();
-
         Order savedOrder = orderRepository.save(order);
 
         List<TicketResponse> tickets = ticketService.createTicketsForOrder(savedOrder);
         ticketEmailService.sendEmail(savedOrder, tickets);
 
         return savedOrder;
+    }
+
+    private void expireOrderIfNeeded(Order order) {
+        if (order.shouldExpire()) {
+            order.expire();
+        }
     }
 }

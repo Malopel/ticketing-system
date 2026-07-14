@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/concerts/{concertId}/orders")
 public class OrderController {
 
-    private static final String ORDER_ACCESS_TOKEM_HEADER = "X-Order-Access-Token";
+    private static final String ORDER_ACCESS_TOKEN_HEADER = "X-Order-Access-Token";
 
     private final OrderService orderService;
 
@@ -20,7 +20,7 @@ public class OrderController {
             @PathVariable Long concertId,
             @PathVariable Long orderId,
             @RequestHeader(
-                    name = ORDER_ACCESS_TOKEM_HEADER,
+                    name = ORDER_ACCESS_TOKEN_HEADER,
                     required = false
             ) String accessToken
     ) {
@@ -40,7 +40,7 @@ public class OrderController {
             @PathVariable Long concertId,
             @PathVariable Long orderId,
             @RequestHeader(
-                    name = ORDER_ACCESS_TOKEM_HEADER,
+                    name = ORDER_ACCESS_TOKEN_HEADER,
                     required = false
             ) String accessToken
     ) {

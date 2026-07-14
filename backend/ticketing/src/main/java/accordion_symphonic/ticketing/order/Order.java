@@ -62,8 +62,23 @@ public class Order {
         this.status = OrderStatus.RESERVED;
         this.totalAmount = BigDecimal.ZERO;
         this.createdAt = createdAt;
-        //TODO das überdenken
         this.expiresAt = createdAt.plusDays(7);
+    }
+
+    public Order(
+            Concert concert,
+            String customerEmail,
+            String accessTokenHash,
+            LocalDateTime createdAt,
+            LocalDateTime expiresAt
+    ) {
+        this.concert = concert;
+        this.customerEmail = customerEmail;
+        this.accessTokenHash = accessTokenHash;
+        this.status = OrderStatus.RESERVED;
+        this.totalAmount = BigDecimal.ZERO;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
     }
 
     public void addItem(OrderItem item) {
@@ -78,7 +93,9 @@ public class Order {
     }
 
     public void expire() {
-        this.status = OrderStatus.EXPIRED;
+        if (this.status == OrderStatus.RESERVED) {
+            this.status = OrderStatus.EXPIRED;
+        }
     }
 
     public void cancel() {
@@ -131,20 +148,12 @@ public class Order {
         return this.items;
     }
 
-    public boolean isCancelledOrExpired() {
-        return (this.status == OrderStatus.CANCELLED)||(shouldExpire());
-    }
-
     public boolean isPaidOrExpired() {
-        return (this.status == OrderStatus.PAID)||(shouldExpire());
+        return this.status == OrderStatus.PAID || this.status == OrderStatus.EXPIRED;
     }
 
     public boolean shouldExpire() {
         return this.status == OrderStatus.RESERVED
                 && this.expiresAt.isBefore(LocalDateTime.now());
-    }
-
-    public boolean isExpired() {
-        return this.status == OrderStatus.EXPIRED;
     }
 }

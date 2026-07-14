@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -63,7 +64,8 @@ class OrderServiceAccessTokenTest {
                 ticketService,
                 ticketAvailabilityService,
                 orderAccessTokenService,
-                ticketEmailService
+                ticketEmailService,
+                new OrderProperties(Duration.ofMinutes(30))
         );
 
         OrderAccessTokenService.GeneratedOrderAccessToken generatedToken =
@@ -159,5 +161,28 @@ class OrderServiceAccessTokenTest {
         assertEquals(OrderStatus.RESERVED, order.getStatus());
 
         verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void customerReadingExpiredOrderMarksItExpired() {
+        Order expiredOrder = new Order(
+                order.getConcert(),
+                "kunde@example.com",
+                order.getAccessTokenHash(),
+                LocalDateTime.now().minusHours(2),
+                LocalDateTime.now().minusHours(1)
+        );
+
+        when(orderRepository.findByIdAndConcertId(ORDER_ID, CONCERT_ID))
+                .thenReturn(Optional.of(expiredOrder));
+
+        OrderResponse response = orderService.getCustomerOrder(
+                CONCERT_ID,
+                ORDER_ID,
+                validAccessToken
+        );
+
+        assertEquals(OrderStatus.EXPIRED, response.status());
+        assertEquals(OrderStatus.EXPIRED, expiredOrder.getStatus());
     }
 }
