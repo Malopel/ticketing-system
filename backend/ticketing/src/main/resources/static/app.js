@@ -94,7 +94,7 @@ async function loadTicketCategories(concertId) {
             element.innerHTML = `
                 <h3>${category.name}</h3>
                 <p><strong>Preis:</strong> ${formatPrice(category.price)}</p>
-                <p><strong>Verfügbare Plätze:</strong> ${category.availableTickets ?? "unbekannt"}</p>
+                <p><strong>Verfügbare Plätze:</strong> ${category.available ?? "unbekannt"}</p>
             `;
 
             element.addEventListener("click", () => selectTicketCategory(category, element));

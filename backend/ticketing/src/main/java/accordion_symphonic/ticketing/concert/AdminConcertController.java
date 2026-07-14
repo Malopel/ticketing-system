@@ -36,8 +36,8 @@ public class AdminConcertController {
     }
 
     @PutMapping("/{concertId}")
-    public ConcertResponse updateConcert(@Valid @RequestBody ConcertRequest concertRequest, @PathVariable Long id) {
-        return concertService.updateConcert(id, concertRequest);
+    public ConcertResponse updateConcert(@Valid @RequestBody ConcertRequest concertRequest, @PathVariable Long concertId) {
+        return concertService.updateConcert(concertId, concertRequest);
     }
 
     @PatchMapping("/{concertId}/publish")

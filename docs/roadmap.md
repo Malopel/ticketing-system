@@ -1,14 +1,28 @@
 # Roadmap
 
-## Phase 1: Projektsetup
-- [x] Git-Repo erstellen
-- [ ] Spring Boot Projekt erstellen
-- [ ] React Projekt erstellen
-- [ ] PostgreSQL mit Docker starten
+## Erledigt
+- Spring Boot Backend
+- PostgreSQL + Flyway
+- Feature-basierte Struktur
+- Konzertverwaltung
+- Ticketkategorien
+- Order-Erstellung
+- Access Token für Kundenorders
+- Payment-Webhooks mit HMAC
+- Ticket-Erzeugung nach Zahlung
+- Ticketmail über JavaMailSender/Mailpit
+- Admin-Basic-Auth
+- Rudimentäres statisches Frontend
+- Tests mit Gradle/Testcontainers
 
-## Phase 2: Konzertverwaltung
-- [ ] Concert Entity
-- [ ] Concert Repository
-- [ ] Concert Service
-- [ ] Concert Controller
-- [ ] Konzertliste im Frontend anzeigen
+## Nächster Schritt
+- Mailtext professionalisieren
+- Order-Lifecycle sauberer machen
+- Reservierungsdauer konfigurierbar machen
+- QR-Code-Ausgabe verbessern
+
+## Danach
+- React-Frontend
+- Echter Payment Provider, vermutlich Mollie
+- Admin-Scanner für Einlass
+- Deployment mit Docker/VPS

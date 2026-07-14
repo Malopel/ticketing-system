@@ -64,6 +64,8 @@ public class OrderService {
         return OrderResponse.fromEntity(order);
     }
 
+    //TODO bessere Lösung
+    @Transactional
     public CreatedOrderResponse createOrder(long concertId, OrderRequest request) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() -> new ConcertNotFoundException(concertId));

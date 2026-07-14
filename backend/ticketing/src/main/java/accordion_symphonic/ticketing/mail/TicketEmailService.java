@@ -33,13 +33,19 @@ public class TicketEmailService {
     private String buildText(Order order, List<TicketResponse> tickets) {
         StringBuilder text = new StringBuilder();
 
-        text.append("Thank you for your order Diggah.\n\n");
-        text.append("Hier deine Tickets LAN:\n\n");
+        text.append("Vielen Dank für Ihre Bestellung.\n\n");
+        text.append("Ihre Tickets für ");
+        text.append(order.getConcert().getTitle());
+        text.append(":\n\n");
 
         for (TicketResponse ticket : tickets) {
-            text.append("- Ticket ID: ").append(ticket.id()).append("\n");
-            text.append("  QR Token: ").append(ticket.qrToken()).append("\n");
+            text.append("- Ticket-ID: ").append(ticket.id()).append("\n");
+            text.append("  Ticket-Code: ").append(ticket.qrToken()).append("\n");
         }
+
+        text.append("\nBitte bringen Sie diese Ticket-Codes zum Einlass mit.\n\n");
+
+        text.append("Denken sie bitte daran, im Kongresszentrum ist ausschließlich Kartenzahlung erlaubt.");
 
         return text.toString();
     }
