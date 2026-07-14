@@ -70,7 +70,6 @@ public class OrderService {
         return OrderResponse.fromEntity(order);
     }
 
-    //TODO bessere Lösung
     @Transactional
     public CreatedOrderResponse createOrder(long concertId, OrderRequest request) {
         Concert concert = concertRepository.findById(concertId)
@@ -97,7 +96,7 @@ public class OrderService {
             }
 
             TicketCategory category = ticketCategoryRepository
-                    .findByIdAndConcertId(itemRequest.ticketCategoryId(), concertId)
+                    .findByIdAndConcertIdForUpdate(itemRequest.ticketCategoryId(), concertId)
                     .orElseThrow(() -> new TicketCategoryNotFoundException(itemRequest.ticketCategoryId()));
 
             this.ticketAvailabilityService.ensureTicketsAvailable(
