@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,7 +91,11 @@ public class OrderService {
 
         Set<Long> requestedCategoryIds = new HashSet<>();
 
-        for (OrderItemRequest itemRequest : request.items()) {
+        List<OrderItemRequest> orderedItems = request.items().stream()
+                .sorted(Comparator.comparing(OrderItemRequest::ticketCategoryId))
+                .toList();
+
+        for (OrderItemRequest itemRequest : orderedItems) {
             if (!requestedCategoryIds.add(itemRequest.ticketCategoryId())) {
                 throw new DuplicateTicketCategoryException(itemRequest.ticketCategoryId());
             }
