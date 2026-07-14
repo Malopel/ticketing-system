@@ -14,9 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -205,5 +203,60 @@ class OrderControllerSecurityTest {
         assertEquals(1, capturedRequest.items().size());
         assertEquals(7L, capturedRequest.items().getFirst().ticketCategoryId());
         assertEquals(2, capturedRequest.items().getFirst().quantity());
+    }
+
+    @Test
+    void createOrderWithInvalidEmailReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/concerts/{concertId}/orders", CONCERT_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "customerEmail": "keine-email",
+                          "items": [
+                            {
+                              "ticketCategoryId": 7,
+                              "quantity": 2
+                            }
+                          ]
+                        }
+                        """))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(orderService);
+    }
+
+    @Test
+    void createOrderWithEmptyItemsReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/concerts/{concertId}/orders", CONCERT_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "customerEmail": "kunde@example.com",
+                          "items": []
+                        }
+                        """))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(orderService);
+    }
+
+    @Test
+    void createOrderWithQuantityZeroReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/concerts/{concertId}/orders", CONCERT_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "customerEmail": "kunde@example.com",
+                          "items": [
+                            {
+                              "ticketCategoryId": 7,
+                              "quantity": 0
+                            }
+                          ]
+                        }
+                        """))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(orderService);
     }
 }

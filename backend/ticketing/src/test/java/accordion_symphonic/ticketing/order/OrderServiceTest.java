@@ -8,6 +8,7 @@ import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticket.Ticket;
 import accordion_symphonic.ticketing.ticket.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
+import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -161,5 +163,52 @@ class OrderServiceTest {
         verify(orderRepository, never()).save(order);
         verify(ticketService, never()).createTicketsForOrder(any());
         verify(ticketEmailService, never()).sendEmail(any(), any());
+    }
+
+    @Test
+    void createOrderRejectsDuplicateTicketCategory() {
+        Long concertId = 1L;
+        Long ticketCategoryId = 7L;
+
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        TicketCategory category = new TicketCategory(
+                "Normalpreis",
+                new BigDecimal("25.00"),
+                100,
+                concert
+        );
+
+        when(concertRepository.findById(concertId))
+                .thenReturn(Optional.of(concert));
+
+        when(orderAccessTokenService.generateToken())
+                .thenReturn(new OrderAccessTokenService.GeneratedOrderAccessToken(
+                        "plain-token",
+                        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                ));
+
+        when(ticketCategoryRepository.findByIdAndConcertIdForUpdate(ticketCategoryId, concertId))
+                .thenReturn(Optional.of(category));
+
+        OrderRequest request = new OrderRequest(
+                "kunde@example.com",
+                List.of(
+                        new OrderItemRequest(ticketCategoryId, 2),
+                        new OrderItemRequest(ticketCategoryId, 3)
+                )
+        );
+
+        assertThrows(
+                DuplicateTicketCategoryException.class,
+                () -> orderService.createOrder(concertId, request)
+        );
+
+        verify(orderRepository, never()).save(any());
     }
 }
