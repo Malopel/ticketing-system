@@ -282,6 +282,10 @@ class OrderControllerSecurityTest {
                           ]
                         }
                         """))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("TOO_MANY_TICKETS_IN_ORDER"))
+                .andExpect(jsonPath("$.message").value(
+                        "Too many tickets in order: requested 11, maximum allowed is 10"
+                ));
     }
 }

@@ -6,6 +6,22 @@ public record ErrorResponse(
         Instant timestamp,
         int status,
         String error,
+        String code,
         String message
 ) {
+
+    public ErrorResponse(
+            Instant timestamp,
+            int status,
+            String error,
+            String message
+    ) {
+        this(
+                timestamp,
+                status,
+                error,
+                "UNKNOWN_ERROR",
+                message
+        );
+    }
 }
