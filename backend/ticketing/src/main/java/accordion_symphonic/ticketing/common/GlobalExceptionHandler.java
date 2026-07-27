@@ -169,7 +169,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
-                "TOO_MANY_TICKETS_IN_ORDER",
+                ErrorCode.TOO_MANY_TICKETS_IN_ORDER,
                 exception.getMessage()
         );
     }

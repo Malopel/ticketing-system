@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.order;
 
+import accordion_symphonic.ticketing.common.ErrorCode;
 import accordion_symphonic.ticketing.common.GlobalExceptionHandler;
 import accordion_symphonic.ticketing.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
@@ -283,7 +284,7 @@ class OrderControllerSecurityTest {
                         }
                         """))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("TOO_MANY_TICKETS_IN_ORDER"))
+                .andExpect(jsonPath("$.code").value(ErrorCode.TOO_MANY_TICKETS_IN_ORDER))
                 .andExpect(jsonPath("$.message").value(
                         "Too many tickets in order: requested 11, maximum allowed is 10"
                 ));

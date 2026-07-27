@@ -20,7 +20,7 @@ public record ErrorResponse(
                 timestamp,
                 status,
                 error,
-                "UNKNOWN_ERROR",
+                ErrorCode.UNKNOWN_ERROR,
                 message
         );
     }
