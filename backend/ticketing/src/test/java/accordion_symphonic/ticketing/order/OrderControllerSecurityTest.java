@@ -259,4 +259,29 @@ class OrderControllerSecurityTest {
 
         verifyNoInteractions(orderService);
     }
+
+    @Test
+    void createOrderWithTooManyTicketsReturnsConflict() throws Exception {
+        when(orderService.createOrder(eq(CONCERT_ID), any(OrderRequest.class)))
+                .thenThrow(new TooManyTicketsInOrderException(11, 10));
+
+        mockMvc.perform(post("/api/concerts/{concertId}/orders", CONCERT_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "customerEmail": "kunde@example.com",
+                          "items": [
+                            {
+                              "ticketCategoryId": 7,
+                              "quantity": 6
+                            },
+                            {
+                              "ticketCategoryId": 8,
+                              "quantity": 5
+                            }
+                          ]
+                        }
+                        """))
+                .andExpect(status().isConflict());
+    }
 }
