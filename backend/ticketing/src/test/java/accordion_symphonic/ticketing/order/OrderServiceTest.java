@@ -62,7 +62,7 @@ class OrderServiceTest {
                 ticketAvailabilityService,
                 orderAccessTokenService,
                 ticketEmailService,
-                new OrderProperties(Duration.ofMinutes(30))
+                new OrderProperties(Duration.ofMinutes(30), 10)
         );
     }
 
@@ -209,6 +209,38 @@ class OrderServiceTest {
                 () -> orderService.createOrder(concertId, request)
         );
 
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void createOrderRejectsMoreThanMaxTicketsPerOrder() {
+        Long concertId = 1L;
+
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        when(concertRepository.findById(concertId))
+                .thenReturn(Optional.of(concert));
+
+        OrderRequest request = new OrderRequest(
+                "kunde@example.com",
+                List.of(
+                        new OrderItemRequest(7L, 6),
+                        new OrderItemRequest(8L, 5)
+                )
+        );
+
+        assertThrows(
+                TooManyTicketsInOrderException.class,
+                () -> orderService.createOrder(concertId, request)
+        );
+
+        verify(orderAccessTokenService, never()).generateToken();
+        verify(ticketCategoryRepository, never()).findByIdAndConcertIdForUpdate(any(), any());
         verify(orderRepository, never()).save(any());
     }
 }

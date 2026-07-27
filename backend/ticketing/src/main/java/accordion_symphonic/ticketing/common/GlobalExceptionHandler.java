@@ -2,10 +2,7 @@ package accordion_symphonic.ticketing.common;
 
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.availability.NotEnoughTicketsAvailableException;
-import accordion_symphonic.ticketing.order.DuplicateTicketCategoryException;
-import accordion_symphonic.ticketing.order.OrderIsExpiredOrCancelledException;
-import accordion_symphonic.ticketing.order.OrderIsPaidOrExpiredException;
-import accordion_symphonic.ticketing.order.OrderNotFoundException;
+import accordion_symphonic.ticketing.order.*;
 import accordion_symphonic.ticketing.payment.InvalidPaymentWebhookSignatureException;
 import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.payment.UnsupportedPaymentStatusException;
@@ -163,5 +160,16 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
                 exception.getMessage());
+    }
+
+    @ExceptionHandler(TooManyTicketsInOrderException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleTooManyTicketsInOrder(TooManyTicketsInOrderException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                exception.getMessage()
+        );
     }
 }

@@ -76,6 +76,8 @@ public class OrderService {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() -> new ConcertNotFoundException(concertId));
 
+        validateMaxTicketsPerOrder(request);
+
         OrderAccessTokenService.GeneratedOrderAccessToken accessToken =
                 orderAccessTokenService.generateToken();
 
@@ -180,6 +182,19 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         return markOrderPaid(order);
+    }
+
+    private void validateMaxTicketsPerOrder(OrderRequest request) {
+        int requestedTickets = request.items().stream()
+                .mapToInt(OrderItemRequest::quantity)
+                .sum();
+
+        if (requestedTickets > orderProperties.maxTicketsPerOrder()) {
+            throw new TooManyTicketsInOrderException(
+                    requestedTickets,
+                    orderProperties.maxTicketsPerOrder()
+            );
+        }
     }
 
     private void ensureCustomerHasAccess(Order order, String accessToken) {

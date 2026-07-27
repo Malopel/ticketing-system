@@ -65,7 +65,7 @@ class OrderServiceAccessTokenTest {
                 ticketAvailabilityService,
                 orderAccessTokenService,
                 ticketEmailService,
-                new OrderProperties(Duration.ofMinutes(30))
+                new OrderProperties(Duration.ofMinutes(30),10)
         );
 
         OrderAccessTokenService.GeneratedOrderAccessToken generatedToken =
