@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
+                ErrorCode.CONCERT_NOT_FOUND,
                 exception.getMessage()
         );
     }
@@ -37,6 +38,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
+                ErrorCode.TICKET_CATEGORY_NOT_FOUND,
                 exception.getMessage()
         );
     }
@@ -48,6 +50,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
+                ErrorCode.ORDER_NOT_FOUND,
                 exception.getMessage()
         );
     }
@@ -61,6 +64,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
+                ErrorCode.ORDER_CANNOT_BE_PAID,
                 exception.getMessage()
         );
     }
@@ -74,6 +78,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
+                ErrorCode.ORDER_CANNOT_BE_PAID,
                 exception.getMessage()
         );
     }
@@ -87,6 +92,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
+                ErrorCode.INVALID_TICKET,
                 exception.getMessage()
         );
     }
@@ -98,6 +104,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
+                ErrorCode.TICKET_NOT_FOUND,
                 exception.getMessage()
         );
     }
@@ -109,6 +116,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
+                ErrorCode.NOT_ENOUGH_TICKETS_AVAILABLE,
                 exception.getMessage()
         );
     }
@@ -134,6 +142,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.UNAUTHORIZED.value(),
                 "Unauthorized",
+                ErrorCode.INVALID_PAYMENT_SIGNATURE,
                 exception.getMessage()
         );
     }
@@ -160,6 +169,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
+                ErrorCode.ORDER_CANNOT_BE_PAID,
                 exception.getMessage());
     }
 
