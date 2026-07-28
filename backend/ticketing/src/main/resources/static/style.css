@@ -136,8 +136,44 @@ code {
      padding: 16px;
      margin-bottom: 16px;
      background: #fafafa;
- }
+}
 
 .hint {
     color: #666;
+}
+
+.button-row {
+     display: flex;
+     gap: 12px;
+     flex-wrap: wrap;
+     margin-top: 16px;
+ }
+
+.secondary-button {
+    background: #777;
+}
+
+.secondary-button:hover {
+    background: #555;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    background: #eee;
+}
+
+.status-badge.reserved {
+    background: #fff3cd;
+}
+
+.status-badge.paid {
+    background: #d1e7dd;
+}
+
+.status-badge.expired,
+.status-badge.cancelled {
+    background: #f8d7da;
 }

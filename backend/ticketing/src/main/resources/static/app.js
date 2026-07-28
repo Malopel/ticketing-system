@@ -1,5 +1,7 @@
 let selectedConcert = null;
 let selectedTicketCategory = null;
+let currentOrder = null;
+let currentAccessToken = null;
 
 const loadConcertsButton = document.getElementById("loadConcertsButton");
 const concertsContainer = document.getElementById("concerts");
@@ -11,8 +13,13 @@ const resultSection = document.getElementById("resultSection");
 const errorSection = document.getElementById("errorSection");
 const errorMessage = document.getElementById("errorMessage");
 
+const refreshOrderButton = document.getElementById("refreshOrderButton");
+const cancelOrderButton = document.getElementById("cancelOrderButton");
+
 loadConcertsButton.addEventListener("click", loadConcerts);
 createOrderButton.addEventListener("click", createOrder);
+refreshOrderButton.addEventListener("click", refreshCurrentOrder);
+cancelOrderButton.addEventListener("click", cancelCurrentOrder);
 
 async function loadConcerts() {
     hideError();
@@ -58,6 +65,8 @@ async function selectConcert(concert, element) {
 
     selectedConcert = concert;
     selectedTicketCategory = null;
+    currentOrder = null;
+    currentAccessToken = null;
 
     document.querySelectorAll("#concerts .item")
         .forEach(item => item.classList.remove("selected"));
@@ -159,17 +168,132 @@ async function createOrder() {
         });
 
         if (!response.ok) {
-            throw new Error("Bestellung konnte nicht erstellt werden.");
+            throw new Error(await readApiErrorMessage(response));
         }
 
         const createdOrder = await response.json();
 
-        document.getElementById("orderId").textContent = createdOrder.order.id;
-        document.getElementById("accessToken").textContent = createdOrder.accessToken;
+        currentOrder = createdOrder.order;
+        currentAccessToken = createdOrder.accessToken;
+
+        renderOrder(currentOrder, currentAccessToken);
 
         resultSection.classList.remove("hidden");
     } catch (error) {
         showError(error.message);
+    }
+}
+
+async function refreshCurrentOrder() {
+    hideError();
+
+    if (!currentOrder || !currentAccessToken) {
+        showError("Es gibt aktuell keine Bestellung zum Aktualisieren.");
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `/api/concerts/${currentOrder.concertId}/orders/${currentOrder.id}`,
+            {
+                headers: {
+                    "X-Order-Access-Token": currentAccessToken
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(await readApiErrorMessage(response));
+        }
+
+        currentOrder = await response.json();
+
+        renderOrder(currentOrder, currentAccessToken);
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+async function cancelCurrentOrder() {
+    hideError();
+
+    if (!currentOrder || !currentAccessToken) {
+        showError("Es gibt aktuell keine Bestellung zum Stornieren.");
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `/api/concerts/${currentOrder.concertId}/orders/${currentOrder.id}/cancel`,
+            {
+                method: "PATCH",
+                headers: {
+                    "X-Order-Access-Token": currentAccessToken
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(await readApiErrorMessage(response));
+        }
+
+        currentOrder = await response.json();
+
+        renderOrder(currentOrder, currentAccessToken);
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+function renderOrder(order, accessToken) {
+    document.getElementById("orderId").textContent = order.id;
+    document.getElementById("orderStatus").innerHTML = formatOrderStatus(order.status);
+    document.getElementById("orderExpiresAt").textContent = formatDate(order.expiresAt);
+    document.getElementById("orderTotalAmount").textContent = formatPrice(order.totalAmount);
+    document.getElementById("accessToken").textContent = accessToken;
+
+    const orderItems = document.getElementById("orderItems");
+    orderItems.innerHTML = "";
+
+    order.items.forEach(item => {
+        const element = document.createElement("li");
+        element.textContent = `${item.quantity}× ${item.ticketCategoryName} zu ${formatPrice(item.unitPrice)} = ${formatPrice(item.totalPrice)}`;
+        orderItems.appendChild(element);
+    });
+}
+
+async function readApiErrorMessage(response) {
+    try {
+        const error = await response.json();
+
+        if (error.code) {
+            return mapApiErrorCodeToMessage(error.code, error.message);
+        }
+
+        if (error.message) {
+            return error.message;
+        }
+    } catch {
+        // Response war kein JSON. Dann nutzen wir den Fallback unten.
+    }
+
+    return "Ein unbekannter Fehler ist aufgetreten.";
+}
+
+function mapApiErrorCodeToMessage(code, fallbackMessage) {
+    switch (code) {
+        case "TOO_MANY_TICKETS_IN_ORDER":
+            return "Du kannst pro Bestellung nur eine begrenzte Anzahl Tickets reservieren.";
+        case "DUPLICATE_TICKET_CATEGORY":
+            return "Diese Ticketkategorie wurde doppelt ausgewählt.";
+        case "NOT_ENOUGH_TICKETS_AVAILABLE":
+            return "Für diese Kategorie sind nicht mehr genug Tickets verfügbar.";
+        case "ORDER_ACCESS_DENIED":
+            return "Du hast keinen Zugriff auf diese Bestellung.";
+        case "ORDER_ALREADY_FINALIZED":
+            return "Diese Bestellung kann nicht mehr geändert werden.";
+        default:
+            return fallbackMessage ?? "Ein unbekannter Fehler ist aufgetreten.";
     }
 }
 
@@ -200,4 +324,17 @@ function formatPrice(value) {
         style: "currency",
         currency: "EUR"
     });
+}
+
+function formatOrderStatus(status) {
+    const normalizedStatus = String(status).toLowerCase();
+
+    const label = {
+        reserved: "Reserviert",
+        paid: "Bezahlt",
+        expired: "Abgelaufen",
+        cancelled: "Storniert"
+    }[normalizedStatus] ?? status;
+
+    return `<span class="status-badge ${normalizedStatus}">${label}</span>`;
 }

@@ -44,17 +44,31 @@
             <h2>Bestellung erstellt</h2>
 
             <p>
-                Die Bestellung wurde reserviert. In einem echten Shop würde der Kunde jetzt zur Zahlung weitergeleitet.
+                Deine Tickets sind vorläufig reserviert. In einem echten Shop würdest du jetzt zur Zahlung weitergeleitet.
             </p>
 
             <div class="result-box">
                 <p><strong>Order-ID:</strong> <span id="orderId"></span></p>
+                <p><strong>Status:</strong> <span id="orderStatus"></span></p>
+                <p><strong>Reserviert bis:</strong> <span id="orderExpiresAt"></span></p>
+                <p><strong>Gesamtbetrag:</strong> <span id="orderTotalAmount"></span></p>
+
+                <div>
+                    <strong>Positionen:</strong>
+                    <ul id="orderItems"></ul>
+                </div>
+
                 <p><strong>Access Token:</strong></p>
                 <code id="accessToken"></code>
             </div>
 
+            <div class="button-row">
+                <button id="refreshOrderButton" type="button">Status aktualisieren</button>
+                <button id="cancelOrderButton" type="button" class="secondary-button">Reservierung stornieren</button>
+            </div>
+
             <p class="hint">
-                Für die Demo kannst du jetzt den Payment-Webhook mit dieser Order-ID auslösen.
+                Der Access Token ist aktuell nur für die Demo sichtbar. Später würde er zum Beispiel in einem sicheren Bestelllink oder einer Session verwendet.
             </p>
         </section>
 
