@@ -289,4 +289,30 @@ class OrderControllerSecurityTest {
                         "Too many tickets in order: requested 11, maximum allowed is 10"
                 ));
     }
+
+    @Test
+    void createOrderWithDuplicateTicketCategoryReturnsConflict() throws Exception {
+        when(orderService.createOrder(eq(CONCERT_ID), any(OrderRequest.class)))
+                .thenThrow(new DuplicateTicketCategoryException(7L));
+
+        mockMvc.perform(post("/api/concerts/{concertId}/orders", CONCERT_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "customerEmail": "kunde@example.com",
+                          "items": [
+                            {
+                              "ticketCategoryId": 7,
+                              "quantity": 2
+                            },
+                            {
+                              "ticketCategoryId": 7,
+                              "quantity": 3
+                            }
+                          ]
+                        }
+                        """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value(ErrorCode.DUPLICATE_TICKET_CATEGORY));
+    }
 }

@@ -120,6 +120,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
+                ErrorCode.DUPLICATE_TICKET_CATEGORY,
                 exception.getMessage()
         );
     }
