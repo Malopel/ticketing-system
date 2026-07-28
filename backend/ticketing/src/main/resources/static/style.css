@@ -177,3 +177,12 @@ code {
 .status-badge.cancelled {
     background: #f8d7da;
 }
+
+.status-badge.valid {
+    background: #d1e7dd;
+}
+
+.status-badge.used,
+.status-badge.invalid {
+    background: #f8d7da;
+}

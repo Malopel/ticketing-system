@@ -92,6 +92,36 @@
         </section>
 
         <section class="card">
+            <h2>Einlasskontrolle</h2>
+
+            <p>
+                Hier kann ein Ticket anhand seines QR-Tokens geprüft und anschließend entwertet werden.
+                In der späteren Version würde ein QR-Code-Scanner diesen Token automatisch eintragen.
+            </p>
+
+            <label>
+                QR-Token
+                <input id="ticketValidationQrToken" placeholder="Ticket-Code oder QR-Token einfügen">
+            </label>
+
+            <div class="button-row">
+                <button id="validateTicketButton" type="button">Ticket prüfen</button>
+                <button id="useTicketButton" type="button" class="secondary-button">Ticket entwerten</button>
+            </div>
+
+            <div class="result-box hidden" id="ticketValidationResult">
+                <h3>Ticketdetails</h3>
+
+                <p><strong>Ticket-ID:</strong> <span id="validatedTicketId"></span></p>
+                <p><strong>Order-ID:</strong> <span id="validatedTicketOrderId"></span></p>
+                <p><strong>Kategorie:</strong> <span id="validatedTicketCategory"></span></p>
+                <p><strong>Status:</strong> <span id="validatedTicketStatus"></span></p>
+                <p><strong>QR-Token:</strong></p>
+                <code id="validatedTicketQrToken"></code>
+            </div>
+        </section>
+
+        <section class="card">
             <h2>Zahlung simulieren</h2>
 
             <p>
