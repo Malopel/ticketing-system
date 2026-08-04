@@ -18,6 +18,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+import org.springframework.http.MediaType;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doThrow;
@@ -132,5 +136,31 @@ class AdminTicketValidationControllerTest {
                 .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
         return "Basic " + encodedCredentials;
+    }
+
+    @Test
+    void getTicketQrCodeReturnsPngForAdmin() throws Exception {
+        Long concertId = 1L;
+        String qrToken = "ticket-token";
+        byte[] qrCodePng = new byte[] {
+                (byte) 0x89, 0x50, 0x4E, 0x47
+        };
+
+        when(ticketService.generateQrCodePng(concertId, qrToken))
+                .thenReturn(qrCodePng);
+
+        mockMvc.perform(get("/api/admin/concerts/{concertId}/tickets/{qrToken}/qr-code", concertId, qrToken)
+                        .header("Authorization", basicAuthHeader()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_PNG))
+                .andExpect(content().bytes(qrCodePng));
+
+        verify(ticketService).generateQrCodePng(concertId, qrToken);
+    }
+
+    @Test
+    void getTicketQrCodeRequiresAdminLogin() throws Exception {
+        mockMvc.perform(get("/api/admin/concerts/{concertId}/tickets/{qrToken}/qr-code", 1L, "ticket-token"))
+                .andExpect(status().isUnauthorized());
     }
 }
