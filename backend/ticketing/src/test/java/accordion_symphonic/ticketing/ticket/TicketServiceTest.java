@@ -27,16 +27,20 @@ class TicketServiceTest {
     private OrderRepository orderRepository;
     private TicketService ticketService;
 
+    private QrCodeService qrCodeService;
+
     @BeforeEach
     void setUp() {
         ticketRepository = mock(TicketRepository.class);
         concertRepository = mock(ConcertRepository.class);
         orderRepository = mock(OrderRepository.class);
+        qrCodeService = mock(QrCodeService.class);
 
         ticketService = new TicketService(
                 ticketRepository,
                 concertRepository,
-                orderRepository
+                orderRepository,
+                qrCodeService
         );
     }
 
