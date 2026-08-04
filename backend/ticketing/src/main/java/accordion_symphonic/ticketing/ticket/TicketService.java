@@ -8,6 +8,15 @@ import accordion_symphonic.ticketing.order.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +88,28 @@ public class TicketService {
         Ticket savedTicket = ticketRepository.save(ticket);
 
         return TicketResponse.fromEntity(savedTicket);
+    }
+
+    public byte[] generateQrCodePng(Long concertId, String qrToken) {
+        findTicketForConcert(concertId, qrToken);
+
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
+            BitMatrix bitMatrix = qrCodeWriter.encode(
+                    qrToken,
+                    BarcodeFormat.QR_CODE,
+                    300,
+                    300
+            );
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+
+            return outputStream.toByteArray();
+        } catch (WriterException | IOException exception) {
+            throw new IllegalStateException("QR-Code konnte nicht erzeugt werden.", exception);
+        }
     }
 
     private Ticket findTicketForConcert(Long concertId, String qrToken) {
