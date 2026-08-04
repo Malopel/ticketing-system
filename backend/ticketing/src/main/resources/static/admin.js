@@ -2,8 +2,13 @@ const loadAdminConcertsButton = document.getElementById("loadAdminConcertsButton
 const loadOrdersButton = document.getElementById("loadOrdersButton");
 const showWebhookBodyButton = document.getElementById("showWebhookBodyButton");
 
+const validateTicketButton = document.getElementById("validateTicketButton");
+const useTicketButton = document.getElementById("useTicketButton");
+
 const adminConcertsContainer = document.getElementById("adminConcerts");
 const ordersContainer = document.getElementById("orders");
+
+const ticketValidationResult = document.getElementById("ticketValidationResult");
 
 const adminErrorSection = document.getElementById("adminErrorSection");
 const adminErrorMessage = document.getElementById("adminErrorMessage");
@@ -18,6 +23,9 @@ addTicketCategoryButton.addEventListener("click", addTicketCategoryForm);
 loadAdminConcertsButton.addEventListener("click", loadAdminConcerts);
 loadOrdersButton.addEventListener("click", loadOrders);
 showWebhookBodyButton.addEventListener("click", showWebhookBody);
+
+validateTicketButton.addEventListener("click", validateTicket);
+useTicketButton.addEventListener("click", useTicket);
 
 function getAuthHeader() {
     const username = document.getElementById("adminUsername").value;
@@ -257,6 +265,154 @@ function showWebhookBody() {
 
     document.getElementById("webhookBody").textContent = JSON.stringify(body);
     document.getElementById("webhookBox").classList.remove("hidden");
+}
+
+async function validateTicket() {
+    hideAdminError();
+
+    const input = readTicketValidationInput();
+
+    if(!input) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `/api/admin/concerts/${input.concertId}/tickets/validate/${encodeURIComponent(input.qrToken)}`,
+            {
+                headers: {
+                    "Authorization": getAuthHeader()
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(await readAdminApiErrorMessage(response));
+        }
+
+        const ticket = await response.json();
+
+        renderValidatedTicket(ticket);
+    } catch (error) {
+        showAdminError(error.message);
+    }
+}
+
+async function useTicket() {
+    hideAdminError();
+
+    const input = readTicketValidationInput();
+
+    if (!input) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `/api/admin/concerts/${input.concertId}/tickets/${encodeURIComponent(input.qrToken)}/use`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Authorization": getAuthHeader()
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(await readAdminApiErrorMessage(response));
+        }
+
+        const ticket = await response.json();
+
+        renderValidatedTicket(ticket);
+    } catch (error) {
+        showAdminError(error.message);
+    }
+}
+
+function readTicketValidationInput() {
+    const concertIdInput = document.getElementById("ticketValidationConcertId");
+    const qrTokenInput = document.getElementById("ticketValidationQrToken");
+
+    if (!concertIdInput || !qrTokenInput) {
+        showAdminError("Die Einlasskontrolle ist im HTML nicht vollständig vorhanden. Bitte prüfe die Element-IDs.");
+        return null;
+    }
+
+    const concertId = concertIdInput.value;
+    const qrToken = qrTokenInput.value.trim();
+
+    if (!concertId) {
+        showAdminError("Bitte eine Konzert-ID für die Einlasskontrolle eingeben.");
+        return null;
+    }
+
+    if (!qrToken) {
+        showAdminError("Bitte einen QR-Token eingeben.");
+        return null;
+    }
+
+    return {
+        concertId: Number(concertId),
+        qrToken: qrToken
+    };
+}
+
+function renderValidatedTicket(ticket) {
+    document.getElementById("validatedTicketId").textContent = ticket.id;
+    document.getElementById("validatedTicketOrderId").textContent = ticket.orderid;
+    document.getElementById("validatedTicketCategory").textContent = ticket.ticketCategoryName;
+    document.getElementById("validatedTicketQrToken").textContent = ticket.qrToken;
+
+    const statusElement = document.getElementById("validatedTicketStatus");
+    const normalizedStatus = String(ticket.status).toLowerCase();
+
+    statusElement.className = `status-badge ${normalizedStatus}`;
+    statusElement.textContent = formatTicketStatus(ticket.status);
+
+    ticketValidationResult.classList.remove("hidden");
+    ticketValidationResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function formatTicketStatus(status) {
+    const normalizedStatus = String(status).toLowerCase();
+
+    return {
+        valid: "Gültig",
+        used: "Bereits verwendet",
+        cancelled: "Storniert",
+    } [normalizedStatus] ?? status;
+}
+
+async function readAdminApiErrorMessage(response) {
+    try {
+        const error = await response.json();
+
+        if (error.code) {
+            return mapAdminApiErrorCodeToMessage(error.code, error.message);
+        }
+
+        if (error.message) {
+            return error.message;
+        }
+    } catch {
+        // Response war kein JSON. Dann nutzen wir den Fallback unten.
+    }
+
+    return "Ein unbekannter Fehler ist aufgetreten.";
+}
+
+function mapAdminApiErrorCodeToMessage(code, fallbackMessage) {
+    switch (code) {
+        case "TICKET_NOT_FOUND":
+            return "Dieses Ticket wurde für dieses Konzert nicht gefunden.";
+        case "TICKET_IS_NOT_VALID":
+            return "Dieses Ticket ist nicht mehr gültig oder wurde bereits verwendet.";
+        case "CONCERT_NOT_FOUND":
+            return "Dieses Konzert wurde nicht gefunden.";
+        default:
+            return fallbackMessage ?? "Ein unbekannter Fehler ist aufgetreten.";
+    }
 }
 
 function showAdminError(message) {
