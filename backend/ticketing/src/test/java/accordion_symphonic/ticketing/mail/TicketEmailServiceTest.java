@@ -67,7 +67,8 @@ class TicketEmailServiceTest {
                 concert,
                 "kunde@example.com",
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(7)
         );
 
         Ticket ticket = new Ticket(order, ticketCategory);

@@ -89,7 +89,8 @@ class OrderServiceAccessTokenTest {
                 concert,
                 "kunde@example.com",
                 generatedToken.tokenHash(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(7)
         );
 
         when(concertRepository.existsById(CONCERT_ID))

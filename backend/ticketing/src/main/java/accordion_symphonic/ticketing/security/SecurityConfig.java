@@ -68,6 +68,11 @@ public class SecurityConfig {
                                 "/api/concerts/{concertId}/orders")
                         .permitAll()
 
+                        // Kunden dürfen für ihre Bestellung eine Zahlung starten
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/concerts/{concertId}/orders/{orderId}/payment")
+                        .permitAll()
+
                         // Kunden dürfen ihre Bestellung mit Access-Token abrufen
                         .requestMatchers(HttpMethod.GET,
                                 "/api/concerts/{concertId}/orders/{orderId}")
@@ -80,6 +85,11 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/webhooks/payments")
+                        .permitAll()
+
+                        // Fake-Payment-Callback für lokale Entwicklung
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/fake-payments/{providerPaymentId}/complete")
                         .permitAll()
 
                         // Admin-Bereich

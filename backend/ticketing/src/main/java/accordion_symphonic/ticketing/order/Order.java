@@ -54,21 +54,6 @@ public class Order {
             Concert concert,
             String customerEmail,
             String accessTokenHash,
-            LocalDateTime createdAt
-    ) {
-        this.concert = concert;
-        this.customerEmail = customerEmail;
-        this.accessTokenHash = accessTokenHash;
-        this.status = OrderStatus.RESERVED;
-        this.totalAmount = BigDecimal.ZERO;
-        this.createdAt = createdAt;
-        this.expiresAt = createdAt.plusDays(7);
-    }
-
-    public Order(
-            Concert concert,
-            String customerEmail,
-            String accessTokenHash,
             LocalDateTime createdAt,
             LocalDateTime expiresAt
     ) {

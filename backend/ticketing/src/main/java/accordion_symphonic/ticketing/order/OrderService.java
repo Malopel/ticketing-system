@@ -4,6 +4,7 @@ import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticket.TicketResponse;
@@ -76,7 +77,8 @@ public class OrderService {
 
     @Transactional
     public CreatedOrderResponse createOrder(long concertId, OrderRequest request) {
-        Concert concert = concertRepository.findById(concertId)
+        Concert concert = concertRepository
+                .findByIdAndStatus(concertId, ConcertStatus.PUBLISHED)
                 .orElseThrow(() -> new ConcertNotFoundException(concertId));
 
         validateMaxTicketsPerOrder(request);
@@ -150,6 +152,7 @@ public class OrderService {
         return OrderResponse.fromEntity(savedOrder);
     }
 
+    @Transactional
     public OrderResponse markOrderAsPaid(Long concertId, Long orderId) {
         if (!concertRepository.existsById(concertId)) {
             throw new ConcertNotFoundException(concertId);
@@ -218,6 +221,7 @@ public class OrderService {
         ticketEmailService.sendEmail(order, tickets);
     }
 
+    @Transactional
     public Order markOrderPaidFromPayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));

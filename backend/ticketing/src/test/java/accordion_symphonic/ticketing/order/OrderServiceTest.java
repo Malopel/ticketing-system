@@ -83,7 +83,8 @@ class OrderServiceTest {
                 concert,
                 "kunde@example.com",
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
         );
 
         List<TicketResponse> tickets = List.of();
@@ -119,7 +120,8 @@ class OrderServiceTest {
                 concert,
                 "kunde@example.com",
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
         );
 
         order.markAsPaid();
