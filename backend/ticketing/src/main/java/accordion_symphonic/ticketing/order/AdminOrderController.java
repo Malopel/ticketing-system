@@ -1,10 +1,6 @@
 package accordion_symphonic.ticketing.order;
 
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -55,5 +51,15 @@ public class AdminOrderController {
                                 .toString()
                 )
                 .body(pdf);
+    }
+
+    @PostMapping("/{orderId}/tickets/resend-email")
+    public ResponseEntity<Void> resendTicketEmail(
+            @PathVariable Long concertId,
+            @PathVariable Long orderId
+    ) {
+        orderService.resendTicketEmail(concertId, orderId);
+
+        return ResponseEntity.noContent().build();
     }
 }

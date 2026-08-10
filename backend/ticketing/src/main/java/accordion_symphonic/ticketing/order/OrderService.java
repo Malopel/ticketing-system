@@ -201,6 +201,27 @@ public class OrderService {
         return ticketPdfService.createTicketPdf(order, tickets);
     }
 
+    @Transactional
+    public void resendTicketEmail(Long concertId, Long orderId) {
+        if (!concertRepository.existsById(concertId)) {
+            throw new ConcertNotFoundException(concertId);
+        }
+
+        Order order = orderRepository.findByIdAndConcertId(orderId, concertId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+
+        List<TicketResponse> tickets =
+                ticketService.getTicketsByConcertIdAndOrderId(concertId, orderId);
+
+        if (tickets.isEmpty()) {
+            throw new IllegalStateException(
+                    "Für diese Bestellung wurden noch keine Tickets erzeugt. Ist die Bestellung bezahlt?"
+            );
+        }
+
+        ticketEmailService.sendEmail(order, tickets);
+    }
+
     public Order markOrderPaidFromPayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
