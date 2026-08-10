@@ -13,7 +13,10 @@ import accordion_symphonic.ticketing.ticket.TicketPdfService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
-import jakarta.transaction.Transactional;
+
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -39,6 +42,8 @@ public class OrderService {
 
     private final OrderProperties orderProperties;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     public OrderService(
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
@@ -48,7 +53,8 @@ public class OrderService {
             OrderAccessTokenService orderAccessTokenService,
             TicketEmailService ticketEmailService,
             TicketPdfService ticketPdfService,
-            OrderProperties orderProperties) {
+            OrderProperties orderProperties,
+            ApplicationEventPublisher eventPublisher) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
@@ -58,6 +64,7 @@ public class OrderService {
         this.ticketEmailService = ticketEmailService;
         this.ticketPdfService = ticketPdfService;
         this.orderProperties = orderProperties;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -202,7 +209,10 @@ public class OrderService {
         return ticketPdfService.createTicketPdf(order, tickets);
     }
 
-    @Transactional
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            readOnly = true
+    )
     public void resendTicketEmail(Long concertId, Long orderId) {
         if (!concertRepository.existsById(concertId)) {
             throw new ConcertNotFoundException(concertId);
@@ -265,10 +275,17 @@ public class OrderService {
         }
 
         order.markAsPaid();
+
         Order savedOrder = orderRepository.save(order);
 
-        List<TicketResponse> tickets = ticketService.createTicketsForOrder(savedOrder);
-        ticketEmailService.sendEmail(savedOrder, tickets);
+        ticketService.createTicketsForOrder(savedOrder);
+
+        eventPublisher.publishEvent(
+                new OrderPaidEvent(
+                        savedOrder.getConcert().getId(),
+                        savedOrder.getId()
+                )
+        );
 
         return savedOrder;
     }

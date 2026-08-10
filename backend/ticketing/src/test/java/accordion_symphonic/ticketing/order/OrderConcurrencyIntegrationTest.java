@@ -33,7 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         "ticketing.security.admin.username=admin",
         "ticketing.security.admin.password=test-password",
         "ticketing.payment.webhook-secret=test-webhook-secret",
-        "ticketing.order.reservation-duration=PT30M"
+        "ticketing.order.reservation-duration=PT30M",
+        "ticketing.payment.provider=fake"
 })
 class OrderConcurrencyIntegrationTest {
 
@@ -56,14 +57,16 @@ class OrderConcurrencyIntegrationTest {
 
     @Test
     void concurrentOrdersDoNotOversellTicketCategory() throws Exception {
-        Concert concert = concertRepository.save(
-                new Concert(
-                        "Concurrency Konzert",
-                        "Test für parallele Bestellungen",
-                        LocalDateTime.now().plusDays(30),
-                        "Konzertsaal"
-                )
+        Concert concert = new Concert(
+                "Concurrency Konzert",
+                "Test für parallele Bestellungen",
+                LocalDateTime.now().plusDays(30),
+                "Konzertsaal"
         );
+
+        concert.publish();
+
+        Concert savedConcert = concertRepository.save(concert);
 
         TicketCategory category = ticketCategoryRepository.save(
                 new TicketCategory(
@@ -89,7 +92,7 @@ class OrderConcurrencyIntegrationTest {
 
                 try {
                     orderService.createOrder(
-                            concert.getId(),
+                            savedConcert.getId(),
                             new OrderRequest(
                                     "kunde" + customerNumber + "@example.com",
                                     List.of(

@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.order;
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticket.TicketPdfService;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -55,6 +57,10 @@ class OrderServiceTest {
     @Mock
     private TicketPdfService ticketPdfService;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
+
     @BeforeEach
     void setUp() {
         orderService = new OrderService(
@@ -66,12 +72,13 @@ class OrderServiceTest {
                 orderAccessTokenService,
                 ticketEmailService,
                 ticketPdfService,
-                new OrderProperties(Duration.ofMinutes(30), 10)
+                new OrderProperties(Duration.ofMinutes(30), 10),
+                eventPublisher
         );
     }
 
     @Test
-    void markOrderPaidFromPaymentCreatesTicketsAndSendsEmail() {
+    void markOrderPaidFromPaymentCreatesTicketsAndPublishesEvent() {
         Concert concert = new Concert(
                 "Accordion Night",
                 "Beschreibung",
@@ -104,7 +111,10 @@ class OrderServiceTest {
 
         verify(orderRepository).save(order);
         verify(ticketService).createTicketsForOrder(order);
-        verify(ticketEmailService).sendEmail(order, tickets);
+
+        verify(eventPublisher).publishEvent(
+                any(OrderPaidEvent.class)
+        );
     }
 
     @Test
@@ -136,7 +146,8 @@ class OrderServiceTest {
         verify(orderRepository).findById(42L);
         verify(orderRepository, never()).save(any());
         verify(ticketService, never()).createTicketsForOrder(any());
-        verify(ticketEmailService, never()).sendEmail(any(), any());
+
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -168,7 +179,8 @@ class OrderServiceTest {
 
         verify(orderRepository, never()).save(order);
         verify(ticketService, never()).createTicketsForOrder(any());
-        verify(ticketEmailService, never()).sendEmail(any(), any());
+
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -190,7 +202,10 @@ class OrderServiceTest {
                 concert
         );
 
-        when(concertRepository.findById(concertId))
+        when(concertRepository.findByIdAndStatus(
+                concertId,
+                ConcertStatus.PUBLISHED
+        ))
                 .thenReturn(Optional.of(concert));
 
         when(orderAccessTokenService.generateToken())
@@ -229,7 +244,10 @@ class OrderServiceTest {
                 "Heidelberg"
         );
 
-        when(concertRepository.findById(concertId))
+        when(concertRepository.findByIdAndStatus(
+                concertId,
+                ConcertStatus.PUBLISHED
+        ))
                 .thenReturn(Optional.of(concert));
 
         OrderRequest request = new OrderRequest(
