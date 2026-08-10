@@ -236,10 +236,84 @@ async function loadOrders() {
                 <p><strong>Kunde:</strong> ${order.customerEmail}</p>
                 <p><strong>Status:</strong> ${order.status}</p>
                 <p><strong>Erstellt:</strong> ${formatDate(order.createdAt)}</p>
+
+                <div class="button-row">
+                    <button type="button" class="downloadTicketPdfButton">
+                        Ticket-PDF herunterladen
+                    </button>
+
+                    <button type="button" class="resendTicketEmailButton secondary-button">
+                        Ticketmail erneut senden
+                    </button>
+                </div>
             `;
+
+            const downloadPdfButton = element.querySelector(".downloadTicketPdfButton");
+            const resendEmailButton = element.querySelector(".resendTicketEmailButton");
+
+            downloadPdfButton.addEventListener("click", () => downloadTicketPdf(concertId, order.id));
+            resendEmailButton.addEventListener("click", () => resendTicketEmail(concertId, order.id));
 
             ordersContainer.appendChild(element);
         });
+    } catch (error) {
+        showAdminError(error.message);
+    }
+}
+
+async function downloadTicketPdf(concertId, orderId) {
+    hideAdminError();
+
+    try {
+        const response = await fetch(
+            `/api/admin/concerts/${concertId}/orders/${orderId}/tickets/pdf`,
+            {
+                headers: {
+                    "Authorization": getAuthHeader()
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(await readAdminApiErrorMessage(response));
+        }
+
+        const pdfBlob = await response.blob();
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        const downloadLink = document.createElement("a");
+        downloadLink.href = pdfUrl;
+        downloadLink.download = `tickets-order-${orderId}.pdf`;
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+
+        URL.revokeObjectURL(pdfUrl);
+    } catch (error) {
+        showAdminError(error.message);
+    }
+}
+
+async function resendTicketEmail(concertId, orderId) {
+    hideAdminError();
+
+    try {
+        const response = await fetch(
+            `/api/admin/concerts/${concertId}/orders/${orderId}/tickets/resend-email`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": getAuthHeader()
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(await readAdminApiErrorMessage(response));
+        }
+
+        alert(`Ticketmail für Bestellung #${orderId} wurde erneut gesendet.`);
     } catch (error) {
         showAdminError(error.message);
     }
@@ -406,10 +480,14 @@ function mapAdminApiErrorCodeToMessage(code, fallbackMessage) {
     switch (code) {
         case "TICKET_NOT_FOUND":
             return "Dieses Ticket wurde für dieses Konzert nicht gefunden.";
-        case "TICKET_IS_NOT_VALID":
+        case "INVALID_TICKET":
             return "Dieses Ticket ist nicht mehr gültig oder wurde bereits verwendet.";
         case "CONCERT_NOT_FOUND":
             return "Dieses Konzert wurde nicht gefunden.";
+        case "ORDER_HAS_NO_TICKETS":
+            return "Für diese Bestellung wurden noch keine Tickets erzeugt. Ist die Bestellung bereits bezahlt?";
+        case "ORDER_NOT_FOUND":
+            return "Diese Bestellung wurde für dieses Konzert nicht gefunden.";
         default:
             return fallbackMessage ?? "Ein unbekannter Fehler ist aufgetreten.";
     }
