@@ -6,9 +6,9 @@ import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.ticket.Ticket;
 import accordion_symphonic.ticketing.ticket.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
+import accordion_symphonic.ticketing.ticket.TicketPdfService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
@@ -34,6 +34,7 @@ public class OrderService {
 
     private final OrderAccessTokenService orderAccessTokenService;
     private final TicketEmailService ticketEmailService;
+    private final TicketPdfService ticketPdfService;
 
     private final OrderProperties orderProperties;
 
@@ -45,6 +46,7 @@ public class OrderService {
             TicketAvailabilityService ticketAvailabilityService,
             OrderAccessTokenService orderAccessTokenService,
             TicketEmailService ticketEmailService,
+            TicketPdfService ticketPdfService,
             OrderProperties orderProperties) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
@@ -53,6 +55,7 @@ public class OrderService {
         this.ticketAvailabilityService = ticketAvailabilityService;
         this.orderAccessTokenService = orderAccessTokenService;
         this.ticketEmailService = ticketEmailService;
+        this.ticketPdfService = ticketPdfService;
         this.orderProperties = orderProperties;
     }
 
@@ -175,6 +178,27 @@ public class OrderService {
         return orders.stream()
                 .map(OrderResponse::fromEntity)
                 .toList();
+    }
+
+    @Transactional
+    public byte[] createTicketPdfForOrder(Long concertId, Long orderId) {
+        if (!concertRepository.existsById(concertId)) {
+            throw new ConcertNotFoundException(concertId);
+        }
+
+        Order order = orderRepository.findByIdAndConcertId(orderId, concertId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+
+        List<TicketResponse> tickets =
+                ticketService.getTicketsByConcertIdAndOrderId(concertId, orderId);
+
+        if (tickets.isEmpty()) {
+            throw new IllegalStateException(
+                    "Für diese Bestellung wurden noch keine Tickets erzeugt. Ist die Bestellung bezahlt?"
+            );
+        }
+
+        return ticketPdfService.createTicketPdf(order, tickets);
     }
 
     public Order markOrderPaidFromPayment(Long orderId) {

@@ -4,6 +4,7 @@ import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
+import accordion_symphonic.ticketing.ticket.TicketPdfService;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,9 @@ class OrderServiceAccessTokenTest {
     @Mock
     private TicketEmailService ticketEmailService;
 
+    @Mock
+    private TicketPdfService ticketPdfService;
+
     private Order order;
     private String validAccessToken;
 
@@ -65,6 +69,7 @@ class OrderServiceAccessTokenTest {
                 ticketAvailabilityService,
                 orderAccessTokenService,
                 ticketEmailService,
+                ticketPdfService,
                 new OrderProperties(Duration.ofMinutes(30),10)
         );
 

@@ -5,7 +5,7 @@ import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.ticket.Ticket;
+import accordion_symphonic.ticketing.ticket.TicketPdfService;
 import accordion_symphonic.ticketing.ticket.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
@@ -52,6 +52,9 @@ class OrderServiceTest {
 
     private OrderService orderService;
 
+    @Mock
+    private TicketPdfService ticketPdfService;
+
     @BeforeEach
     void setUp() {
         orderService = new OrderService(
@@ -62,6 +65,7 @@ class OrderServiceTest {
                 ticketAvailabilityService,
                 orderAccessTokenService,
                 ticketEmailService,
+                ticketPdfService,
                 new OrderProperties(Duration.ofMinutes(30), 10)
         );
     }
