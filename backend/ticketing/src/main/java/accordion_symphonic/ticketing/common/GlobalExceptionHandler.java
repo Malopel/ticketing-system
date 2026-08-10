@@ -184,4 +184,18 @@ public class GlobalExceptionHandler {
                 exception.getMessage()
         );
     }
+
+    @ExceptionHandler(OrderHasNoTicketsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOrderHasNoTickets(
+            OrderHasNoTicketsException exception
+    ) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ErrorCode.ORDER_HAS_NO_TICKETS,
+                exception.getMessage()
+        );
+    }
 }

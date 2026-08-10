@@ -193,9 +193,7 @@ public class OrderService {
                 ticketService.getTicketsByConcertIdAndOrderId(concertId, orderId);
 
         if (tickets.isEmpty()) {
-            throw new IllegalStateException(
-                    "Für diese Bestellung wurden noch keine Tickets erzeugt. Ist die Bestellung bezahlt?"
-            );
+            throw new OrderHasNoTicketsException(orderId);
         }
 
         return ticketPdfService.createTicketPdf(order, tickets);
@@ -214,9 +212,7 @@ public class OrderService {
                 ticketService.getTicketsByConcertIdAndOrderId(concertId, orderId);
 
         if (tickets.isEmpty()) {
-            throw new IllegalStateException(
-                    "Für diese Bestellung wurden noch keine Tickets erzeugt. Ist die Bestellung bezahlt?"
-            );
+            throw new OrderHasNoTicketsException(orderId);
         }
 
         ticketEmailService.sendEmail(order, tickets);

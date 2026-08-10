@@ -12,6 +12,7 @@ public final class ErrorCode {
     public static final String ORDER_ACCESS_DENIED = "ORDER_ACCESS_DENIED";
     public static final String ORDER_ALREADY_FINALIZED = "ORDER_ALREADY_FINALIZED";
     public static final String ORDER_CANNOT_BE_PAID = "ORDER_CANNOT_BE_PAID";
+    public static final String ORDER_HAS_NO_TICKETS = "ORDER_HAS_NO_TICKETS";
 
     public static final String NOT_ENOUGH_TICKETS_AVAILABLE = "NOT_ENOUGH_TICKETS_AVAILABLE";
     public static final String TOO_MANY_TICKETS_IN_ORDER = "TOO_MANY_TICKETS_IN_ORDER";

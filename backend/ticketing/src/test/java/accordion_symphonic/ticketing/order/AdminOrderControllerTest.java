@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import accordion_symphonic.ticketing.common.ErrorCode;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -19,6 +20,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -98,5 +101,39 @@ class AdminOrderControllerTest {
                 .andExpect(status().isUnauthorized());
 
         verifyNoInteractions(orderService);
+    }
+
+    @Test
+    void downloadTicketPdfReturnsConflictWhenOrderHasNoTickets() throws Exception {
+        Long concertId = 1L;
+        Long orderId = 42L;
+
+        doThrow(new OrderHasNoTicketsException(orderId))
+                .when(orderService)
+                .createTicketPdfForOrder(concertId, orderId);
+
+        mockMvc.perform(get("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/pdf", concertId, orderId)
+                        .header("Authorization", basicAuthHeader()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_HAS_NO_TICKETS));
+
+        verify(orderService).createTicketPdfForOrder(concertId, orderId);
+    }
+
+    @Test
+    void resendTicketEmailReturnsConflictWhenOrderHasNoTickets() throws Exception {
+        Long concertId = 1L;
+        Long orderId = 42L;
+
+        doThrow(new OrderHasNoTicketsException(orderId))
+                .when(orderService)
+                .resendTicketEmail(concertId, orderId);
+
+        mockMvc.perform(post("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/resend-email", concertId, orderId)
+                        .header("Authorization", basicAuthHeader()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_HAS_NO_TICKETS));
+
+        verify(orderService).resendTicketEmail(concertId, orderId);
     }
 }
