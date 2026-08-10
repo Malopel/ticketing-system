@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,5 +78,25 @@ class AdminOrderControllerTest {
                 .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
         return "Basic " + encodedCredentials;
+    }
+
+    @Test
+    void resendTicketEmailReturnsNoContentForAdmin() throws Exception {
+        Long concertId = 1L;
+        Long orderId = 42L;
+
+        mockMvc.perform(post("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/resend-email", concertId, orderId)
+                        .header("Authorization", basicAuthHeader()))
+                .andExpect(status().isNoContent());
+
+        verify(orderService).resendTicketEmail(concertId, orderId);
+    }
+
+    @Test
+    void resendTicketEmailRequiresAdminLogin() throws Exception {
+        mockMvc.perform(post("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/resend-email", 1L, 42L))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(orderService);
     }
 }
