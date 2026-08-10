@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.ticketcategory;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +26,10 @@ public class TicketCategoryService {
     }
 
     public List<TicketCategoryResponse> getCategoriesForConcert(Long concertId) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new ConcertNotFoundException(concertId);
-        }
+        concertRepository.findByIdAndStatus(
+                concertId,
+                ConcertStatus.PUBLISHED
+        ).orElseThrow(() -> new ConcertNotFoundException(concertId));
 
         return ticketCategoryRepository.findByConcertId(concertId)
                 .stream()
