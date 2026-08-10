@@ -360,8 +360,8 @@ function readTicketValidationInput() {
 
 function renderValidatedTicket(ticket) {
     document.getElementById("validatedTicketId").textContent = ticket.id;
-    document.getElementById("validatedTicketOrderId").textContent = ticket.orderid;
-    document.getElementById("validatedTicketCategory").textContent = ticket.ticketCategoryName;
+    document.getElementById("validatedTicketOrderId").textContent = ticket.orderId;
+    document.getElementById("validatedTicketCategory").textContent = ticket.ticketCategoryId;
     document.getElementById("validatedTicketQrToken").textContent = ticket.qrToken;
 
     const statusElement = document.getElementById("validatedTicketStatus");

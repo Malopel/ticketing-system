@@ -65,7 +65,7 @@ public class TicketPdfService {
                 PDImageXObject.createFromByteArray(document, qrCodePng, "ticket-qr-code");
 
         try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-            writeText(contentStream, "Accordion Symphonic Karlsruhe", titleFont, 22, 70, 760);
+            writeText(contentStream, "Accordion Symphonic", titleFont, 22, 70, 760);
             writeText(contentStream, "Eintrittskarte", boldFont, 16, 70, 730);
 
             writeText(contentStream, "Konzert:", boldFont, 12, 70, 680);
