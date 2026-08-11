@@ -1,6 +1,6 @@
 ### Variablen
 @baseUrl = http://localhost:8080
-@concertId = 1
+@concertId = 2
 @categoryId = 1
 @orderId = 4
 @qrToken = 797e37a2-530a-4a16-a43d-47d7f11cf1aa
@@ -17,6 +17,18 @@ Content-Type: application/json
 
 {
   "title": "Accordion Symphonic",
+  "description": "Von Drachen zu Vulkanausbrüchen - eine musikalische Reise durch die Naturgewalten",
+  "startTime": "2027-11-27T16:00:00",
+  "location": "Kongresszentrum Heidelberg"
+}
+
+### Testkonzert
+POST {{baseUrl}}/api/admin/concerts
+Authorization: Basic admin test-password
+Content-Type: application/json
+
+{
+  "title": "Accordion Symphonic 2",
   "description": "Von Drachen zu Vulkanausbrüchen - eine musikalische Reise durch die Naturgewalten",
   "startTime": "2027-11-27T16:00:00",
   "location": "Kongresszentrum Heidelberg"
@@ -42,6 +54,17 @@ Content-Type: application/json
   "name": "Normal",
   "price": 25.00,
   "capacity": 100
+}
+
+### Test Ticketkategorie anlegen
+POST {{baseUrl}}/api/admin/concerts/2/ticket-categories
+Authorization: Basic admin test-password
+Content-Type: application/json
+
+{
+  "name": "Normal",
+  "price": 25.00,
+  "capacity": 10
 }
 
 

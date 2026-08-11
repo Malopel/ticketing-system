@@ -1,4 +1,5 @@
 import type { OrderResponse } from './orderApi';
+import {throwApiError} from './apiError';
 
 export type PaymentSession = {
     providerPaymentId: string;
@@ -21,7 +22,10 @@ export async function startPayment(
     );
 
     if (!response.ok) {
-        throw new Error('Zahlung konnte nicht gestartet werden.');
+        await throwApiError(
+            response,
+            'Zahlung konnte nicht gestartet werden.',
+        );
     }
 
     return response.json();
@@ -38,7 +42,8 @@ export async function completeFakePayment(
     );
 
     if (!response.ok) {
-        throw new Error(
+        await throwApiError(
+            response,
             'Fake-Zahlung konnte nicht abgeschlossen werden.',
         );
     }

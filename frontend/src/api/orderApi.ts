@@ -1,3 +1,5 @@
+import {throwApiError} from './apiError';
+
 export type OrderItemRequest = {
     ticketCategoryId: number;
     quantity: number;
@@ -17,12 +19,18 @@ export type OrderItemResponse = {
     totalPrice: number;
 };
 
+export type OrderStatus =
+    | 'RESERVED'
+    | 'PAID'
+    | 'EXPIRED'
+    | 'CANCELLED';
+
 export type OrderResponse = {
     id: number;
     concertId: number;
     concertTitle: string;
     customerEmail: string;
-    status: string;
+    status: OrderStatus;
     totalAmount: number;
     createdAt: string;
     expiresAt: string;
@@ -48,7 +56,10 @@ export async function createOrder(
     });
 
     if (!response.ok) {
-        throw new Error('Bestellung konnte nicht erstellt werden.');
+        await throwApiError(
+            response,
+            'Bestellung konnte nicht erstellt werden.',
+        );
     }
 
     return response.json();
@@ -69,7 +80,10 @@ export async function getOrder(
     );
 
     if (!response.ok) {
-        throw new Error('Bestellung konnte nicht geladen werden.');
+        await throwApiError(
+            response,
+            'Bestellung konnte nicht geladen werden.',
+        );
     }
 
     return response.json();

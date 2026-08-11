@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 
 import {
@@ -8,11 +8,24 @@ import {
 
 import PaymentSection
     from '../components/checkout/PaymentSection';
+import OrderStatusBadge from '../components/order/OrderStatusBadge';
 
 type StoredOrderAccess = {
     concertId: number;
     accessToken: string;
 };
+
+function calculateRemainingSeconds(
+    expiresAt: string,
+): number {
+    const remainingMilliseconds =
+        new Date(expiresAt).getTime() - Date.now();
+
+    return Math.max(
+        0,
+        Math.ceil(remainingMilliseconds / 1000),
+    );
+}
 
 function OrderStatusPage() {
     const {orderId} = useParams<{
@@ -31,8 +44,33 @@ function OrderStatusPage() {
     const [error, setError] =
         useState<string | null>(null);
 
+    const [countdown, setCountdown] = useState<{
+        orderId: number;
+        seconds: number;
+    } | null>(null);
+
+    const expirationRefreshTriggered =
+        useRef<number | null>(null);
+
+    const fetchOrder = useCallback(
+        async (
+            concertId: number,
+            currentAccessToken: string,
+        ) => {
+            const loadedOrder = await getOrder(
+                concertId,
+                id,
+                currentAccessToken,
+            );
+
+            setAccessToken(currentAccessToken);
+            setOrder(loadedOrder);
+        },
+        [id],
+    );
+
     useEffect(() => {
-        async function loadOrder() {
+        async function initializeOrder() {
             if (!Number.isInteger(id) || id <= 0) {
                 setError('Ungültige Bestellnummer.');
                 setLoading(false);
@@ -69,14 +107,10 @@ function OrderStatusPage() {
                     );
                 }
 
-                const loadedOrder = await getOrder(
+                await fetchOrder(
                     parsedAccess.concertId,
-                    id,
                     parsedAccess.accessToken,
                 );
-
-                setAccessToken(parsedAccess.accessToken);
-                setOrder(loadedOrder);
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
@@ -90,8 +124,84 @@ function OrderStatusPage() {
             }
         }
 
-        void loadOrder();
-    }, [id]);
+        void initializeOrder();
+    }, [id, fetchOrder]);
+
+    useEffect(() => {
+        if (!order || order.status !== 'RESERVED') {
+            return;
+        }
+
+        const currentOrderId = order.id;
+        const expiresAt = order.expiresAt;
+
+        const intervalId = window.setInterval(() => {
+            setCountdown({
+                orderId: currentOrderId,
+                seconds:
+                    calculateRemainingSeconds(expiresAt),
+            });
+        }, 1000);
+
+        return () => {
+            window.clearInterval(intervalId);
+        };
+    }, [order]);
+
+    const remainingSeconds =
+        order?.status === 'RESERVED'
+            ? countdown?.orderId === order.id
+                ? countdown.seconds
+                : calculateRemainingSeconds(
+                    order.expiresAt,
+                )
+            : null;
+
+    useEffect(() => {
+        if (
+            !order ||
+            order.status !== 'RESERVED' ||
+            remainingSeconds !== 0 ||
+            !accessToken
+        ) {
+            return;
+        }
+
+        if (
+            expirationRefreshTriggered.current ===
+            order.id
+        ) {
+            return;
+        }
+
+        expirationRefreshTriggered.current = order.id;
+
+        const concertId = order.concertId;
+        const currentOrderId = order.id;
+        const currentAccessToken = accessToken;
+
+        async function refreshOrderAfterExpiration() {
+            try {
+                const refreshedOrder = await getOrder(
+                    concertId,
+                    currentOrderId,
+                    currentAccessToken,
+                );
+
+                setOrder(refreshedOrder);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setError(error.message);
+                } else {
+                    setError(
+                        'Bestellstatus konnte nicht aktualisiert werden.',
+                    );
+                }
+            }
+        }
+
+        void refreshOrderAfterExpiration();
+    }, [remainingSeconds, order, accessToken]);
 
     if (loading) {
         return <p>Bestellung wird geladen...</p>;
@@ -123,6 +233,24 @@ function OrderStatusPage() {
         },
     );
 
+    const remainingMinutes =
+        remainingSeconds !== null
+            ? Math.floor(remainingSeconds / 60)
+            : null;
+
+    const remainingSecondsPart =
+        remainingSeconds !== null
+            ? remainingSeconds % 60
+            : null;
+
+    const formattedRemainingTime =
+        remainingMinutes !== null &&
+        remainingSecondsPart !== null
+            ? `${remainingMinutes}:${remainingSecondsPart
+                .toString()
+                .padStart(2, '0')}`
+            : null;
+
     return (
         <main>
             <Link to="/">
@@ -135,7 +263,9 @@ function OrderStatusPage() {
 
             <p>
                 Status:{' '}
-                <strong>{order.status}</strong>
+                <strong>
+                    <OrderStatusBadge status={order.status}/>
+                </strong>
             </p>
 
             <section>
@@ -173,10 +303,22 @@ function OrderStatusPage() {
             </section>
 
             {order.status === 'RESERVED' && (
-                <PaymentSection
-                    order={order}
-                    accessToken={accessToken}
-                />
+                <>
+                    {formattedRemainingTime && (
+                        <section>
+                            <p>
+                                <strong>
+                                    Reservierungszeit verbleibend:
+                                </strong>{' '}
+                                {formattedRemainingTime} Minuten
+                            </p>
+                        </section>
+                    )}
+                    <PaymentSection
+                        order={order}
+                        accessToken={accessToken}
+                    />
+                </>
             )}
 
             {order.status === 'PAID' && (

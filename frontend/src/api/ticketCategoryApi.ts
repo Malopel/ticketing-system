@@ -1,3 +1,5 @@
+import {throwApiError} from './apiError';
+
 export type TicketCategory = {
     id: number;
     name: string;
@@ -14,7 +16,10 @@ export async function getTicketCategories(
     );
 
     if (!response.ok) {
-        throw new Error('Ticketkategorien konnten nicht geladen werden.');
+        await throwApiError(
+            response,
+            'Ticketkategorien konnten nicht geladen werden.',
+        );
     }
 
     return response.json();
