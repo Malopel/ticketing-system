@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.concert;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,5 +20,12 @@ public class ConcertController {
     @GetMapping
     public List<ConcertResponse> getConcerts() {
         return concertService.getPublishedConcerts();
+    }
+
+    @GetMapping("/{concertId}")
+    public ConcertResponse getPublishedConcertById(
+            @PathVariable Long concertId
+    ) {
+        return concertService.getPublishedConcertById(concertId);
     }
 }

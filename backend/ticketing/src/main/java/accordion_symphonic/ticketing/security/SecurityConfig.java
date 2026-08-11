@@ -60,6 +60,7 @@ public class SecurityConfig {
                         // Öffentliche Konzertübersicht
                         .requestMatchers(HttpMethod.GET,
                                 "/api/concerts",
+                                "/api/concerts/{concertId}",
                                 "/api/concerts/{concertId}/ticket-categories")
                         .permitAll()
 

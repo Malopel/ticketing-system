@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.concert;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConcertService {
@@ -18,6 +19,12 @@ public class ConcertService {
                 .stream()
                 .map(ConcertResponse::fromEntity)
                 .toList();
+    }
+
+    public ConcertResponse getPublishedConcertById(Long concertId) {
+        return this.concertRepository.findByIdAndStatus(concertId, ConcertStatus.PUBLISHED)
+                .map(ConcertResponse::fromEntity)
+                .orElseThrow(() -> new ConcertNotFoundException(concertId));
     }
 
     public List<ConcertResponse> getAllConcerts() {

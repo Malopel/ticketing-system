@@ -1,23 +1,25 @@
 import { useState } from 'react';
+import {useParams} from 'react-router-dom';
 import { completeFakePayment } from '../api/paymentApi';
 import type { OrderResponse } from '../api/orderApi';
 
-type FakePaymentPageProps = {
-    providerPaymentId: string;
-};
+function FakePaymentPage() {
+    const { providerPaymentId } = useParams<{providerPaymentId: string;}>();
 
-function FakePaymentPage({
-                             providerPaymentId,
-                         }: FakePaymentPageProps) {
     const [paying, setPaying] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [order, setOrder] = useState<OrderResponse | null>(null);
 
     async function handleCompletePayment() {
-        setPaying(true);
-        setError(null);
+        if (!providerPaymentId) {
+            setError('Ungültige Zahlungs-ID.');
+            return;
+        }
 
         try {
+            setPaying(true);
+            setError(null);
+
             const paidOrder =
                 await completeFakePayment(providerPaymentId);
 
@@ -33,6 +35,10 @@ function FakePaymentPage({
         } finally {
             setPaying(false);
         }
+    }
+
+    if (!providerPaymentId) {
+        return <p>Ungültige Zahlungs-ID.</p>;
     }
 
     return (

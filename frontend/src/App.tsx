@@ -1,24 +1,31 @@
-import './App.css';
+import {Route, Routes} from 'react-router-dom';
+
 import HomePage from './pages/HomePage';
+import ConcertPage from './pages/ConcertPage';
+import CheckoutPage from './pages/CheckoutPage';
 import FakePaymentPage from './pages/FakePaymentPage';
 
 function App() {
-  const fakePaymentPrefix = '/fake-payment/';
-
-  if (window.location.pathname.startsWith(fakePaymentPrefix)) {
-    const providerPaymentId =
-        window.location.pathname.substring(
-            fakePaymentPrefix.length,
-        );
-
     return (
-        <FakePaymentPage
-            providerPaymentId={providerPaymentId}
-        />
-    );
-  }
+        <Routes>
+            <Route path="/" element={<HomePage/>}/>
 
-  return <HomePage />;
+            <Route
+                path="/concerts/:concertId"
+                element={<ConcertPage/>}
+            />
+
+            <Route
+                path="/concerts/:concertId/checkout"
+                element={<CheckoutPage />}
+            />
+
+            <Route
+                path="/fake-payment/:providerPaymentId"
+                element={<FakePaymentPage/>}
+            />
+        </Routes>
+    );
 }
 
 export default App;
