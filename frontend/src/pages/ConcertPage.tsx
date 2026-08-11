@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Link, useNavigate, useParams} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 
 import {
     getConcertById,
@@ -10,7 +10,7 @@ import {
     type TicketCategory,
 } from '../api/ticketCategoryApi';
 
-import TicketCategoryCard from '../components/TicketCategoryCard';
+import TicketSelection from '../components/TicketSelection';
 
 function ConcertPage() {
     const {concertId} = useParams<{
@@ -22,11 +22,8 @@ function ConcertPage() {
     const [error, setError] = useState<string | null>(null);
     const [ticketCategories, setTicketCategories] =
         useState<TicketCategory[]>([]);
-    const [quantities, setQuantities] =
-        useState<Record<number, number>>({});
     const [loadingTickets, setLoadingTickets] = useState(true);
     const [ticketError, setTicketError] = useState<string | null>(null);
-    const navigate = useNavigate();
 
     useEffect(() => {
         async function loadConcert() {
@@ -86,50 +83,6 @@ function ConcertPage() {
         void loadTicketCategories();
     }, [concertId]);
 
-    function handleQuantityChange(
-        categoryId: number,
-        quantity: number,
-    ) {
-        setQuantities((currentQuantities) => ({
-            ...currentQuantities,
-            [categoryId]: quantity,
-        }));
-    }
-
-    function handleContinueToCheckout() {
-        const id = Number(concertId);
-
-        if (!Number.isInteger(id) || id <= 0 || totalQuantity === 0) {
-            return;
-        }
-
-        sessionStorage.setItem(
-            `checkout-${id}`,
-            JSON.stringify(quantities),
-        );
-
-        navigate(`/concerts/${id}/checkout`);
-    }
-
-    const totalQuantity = Object.values(quantities).reduce(
-        (sum, quantity) => sum + quantity,
-        0,
-    );
-
-    const totalPrice = ticketCategories.reduce(
-        (sum, category) => {
-            const quantity = quantities[category.id] ?? 0;
-
-            return sum + category.price * quantity;
-        },
-        0,
-    );
-
-    const currencyFormatter = new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR',
-    });
-
     if (loading) {
         return <p>Konzert wird geladen...</p>;
     }
@@ -175,8 +128,6 @@ function ConcertPage() {
             <p>{concert.location}</p>
 
             <section>
-                <h2>Tickets</h2>
-
                 {loadingTickets && (
                     <p>Ticketkategorien werden geladen...</p>
                 )}
@@ -185,41 +136,11 @@ function ConcertPage() {
                     <p>Fehler: {ticketError}</p>
                 )}
 
-                {!loadingTickets &&
-                    !ticketError &&
-                    ticketCategories.length === 0 && (
-                        <p>
-                            Für dieses Konzert sind aktuell keine Tickets verfügbar.
-                        </p>
-                    )}
-
-                {ticketCategories.map((category) => (
-                    <TicketCategoryCard
-                        key={category.id}
-                        category={category}
-                        quantity={quantities[category.id] ?? 0}
-                        onQuantityChange={handleQuantityChange}
+                {!ticketError && !loadingTickets && (
+                    <TicketSelection
+                        concertId={concert.id}
+                        ticketCategories={ticketCategories}
                     />
-                ))}
-
-                {totalQuantity > 0 && (
-                    <div>
-                        <p>
-                            <strong>Ausgewählte Tickets:</strong>{' '}
-                            {totalQuantity}
-                        </p>
-
-                        <p>
-                            <strong>Gesamtpreis:</strong>{' '}
-                            {currencyFormatter.format(totalPrice)}
-                        </p>
-                    </div>
-                )}
-
-                {totalQuantity > 0 && (
-                    <button onClick={handleContinueToCheckout}>
-                        Weiter zur Bestellung
-                    </button>
                 )}
             </section>
         </main>

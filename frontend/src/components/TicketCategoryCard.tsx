@@ -3,7 +3,7 @@ import type {TicketCategory} from '../api/ticketCategoryApi';
 type TicketCategoryCardProps = {
     category: TicketCategory;
     quantity: number;
-    onQuantityChange: (categoryId: number, quality: number) => void;
+    onQuantityChange: (categoryId: number, quantity: number) => void;
 };
 
 function TicketCategoryCard({
