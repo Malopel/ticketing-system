@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import ConcertPage from './pages/ConcertPage';
 import CheckoutPage from './pages/CheckoutPage';
 import FakePaymentPage from './pages/FakePaymentPage';
+import OrderStatusPage from './pages/OrderStatusPage';
 
 function App() {
     return (
@@ -18,6 +19,11 @@ function App() {
             <Route
                 path="/concerts/:concertId/checkout"
                 element={<CheckoutPage />}
+            />
+
+            <Route
+                path="/orders/:orderId"
+                element={<OrderStatusPage/>}
             />
 
             <Route

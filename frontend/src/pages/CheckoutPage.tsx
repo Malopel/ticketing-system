@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 
 import {
     getConcertById,
@@ -17,13 +17,7 @@ import CustomerDetailsForm
 import OrderSummary
     from '../components/checkout/OrderSummary';
 
-import PaymentSection
-    from '../components/checkout/PaymentSection';
-
-import {
-    createOrder,
-    type CreatedOrderResponse,
-} from '../api/orderApi';
+import {createOrder} from '../api/orderApi';
 
 function CheckoutPage() {
     const {concertId} = useParams<{
@@ -43,8 +37,7 @@ function CheckoutPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [createdOrder, setCreatedOrder] =
-        useState<CreatedOrderResponse | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function loadCheckout() {
@@ -127,7 +120,19 @@ function CheckoutPage() {
             },
         );
 
-        setCreatedOrder(response);
+        sessionStorage.setItem(
+            `order-${response.order.id}`,
+            JSON.stringify({
+                concertId: response.order.concertId,
+                accessToken: response.accessToken,
+            }),
+        );
+
+        sessionStorage.removeItem(
+            `checkout-${concert.id}`,
+        );
+
+        navigate(`/orders/${response.order.id}`);
     }
 
     if (loading) {
@@ -167,17 +172,7 @@ function CheckoutPage() {
                 quantities={quantities}
             />
 
-            {!createdOrder && (
-                <CustomerDetailsForm
-                    onSubmit={handleCreateOrder}
-                />
-            )}
-
-            {createdOrder && (
-                <PaymentSection
-                    createdOrder={createdOrder}
-                />
-            )}
+            <CustomerDetailsForm onSubmit={handleCreateOrder}/>
         </main>
     );
 }

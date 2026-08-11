@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import {useParams} from 'react-router-dom';
-import { completeFakePayment } from '../api/paymentApi';
-import type { OrderResponse } from '../api/orderApi';
+import {useState} from 'react';
+import {Link, useParams} from 'react-router-dom';
+import {completeFakePayment} from '../api/paymentApi';
+import type {OrderResponse} from '../api/orderApi';
 
 function FakePaymentPage() {
-    const { providerPaymentId } = useParams<{providerPaymentId: string;}>();
+    const {providerPaymentId} = useParams<{ providerPaymentId: string; }>();
 
     const [paying, setPaying] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -73,9 +73,9 @@ function FakePaymentPage() {
                         Status: <strong>{order.status}</strong>
                     </p>
 
-                    <a href="/">
-                        Zurück zum Ticketshop
-                    </a>
+                    <Link to={`/orders/${order.id}`}>
+                        Zur Bestellung
+                    </Link>
                 </>
             )}
 
