@@ -4,22 +4,37 @@ type OrderStatusBadgeProps = {
     status: OrderResponse['status'];
 };
 
-function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
+function OrderStatusBadge({
+                              status,
+                          }: OrderStatusBadgeProps) {
     switch (status) {
         case 'RESERVED':
-            return <span>🕒 Zahlung ausstehend</span>;
+            return (
+                <span className="order-status-badge order-status-reserved">
+                    🕒 Zahlung ausstehend
+                </span>
+            );
 
         case 'PAID':
-            return <span>✅ Bezahlt</span>;
+            return (
+                <span className="order-status-badge order-status-paid">
+                    ✓ Bezahlt
+                </span>
+            );
 
         case 'EXPIRED':
-            return <span>⌛ Reservierung abgelaufen</span>;
+            return (
+                <span className="order-status-badge order-status-expired">
+                    ⌛ Reservierung abgelaufen
+                </span>
+            );
 
         case 'CANCELLED':
-            return <span>❌ Storniert</span>;
-
-        default:
-            return <span>{status}</span>;
+            return (
+                <span className="order-status-badge order-status-cancelled">
+                    ✕ Storniert
+                </span>
+            );
     }
 }
 

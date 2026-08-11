@@ -23,31 +23,48 @@ function TicketCategoryCard({
         }
     }
 
+    const currencyFormatter = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+    });
+
     return (
-        <article>
-            <h4>{category.name}</h4>
+        <article className="ticket-category-card">
+            <div className="ticket-category-info">
+                <h3>{category.name}</h3>
 
-            <p>
-                Preis: {category.price.toFixed(2)} €
-            </p>
+                <p>
+                    {currencyFormatter.format(category.price)}
+                </p>
 
-            <p>
-                Verfügbar: {category.available}
-            </p>
+                <small>
+                    Noch {category.available} Tickets verfügbar
+                </small>
+            </div>
 
-            <button type="button"
+            <div className="quantity-control">
+                <button
+                    type="button"
+                    className="quantity-button"
                     onClick={handleDecrease}
-                    disabled={quantity === 0}>
-                -
-            </button>
+                    disabled={quantity === 0}
+                >
+                    −
+                </button>
 
-            <span>{quantity}</span>
+                <span className="quantity-value">
+                    {quantity}
+                </span>
 
-            <button type="button"
+                <button
+                    type="button"
+                    className="quantity-button"
                     onClick={handleIncrease}
-                    disabled={quantity >= category.available}>
-                +
-            </button>
+                    disabled={quantity >= category.available}
+                >
+                    +
+                </button>
+            </div>
         </article>
     );
 }

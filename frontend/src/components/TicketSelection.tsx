@@ -61,8 +61,15 @@ function TicketSelection({
     }
 
     return (
-        <section>
-            <h2>Tickets</h2>
+        <section className="ticket-selection">
+            <div className="ticket-selection-header">
+                <h2>Tickets auswählen</h2>
+
+                <p>
+                    Wähle deine gewünschten Ticketkategorien
+                    und Mengen aus.
+                </p>
+            </div>
 
             {ticketCategories.length === 0 && (
                 <p>
@@ -70,26 +77,28 @@ function TicketSelection({
                 </p>
             )}
 
-            {ticketCategories.map((category) => (
-                <TicketCategoryCard
-                    key={category.id}
-                    category={category}
-                    quantity={quantities[category.id] ?? 0}
-                    onQuantityChange={handleQuantityChange}
-                />
-            ))}
+            <div className="ticket-list">
+                {ticketCategories.map((category) => (
+                    <TicketCategoryCard
+                        key={category.id}
+                        category={category}
+                        quantity={quantities[category.id] ?? 0}
+                        onQuantityChange={handleQuantityChange}
+                    />
+                ))}
+            </div>
 
             {totalQuantity > 0 && (
-                <div>
-                    <p>
+                <div className={"ticket-summary"}>
+                    <div>
                         <strong>Ausgewählte Tickets:</strong>{' '}
-                        {totalQuantity}
-                    </p>
+                        <span>{totalQuantity}</span>
+                    </div>
 
-                    <p>
+                    <div>
                         <strong>Gesamtpreis:</strong>{' '}
-                        {currencyFormatter.format(totalPrice)}
-                    </p>
+                        <span>{currencyFormatter.format(totalPrice)}</span>
+                    </div>
 
                     <button
                         type="button"

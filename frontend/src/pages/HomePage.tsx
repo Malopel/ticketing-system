@@ -28,22 +28,23 @@ function HomePage() {
 
     return (
         <main>
-            <h1>Accordion Symphonic Ticketshop</h1>
+            <header className="page-header">
+                <h1>Accordion Symphonic</h1>
+                <h2>Konzerte</h2>
+                <p>
+                    Wähle ein Konzert aus und sichere dir
+                    deine Tickets.
+                </p>
+            </header>
 
-            <h2>Konzerte</h2>
-
-            {concerts.length === 0 ? (
-                <p>Aktuell sind keine Konzerte verfügbar.</p>
-            ) : (
-                <div>
-                    {concerts.map((concert) => (
-                        <ConcertCard
-                            key={concert.id}
-                            concert={concert}
-                        />
-                    ))}
-                </div>
-            )}
+            <div className="concert-grid">
+                {concerts.map((concert) => (
+                    <ConcertCard
+                        key={concert.id}
+                        concert={concert}
+                    />
+                ))}
+            </div>
         </main>
     );
 }

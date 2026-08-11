@@ -141,7 +141,7 @@ function CheckoutPage() {
 
     if (error) {
         return (
-            <main>
+            <main className="checkout-page">
                 <p>Fehler: {error}</p>
 
                 {Number.isInteger(id) && id > 0 && (
@@ -158,14 +158,18 @@ function CheckoutPage() {
     }
 
     return (
-        <main>
-            <Link to={`/concerts/${concert.id}`}>
+        <main className="checkout-page">
+            <Link
+                className="back-link"
+                to={`/concerts/${concert.id}`}
+            >
                 ← Zurück zur Ticketauswahl
             </Link>
 
-            <h1>Bestellung</h1>
-
-            <h2>{concert.title}</h2>
+            <header className="checkout-header">
+                <h1>Bestellung</h1>
+                <p>{concert.title}</p>
+            </header>
 
             <OrderSummary
                 ticketCategories={ticketCategories}

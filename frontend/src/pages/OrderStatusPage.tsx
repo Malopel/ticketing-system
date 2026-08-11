@@ -252,110 +252,110 @@ function OrderStatusPage() {
             : null;
 
     return (
-        <main>
-            <Link to="/">
+        <main className="order-status-page">
+            <Link
+                className="back-link"
+                to="/"
+            >
                 ← Zurück zum Ticketshop
             </Link>
 
-            <h1>Bestellung #{order.id}</h1>
+            <header className="order-page-header">
+                <h1>Bestellung #{order.id}</h1>
+                <p>{order.concertTitle}</p>
+            </header>
 
-            <h2>{order.concertTitle}</h2>
+            <section className="order-status-card">
+                <OrderStatusBadge status={order.status}/>
 
-            <p>
-                Status:{' '}
-                <strong>
-                    <OrderStatusBadge status={order.status}/>
-                </strong>
-            </p>
-
-            <section>
-                <h2>Tickets</h2>
-
-                {order.items.map((item) => (
-                    <div key={item.id}>
+                {order.status === 'RESERVED' &&
+                    formattedRemainingTime && (
                         <p>
+                            Deine Tickets sind noch{' '}
                             <strong>
-                                {item.ticketCategoryName}
-                            </strong>
+                                {formattedRemainingTime} Minuten
+                            </strong>{' '}
+                            für dich reserviert.
                         </p>
-
-                        <p>
-                            {item.quantity} ×{' '}
-                            {currencyFormatter.format(
-                                item.unitPrice,
-                            )}
-                        </p>
-
-                        <p>
-                            {currencyFormatter.format(
-                                item.totalPrice,
-                            )}
-                        </p>
-                    </div>
-                ))}
-
-                <p>
-                    <strong>Gesamt:</strong>{' '}
-                    {currencyFormatter.format(
-                        order.totalAmount,
                     )}
-                </p>
+
+                {order.status === 'PAID' && (
+                    <p>
+                        Deine Bestellung wurde erfolgreich bezahlt.
+                    </p>
+                )}
+
+                {order.status === 'EXPIRED' && (
+                    <p>
+                        Die Reservierungszeit ist abgelaufen.
+                        Diese Bestellung kann nicht mehr bezahlt werden.
+                    </p>
+                )}
+
+                {order.status === 'CANCELLED' && (
+                    <p>
+                        Diese Bestellung wurde storniert.
+                    </p>
+                )}
+            </section>
+
+            <section className="order-details">
+                <h2>Deine Bestellung</h2>
+
+                <div className="order-items">
+                    {order.items.map((item) => (
+                        <div
+                            key={item.id}
+                            className="order-item"
+                        >
+                            <div>
+                                <strong>
+                                    {item.ticketCategoryName}
+                                </strong>
+
+                                <span>
+                                {item.quantity} ×{' '}
+                                    {currencyFormatter.format(
+                                        item.unitPrice,
+                                    )}
+                            </span>
+                            </div>
+
+                            <strong>
+                                {currencyFormatter.format(
+                                    item.totalPrice,
+                                )}
+                            </strong>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="status-order-total">
+                    <span>Gesamt</span>
+
+                    <strong>
+                        {currencyFormatter.format(
+                            order.totalAmount,
+                        )}
+                    </strong>
+                </div>
             </section>
 
             {order.status === 'RESERVED' && (
-                <>
-                    {formattedRemainingTime && (
-                        <section>
-                            <p>
-                                <strong>
-                                    Reservierungszeit verbleibend:
-                                </strong>{' '}
-                                {formattedRemainingTime} Minuten
-                            </p>
-                        </section>
-                    )}
-                    <PaymentSection
-                        order={order}
-                        accessToken={accessToken}
-                    />
-                </>
+                <PaymentSection
+                    order={order}
+                    accessToken={accessToken}
+                />
             )}
 
             {order.status === 'PAID' && (
-                <section>
-                    <h2>Zahlung erfolgreich</h2>
+                <section className="ticket-delivery-card">
+                    <h2>Deine Tickets</h2>
 
                     <p>
-                        Deine Bestellung wurde bezahlt.
-                    </p>
-
-                    <p>
-                        Deine Tickets wurden an{' '}
-                        <strong>
-                            {order.customerEmail}
-                        </strong>{' '}
+                        Die Tickets wurden an{' '}
+                        <strong>{order.customerEmail}</strong>{' '}
                         gesendet.
-                    </p>
-                </section>
-            )}
-
-            {order.status === 'EXPIRED' && (
-                <section>
-                    <h2>Reservierung abgelaufen</h2>
-
-                    <p>
-                        Diese Bestellung kann nicht mehr
-                        bezahlt werden.
-                    </p>
-                </section>
-            )}
-
-            {order.status === 'CANCELLED' && (
-                <section>
-                    <h2>Bestellung storniert</h2>
-
-                    <p>
-                        Diese Bestellung wurde storniert.
                     </p>
                 </section>
             )}

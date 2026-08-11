@@ -114,35 +114,52 @@ function ConcertPage() {
     });
 
     return (
-        <main>
-            <Link to="/">← Zurück zu den Konzerten</Link>
+        <main className="concert-page">
+            <Link
+                className="back-link"
+                to="/"
+            >
+                ← Zurück zu den Konzerten
+            </Link>
 
-            <h1>{concert.title}</h1>
+            <header className="concert-header">
+                <h1>{concert.title}</h1>
 
-            <p>{concert.description}</p>
+                <p className="concert-description">
+                    {concert.description}
+                </p>
 
-            <p>
-                {formattedDate} um {formattedTime} Uhr
-            </p>
+                <div className="concert-meta">
+                    <p>
+                        <strong>Termin</strong>
+                        <span>
+                            {formattedDate} um {formattedTime} Uhr
+                        </span>
+                    </p>
 
-            <p>{concert.location}</p>
+                    <p>
+                        <strong>Ort</strong>
+                        <span>{concert.location}</span>
+                    </p>
+                </div>
+            </header>
 
-            <section>
-                {loadingTickets && (
-                    <p>Ticketkategorien werden geladen...</p>
-                )}
+            {loadingTickets && (
+                <p>Ticketkategorien werden geladen...</p>
+            )}
 
-                {ticketError && (
-                    <p>Fehler: {ticketError}</p>
-                )}
+            {ticketError && (
+                <p className="error-message">
+                    Fehler: {ticketError}
+                </p>
+            )}
 
-                {!ticketError && !loadingTickets && (
-                    <TicketSelection
-                        concertId={concert.id}
-                        ticketCategories={ticketCategories}
-                    />
-                )}
-            </section>
+            {!ticketError && !loadingTickets && (
+                <TicketSelection
+                    concertId={concert.id}
+                    ticketCategories={ticketCategories}
+                />
+            )}
         </main>
     );
 }

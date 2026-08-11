@@ -42,46 +42,59 @@ function FakePaymentPage() {
     }
 
     return (
-        <main>
-            <h1>Fake Payment</h1>
+        <main className="fake-payment-page">
+            <section className="fake-payment-card">
+                <p className="fake-payment-label">
+                    Test-Zahlungsanbieter
+                </p>
 
-            {order === null ? (
-                <>
-                    <p>
-                        Dies ist der lokale Test-Zahlungsanbieter.
-                    </p>
+                <h1>Fake Payment</h1>
 
-                    <button
-                        type="button"
-                        onClick={handleCompletePayment}
-                        disabled={paying}
-                    >
-                        {paying
-                            ? 'Zahlung wird verarbeitet...'
-                            : 'Zahlung erfolgreich simulieren'}
-                    </button>
-                </>
-            ) : (
-                <>
-                    <h2>Zahlung erfolgreich</h2>
+                {!order && (
+                    <>
+                        <p>
+                            Diese Seite simuliert einen externen
+                            Zahlungsanbieter.
+                        </p>
 
-                    <p>
-                        Bestellung #{order.id} wurde bezahlt.
-                    </p>
+                        {error && (
+                            <p className="error-message">
+                                Fehler: {error}
+                            </p>
+                        )}
 
-                    <p>
-                        Status: <strong>{order.status}</strong>
-                    </p>
+                        <button
+                            type="button"
+                            className="primary-button"
+                            onClick={handleCompletePayment}
+                            disabled={paying}
+                        >
+                            {paying
+                                ? 'Zahlung wird verarbeitet...'
+                                : 'Zahlung erfolgreich simulieren'}
+                        </button>
+                    </>
+                )}
 
-                    <Link to={`/orders/${order.id}`}>
-                        Zur Bestellung
-                    </Link>
-                </>
-            )}
+                {order && (
+                    <>
+                        <p className="payment-success">
+                            ✓ Zahlung erfolgreich
+                        </p>
 
-            {error && (
-                <p>Fehler: {error}</p>
-            )}
+                        <p>
+                            Bestellung #{order.id} wurde bezahlt.
+                        </p>
+
+                        <Link
+                            className="button-link"
+                            to={`/orders/${order.id}`}
+                        >
+                            Zur Bestellung
+                        </Link>
+                    </>
+                )}
+            </section>
         </main>
     );
 }

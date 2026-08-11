@@ -1,4 +1,4 @@
-import type { TicketCategory } from '../../api/ticketCategoryApi';
+import type {TicketCategory} from '../../api/ticketCategoryApi';
 
 type OrderSummaryProps = {
     ticketCategories: TicketCategory[];
@@ -9,13 +9,17 @@ function OrderSummary({
                           ticketCategories,
                           quantities,
                       }: OrderSummaryProps) {
-    const currencyFormatter = new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR',
-    });
+    const currencyFormatter = new Intl.NumberFormat(
+        'de-DE',
+        {
+            style: 'currency',
+            currency: 'EUR',
+        },
+    );
 
     const selectedCategories = ticketCategories.filter(
-        (category) => (quantities[category.id] ?? 0) > 0,
+        (category) =>
+            (quantities[category.id] ?? 0) > 0,
     );
 
     const totalQuantity = selectedCategories.reduce(
@@ -33,40 +37,61 @@ function OrderSummary({
     );
 
     return (
-        <section>
-            <h3>Deine Tickets</h3>
+        <section className="order-summary">
+            <h2>Deine Tickets</h2>
 
-            {selectedCategories.map((category) => {
-                const quantity = quantities[category.id] ?? 0;
+            <div className="order-items">
+                {selectedCategories.map((category) => {
+                    const quantity =
+                        quantities[category.id] ?? 0;
 
-                return (
-                    <div key={category.id}>
-                        <p>
-                            <strong>{category.name}</strong>
-                        </p>
+                    return (
+                        <div
+                            key={category.id}
+                            className="order-item"
+                        >
+                            <div>
+                                <strong>
+                                    {category.name}
+                                </strong>
 
-                        <p>
-                            {quantity} ×{' '}
-                            {currencyFormatter.format(category.price)}
-                        </p>
+                                <span>
+                                    {quantity} ×{' '}
+                                    {currencyFormatter.format(
+                                        category.price,
+                                    )}
+                                </span>
+                            </div>
 
-                        <p>
-                            {currencyFormatter.format(
-                                category.price * quantity,
-                            )}
-                        </p>
-                    </div>
-                );
-            })}
+                            <strong>
+                                {currencyFormatter.format(
+                                    category.price *
+                                    quantity,
+                                )}
+                            </strong>
+                        </div>
+                    );
+                })}
+            </div>
 
-            <p>
-                <strong>Tickets:</strong> {totalQuantity}
-            </p>
+            <div className="order-total">
+                <span>
+                    {totalQuantity}{' '}
+                    {totalQuantity === 1
+                        ? 'Ticket'
+                        : 'Tickets'}
+                </span>
 
-            <p>
-                <strong>Gesamt:</strong>{' '}
-                {currencyFormatter.format(totalPrice)}
-            </p>
+                <div>
+                    <span>Gesamt</span>
+
+                    <strong>
+                        {currencyFormatter.format(
+                            totalPrice,
+                        )}
+                    </strong>
+                </div>
+            </div>
         </section>
     );
 }

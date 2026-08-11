@@ -1,12 +1,12 @@
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
-import type { Concert } from '../api/concertApi';
+import type {Concert} from '../api/concertApi';
 
 type ConcertCardProps = {
     concert: Concert;
 };
 
-function ConcertCard({ concert }: ConcertCardProps) {
+function ConcertCard({concert}: ConcertCardProps) {
     const startTime = new Date(concert.startTime);
 
     const formattedDate = startTime.toLocaleDateString('de-DE', {
@@ -21,7 +21,7 @@ function ConcertCard({ concert }: ConcertCardProps) {
     });
 
     return (
-        <article>
+        <article className="concert-card">
             <h2>{concert.title}</h2>
 
             <p>{concert.description}</p>
@@ -35,7 +35,9 @@ function ConcertCard({ concert }: ConcertCardProps) {
                 {formattedDate} · {formattedTime} Uhr
             </p>
 
-            <Link to={`/concerts/${concert.id}`}>
+            <Link
+                className="button-link"
+                to={`/concerts/${concert.id}`}>
                 Tickets auswählen
             </Link>
         </article>

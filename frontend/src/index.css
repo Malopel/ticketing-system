@@ -1,27 +1,652 @@
-* {
-  box-sizing: border-box;
+:root {
+    --page-width: 1100px;
+
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+
+    --radius-sm: 6px;
+    --radius-md: 12px;
+
+    --border-color: #d9d9d9;
+    --background: #ffffff;
+    --background-muted: #f6f6f6;
+    --text: #1f1f1f;
 }
 
-html {
-  font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
+* {
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background: #f5f5f5;
-  color: #222;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+
+    font-family: Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+    background-color: var(--background-muted);
+    color: var(--text);
+}
+
+main {
+    width: min(
+            calc(100% - 2 * var(--spacing-md)),
+            var(--padge-width)
+    );
+
+    margin: 0 auto;
+    padding: var(--spacing-lg) 0;
+}
+
+h1, h2, h3 {
+    margin-top: 0;
+    line-height: 1.2;
+}
+
+p {
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+    text-underline-offset: 0.2em
 }
 
 button,
-input,
-select,
-textarea {
-  font: inherit;
+input {
+    font: inherit;
+}
+
+button {
+    border: 0;
+    border-radius: var(--radius-sm);
+
+    padding: 0.75rem 1rem;
+
+    cursor: pointer;
+
+    background: var(--text);
+    color: var(--background);
+}
+
+button:hover {
+    opacity: 0.88;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+input {
+    width: 100%;
+    max-width: 28rem;
+
+    padding: 0.75rem;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+
+    background: var(--background);
+    color: var(--text);
+}
+
+input:focus {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
+section, article {
+    margin-top: var(--spacing-md);
+}
+
+article {
+    padding: var(--spacing-md);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.page-header {
+    max-width: 40rem;
+    margin: 0 auto var(--spacing-lg);
+    text-align: center;
+}
+
+.page-header p {
+    margin-bottom: 0;
+}
+
+.concert-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.concert-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.concert-card h2 {
+    margin-bottom: 0;
+}
+
+.concert-card p {
+    margin: 0;
+}
+
+.button-link {
+    align-self: flex-start;
+
+    display: inline-block;
+
+    margin-top: var(--spacing-sm);
+    padding: 0.75rem 1rem;
+
+    border-radius: var(--radius-sm);
+
+    background: var(--text);
+    color: var(--background);
+
+    text-decoration: none;
+}
+
+.button-link:hover {
+    opacity: 0.88;
+}
+
+.concert-page {
+    max-width: 900px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: var(--spacing-md);
+}
+
+.concert-header {
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.concert-header h1 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.concert-description {
+    max-width: 45rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.concert-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.concert-meta p {
+    display: flex;
+    flex-direction: column;
+
+    margin: 0;
+}
+
+.concert-meta span {
+    margin-top: 0.25rem;
+}
+
+.ticket-selection {
+    margin-top: var(--spacing-lg);
+}
+
+.section-header {
+    margin-bottom: var(--spacing-md);
+}
+
+.section-header h2 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.section-header p {
+    margin: 0;
+}
+
+.ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.ticket-category-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+
+    margin: 0;
+    padding: var(--spacing-md);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.ticket-category-info h3,
+.ticket-category-info p {
+    margin: 0;
+}
+
+.ticket-category-info p {
+    margin-top: 0.25rem;
+    font-weight: 600;
+}
+
+.ticket-category-info small {
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.quantity-button {
+    display: grid;
+    place-items: center;
+
+    width: 2.5rem;
+    height: 2.5rem;
+
+    padding: 0;
+
+    font-size: 1.25rem;
+}
+
+.quantity-value {
+    min-width: 2rem;
+
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.ticket-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.ticket-summary > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-summary > div span {
+    font-size: 0.9rem;
+}
+
+.ticket-summary > div strong {
+    margin-top: 0.25rem;
+}
+
+.ticket-summary button {
+    margin-left: auto;
+}
+
+.error-message {
+    padding: var(--spacing-sm);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.checkout-page {
+    max-width: 760px;
+}
+
+.checkout-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.checkout-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.checkout-header p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.order-summary,
+.customer-details {
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.order-summary {
+    margin-top: 0;
+}
+
+.order-summary h2,
+.customer-details h2,
+.customer-details h3 {
+    margin-bottom: var(--spacing-md);
+}
+
+.order-items {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+
+    padding: var(--spacing-sm) 0;
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.order-item span {
+    font-size: 0.9rem;
+}
+
+.order-total {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+
+    padding-top: var(--spacing-md);
+}
+
+.order-total > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.order-total > div strong {
+    margin-top: 0.25rem;
+
+    font-size: 1.4rem;
+}
+
+.customer-details {
+    margin-top: var(--spacing-md);
+}
+
+.customer-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+}
+
+.customer-form label {
+    font-weight: 600;
+}
+
+.customer-form input {
+    max-width: none;
+}
+
+.primary-button {
+    margin-top: var(--spacing-xs);
+}
+
+.order-status-page {
+    max-width: 760px;
+}
+
+.order-page-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.order-page-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.order-page-header p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.order-status-card,
+.order-details,
+.payment-section,
+.ticket-delivery-card {
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.order-status-card {
+    margin-top: 0;
+}
+
+.order-status-card p {
+    margin-bottom: 0;
+}
+
+.order-status-badge {
+    display: inline-block;
+
+    padding: 0.4rem 0.7rem;
+
+    border-radius: 999px;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.order-status-reserved {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.order-status-paid {
+    background: #ecfdf3;
+    color: #166534;
+}
+
+.order-status-expired,
+.order-status-cancelled {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.order-details,
+.payment-section,
+.ticket-delivery-card {
+    margin-top: var(--spacing-md);
+}
+
+.order-details h2,
+.payment-section h2,
+.ticket-delivery-card h2 {
+    margin-bottom: var(--spacing-md);
+}
+
+.status-order-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-top: var(--spacing-md);
+
+    font-size: 1.1rem;
+}
+
+.status-order-total strong {
+    font-size: 1.4rem;
+}
+
+.payment-section .primary-button {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+}
+
+.ticket-delivery-card p {
+    margin-bottom: 0;
+}
+
+.fake-payment-page {
+     display: grid;
+     place-items: center;
+
+     min-height: 80vh;
+     max-width: 520px;
+ }
+
+.fake-payment-card {
+    width: 100%;
+
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.fake-payment-label {
+    margin: 0 0 var(--spacing-xs);
+
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.fake-payment-card .primary-button {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+}
+
+.payment-success {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+@media (max-width: 600px) {
+    .concert-header {
+        padding: var(--spacing-md);
+    }
+
+    .concert-meta {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .ticket-category-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .quantity-control {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .ticket-summary {
+        align-items: stretch;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .ticket-summary button {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .order-summary,
+    .customer-details {
+        padding: var(--spacing-md);
+    }
+
+    .order-item {
+        align-items: flex-start;
+    }
+
+    .order-total {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .order-total > div {
+        align-items: flex-start;
+    }
+
+    .primary-button {
+        width: 100%;
+    }
+
+    .order-status-card,
+    .order-details,
+    .payment-section,
+    .ticket-delivery-card {
+        padding: var(--spacing-md);
+    }
+
+    .status-order-total {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
 }

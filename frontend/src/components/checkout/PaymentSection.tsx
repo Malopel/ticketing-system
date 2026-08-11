@@ -53,7 +53,7 @@ function PaymentSection({
     }
 
     return (
-        <section>
+        <section className="payment-section">
             <h2>Zahlung</h2>
 
             <p>
@@ -75,6 +75,7 @@ function PaymentSection({
             )}
 
             <button
+                className="primary-button"
                 type="button"
                 onClick={handleStartPayment}
                 disabled={startingPayment}

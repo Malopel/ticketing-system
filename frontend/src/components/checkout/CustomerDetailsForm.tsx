@@ -42,15 +42,16 @@ function CustomerDetailsForm({
     }
 
     return (
-        <section>
+        <section className="customer-details">
             <h3>Kontaktdaten</h3>
 
-            <form onSubmit={handleSubmit}>
+            <form
+                className="customer-form"
+                onSubmit={handleSubmit}
+            >
                 <label htmlFor="customerEmail">
                     E-Mail-Adresse
                 </label>
-
-                <br />
 
                 <input
                     id="customerEmail"
@@ -69,6 +70,7 @@ function CustomerDetailsForm({
                 )}
 
                 <button
+                    className="primary-button"
                     type="submit"
                     disabled={
                         submitting ||
