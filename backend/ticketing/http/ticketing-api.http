@@ -1,6 +1,6 @@
 ### Variablen
 @baseUrl = http://localhost:8080
-@concertId = 1
+@concertId = 2
 @categoryId = 1
 @orderId = 4
 @qrToken = 797e37a2-530a-4a16-a43d-47d7f11cf1aa
@@ -62,9 +62,9 @@ Authorization: Basic admin test-password
 Content-Type: application/json
 
 {
-  "name": "1. Preiskategorie",
+  "name": "2. Preiskategorie",
   "price": 50.00,
-  "capacity": 200
+  "capacity": 9
 }
 
 

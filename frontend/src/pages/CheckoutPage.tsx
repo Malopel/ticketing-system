@@ -19,6 +19,8 @@ import OrderSummary
 
 import {createOrder} from '../api/orderApi';
 
+import {ApiError} from '../api/apiError';
+
 function CheckoutPage() {
     const {concertId} = useParams<{
         concertId: string;
@@ -112,13 +114,38 @@ function CheckoutPage() {
             );
         }
 
-        const response = await createOrder(
-            concert.id,
-            {
-                customerEmail,
-                items,
-            },
-        );
+        let response;
+
+        try {
+            response = await createOrder(
+                concert.id,
+                {
+                    customerEmail,
+                    items,
+                }
+            );
+        } catch (error) {
+            if (
+                error instanceof ApiError &&
+                (
+                    error.code === 'NOT_ENOUGH_TICKETS_AVAILABLE' ||
+                    error.code === 'TICKET_CATEGORY_NOT_FOUND'
+                )
+            ) {
+                navigate(
+                    `/concerts/${concert.id}`,
+                    {
+                        state: {
+                            availabilityChanged: true,
+                        },
+                    },
+                );
+
+                return;
+            }
+
+            throw error;
+        }
 
         sessionStorage.setItem(
             `order-${response.order.id}`,

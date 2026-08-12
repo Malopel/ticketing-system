@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 
-import type { TicketCategory } from '../api/ticketCategoryApi';
+import type {TicketCategory} from '../api/ticketCategoryApi';
 import TicketCategoryCard from './TicketCategoryCard';
 
 type TicketSelectionProps = {
@@ -16,7 +16,44 @@ function TicketSelection({
     const navigate = useNavigate();
 
     const [quantities, setQuantities] =
-        useState<Record<number, number>>({});
+        useState<Record<number, number>>(() => {
+            const storedQuantities = sessionStorage.getItem(
+                `checkout-${concertId}`,
+            );
+
+            if (!storedQuantities) {
+                return {};
+            }
+
+            try {
+                const parsedQuantities =
+                    JSON.parse(storedQuantities) as Record<
+                        number,
+                        number
+                    >;
+
+                return Object.fromEntries(
+                    ticketCategories.map((category) => {
+                        const storedQuantity =
+                            parsedQuantities[category.id] ?? 0;
+
+                        return [
+                            category.id,
+                            Math.min(
+                                storedQuantity,
+                                category.available,
+                            ),
+                        ];
+                    }),
+                );
+            } catch {
+                sessionStorage.removeItem(
+                    `checkout-${concertId}`,
+                );
+
+                return {};
+            }
+        });
 
     const currencyFormatter = new Intl.NumberFormat('de-DE', {
         style: 'currency',
@@ -47,6 +84,15 @@ function TicketSelection({
         0,
     );
 
+    const location = useLocation();
+
+    const availabilityChanged =
+        (
+            location.state as {
+                availabilityChanged?: boolean;
+            } | null
+        )?.availabilityChanged === true;
+
     function handleContinueToCheckout() {
         if (totalQuantity === 0) {
             return;
@@ -64,6 +110,14 @@ function TicketSelection({
         <section className="ticket-selection">
             <div className="ticket-selection-header">
                 <h2>Tickets auswählen</h2>
+
+                {availabilityChanged && (
+                    <p className="availability-warning">
+                        Die Ticketverfügbarkeit hat sich geändert.
+                        Wir haben deine Auswahl an den aktuellen
+                        Bestand angepasst. Bitte prüfe sie noch einmal.
+                    </p>
+                )}
 
                 <p>
                     Wähle deine gewünschten Ticketkategorien
