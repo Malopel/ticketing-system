@@ -96,7 +96,7 @@ class OrderServiceTest {
 
         List<TicketResponse> tickets = List.of();
 
-        when(orderRepository.findById(42L))
+        when(orderRepository.findByIdForUpdate(42L))
                 .thenReturn(Optional.of(order));
 
         when(orderRepository.save(order))
@@ -136,14 +136,14 @@ class OrderServiceTest {
 
         order.markAsPaid();
 
-        when(orderRepository.findById(42L))
+        when(orderRepository.findByIdForUpdate(42L))
                 .thenReturn(Optional.of(order));
 
         Order paidOrder = orderService.markOrderPaidFromPayment(42L);
 
         assertEquals(OrderStatus.PAID, paidOrder.getStatus());
 
-        verify(orderRepository).findById(42L);
+        verify(orderRepository).findByIdForUpdate(42L);
         verify(orderRepository, never()).save(any());
         verify(ticketService, never()).createTicketsForOrder(any());
 
@@ -167,7 +167,7 @@ class OrderServiceTest {
                 LocalDateTime.now().minusHours(1)
         );
 
-        when(orderRepository.findById(42L))
+        when(orderRepository.findByIdForUpdate(42L))
                 .thenReturn(Optional.of(order));
 
         assertThrows(
@@ -266,5 +266,289 @@ class OrderServiceTest {
         verify(orderAccessTokenService, never()).generateToken();
         verify(ticketCategoryRepository, never()).findByIdAndConcertIdForUpdate(any(), any());
         verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void cancelOrderCancelsReservedOrder() {
+        Long concertId = 1L;
+        Long orderId = 42L;
+        String accessToken = "plain-token";
+
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        Order order = new Order(
+                concert,
+                "kunde@example.com",
+                "stored-token-hash",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
+        );
+
+        when(concertRepository.existsById(concertId))
+                .thenReturn(true);
+
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        ))
+                .thenReturn(Optional.of(order));
+
+        when(orderAccessTokenService.matches(
+                accessToken,
+                order.getAccessTokenHash()
+        ))
+                .thenReturn(true);
+
+        when(orderRepository.save(order))
+                .thenReturn(order);
+
+        OrderResponse response = orderService.cancelOrder(
+                concertId,
+                orderId,
+                accessToken
+        );
+
+        assertEquals(
+                OrderStatus.CANCELLED,
+                response.status()
+        );
+
+        assertEquals(
+                OrderStatus.CANCELLED,
+                order.getStatus()
+        );
+
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void cancelOrderRejectsWrongAccessToken() {
+        Long concertId = 1L;
+        Long orderId = 42L;
+        String accessToken = "wrong-token";
+
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        Order order = new Order(
+                concert,
+                "kunde@example.com",
+                "stored-token-hash",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
+        );
+
+        when(concertRepository.existsById(concertId))
+                .thenReturn(true);
+
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        ))
+                .thenReturn(Optional.of(order));
+
+        when(orderAccessTokenService.matches(
+                accessToken,
+                order.getAccessTokenHash()
+        ))
+                .thenReturn(false);
+
+        assertThrows(
+                OrderNotFoundException.class,
+                () -> orderService.cancelOrder(
+                        concertId,
+                        orderId,
+                        accessToken
+                )
+        );
+
+        assertEquals(
+                OrderStatus.RESERVED,
+                order.getStatus()
+        );
+
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void cancelOrderRejectsPaidOrder() {
+        Long concertId = 1L;
+        Long orderId = 42L;
+        String accessToken = "plain-token";
+
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        Order order = new Order(
+                concert,
+                "kunde@example.com",
+                "stored-token-hash",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
+        );
+
+        order.markAsPaid();
+
+        when(concertRepository.existsById(concertId))
+                .thenReturn(true);
+
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        ))
+                .thenReturn(Optional.of(order));
+
+        when(orderAccessTokenService.matches(
+                accessToken,
+                order.getAccessTokenHash()
+        ))
+                .thenReturn(true);
+
+        assertThrows(
+                OrderIsPaidOrExpiredException.class,
+                () -> orderService.cancelOrder(
+                        concertId,
+                        orderId,
+                        accessToken
+                )
+        );
+
+        assertEquals(
+                OrderStatus.PAID,
+                order.getStatus()
+        );
+
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void cancelOrderExpiresAndRejectsExpiredOrder() {
+        Long concertId = 1L;
+        Long orderId = 42L;
+        String accessToken = "plain-token";
+
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        Order order = new Order(
+                concert,
+                "kunde@example.com",
+                "stored-token-hash",
+                LocalDateTime.now().minusHours(2),
+                LocalDateTime.now().minusHours(1)
+        );
+
+        when(concertRepository.existsById(concertId))
+                .thenReturn(true);
+
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        ))
+                .thenReturn(Optional.of(order));
+
+        when(orderAccessTokenService.matches(
+                accessToken,
+                order.getAccessTokenHash()
+        ))
+                .thenReturn(true);
+
+        assertThrows(
+                OrderIsPaidOrExpiredException.class,
+                () -> orderService.cancelOrder(
+                        concertId,
+                        orderId,
+                        accessToken
+                )
+        );
+
+        assertEquals(
+                OrderStatus.EXPIRED,
+                order.getStatus()
+        );
+
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void cancelOrderIsIdempotentWhenAlreadyCancelled() {
+        Long concertId = 1L;
+        Long orderId = 42L;
+        String accessToken = "plain-token";
+
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        Order order = new Order(
+                concert,
+                "kunde@example.com",
+                "stored-token-hash",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
+        );
+
+        when(concertRepository.existsById(concertId))
+                .thenReturn(true);
+
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        ))
+                .thenReturn(Optional.of(order));
+
+        when(orderAccessTokenService.matches(
+                accessToken,
+                order.getAccessTokenHash()
+        ))
+                .thenReturn(true);
+
+        when(orderRepository.save(order))
+                .thenReturn(order);
+
+        orderService.cancelOrder(
+                concertId,
+                orderId,
+                accessToken
+        );
+
+        OrderResponse secondResponse =
+                orderService.cancelOrder(
+                        concertId,
+                        orderId,
+                        accessToken
+                );
+
+        assertEquals(
+                OrderStatus.CANCELLED,
+                secondResponse.status()
+        );
+
+        assertEquals(
+                OrderStatus.CANCELLED,
+                order.getStatus()
+        );
+
+        verify(orderRepository, times(2)).save(order);
     }
 }

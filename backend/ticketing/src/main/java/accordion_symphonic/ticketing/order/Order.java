@@ -73,6 +73,12 @@ public class Order {
     }
 
     public void markAsPaid() {
+        if (this.status == OrderStatus.PAID) return;
+
+        if (this.status != OrderStatus.RESERVED) {
+            throw new IllegalStateException("Only reserved orders can be paid.");
+        }
+
         this.status = OrderStatus.PAID;
         this.paidAt = LocalDateTime.now();
     }
@@ -84,6 +90,12 @@ public class Order {
     }
 
     public void cancel() {
+        if (this.status == OrderStatus.CANCELLED) return;
+
+        if (this.status != OrderStatus.RESERVED) {
+            throw new IllegalStateException("Only reserved orders can be cancelled.");
+        }
+
         this.status = OrderStatus.CANCELLED;
     }
 

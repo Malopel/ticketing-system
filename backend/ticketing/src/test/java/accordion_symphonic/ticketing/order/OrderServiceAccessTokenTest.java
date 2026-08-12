@@ -101,13 +101,15 @@ class OrderServiceAccessTokenTest {
 
         when(concertRepository.existsById(CONCERT_ID))
                 .thenReturn(true);
-
-        when(orderRepository.findByIdAndConcertId(ORDER_ID, CONCERT_ID))
-                .thenReturn(Optional.of(order));
     }
 
     @Test
     void customerCanReadOrderWithCorrectToken() {
+        when(orderRepository.findByIdAndConcertId(
+            ORDER_ID,
+            CONCERT_ID
+        )).thenReturn(Optional.of(order));
+
         OrderResponse response = orderService.getCustomerOrder(
                 CONCERT_ID,
                 ORDER_ID,
@@ -120,6 +122,11 @@ class OrderServiceAccessTokenTest {
 
     @Test
     void customerCannotReadOrderWithWrongToken() {
+        when(orderRepository.findByIdAndConcertId(
+                ORDER_ID,
+                CONCERT_ID
+        )).thenReturn(Optional.of(order));
+
         assertThrows(
                 OrderNotFoundException.class,
                 () -> orderService.getCustomerOrder(
@@ -132,6 +139,11 @@ class OrderServiceAccessTokenTest {
 
     @Test
     void customerCannotReadOrderWithoutToken() {
+        when(orderRepository.findByIdAndConcertId(
+                ORDER_ID,
+                CONCERT_ID
+        )).thenReturn(Optional.of(order));
+
         assertThrows(
                 OrderNotFoundException.class,
                 () -> orderService.getCustomerOrder(
@@ -144,6 +156,11 @@ class OrderServiceAccessTokenTest {
 
     @Test
     void customerCanCancelOrderWithCorrectToken() {
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+            ORDER_ID,
+            CONCERT_ID
+        )).thenReturn(Optional.of(order));
+
         when(orderRepository.save(order))
                 .thenReturn(order);
 
@@ -161,6 +178,11 @@ class OrderServiceAccessTokenTest {
 
     @Test
     void customerCannotCancelOrderWithWrongToken() {
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                ORDER_ID,
+                CONCERT_ID
+        )).thenReturn(Optional.of(order));
+
         assertThrows(
                 OrderNotFoundException.class,
                 () -> orderService.cancelOrder(
@@ -177,6 +199,11 @@ class OrderServiceAccessTokenTest {
 
     @Test
     void customerReadingExpiredOrderMarksItExpired() {
+        when(orderRepository.findByIdAndConcertId(
+                ORDER_ID,
+                CONCERT_ID
+        )).thenReturn(Optional.of(order));
+
         Order expiredOrder = new Order(
                 order.getConcert(),
                 "kunde@example.com",
