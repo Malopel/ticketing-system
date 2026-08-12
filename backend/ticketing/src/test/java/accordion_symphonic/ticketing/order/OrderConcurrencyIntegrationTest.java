@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.order;
 import accordion_symphonic.ticketing.availability.NotEnoughTicketsAvailableException;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.Test;
@@ -18,14 +19,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.hibernate.validator.internal.util.Contracts.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
@@ -144,6 +141,131 @@ class OrderConcurrencyIntegrationTest {
                 );
 
         assertEquals(1, orderRepository.findAll().size());
+    }
+
+    @Test
+    void cancelAndPaymentCannotBothWin() throws Exception {
+        Concert concert = new Concert(
+                "Race Condition Konzert",
+                "Test",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        concert.publish();
+        final Concert savedConcert = concertRepository.save(concert);
+
+        TicketCategory category = new TicketCategory(
+                "Normal",
+                new BigDecimal("25.00"),
+                100,
+                savedConcert
+        );
+
+        category = ticketCategoryRepository.save(category);
+
+        OrderRequest request = new OrderRequest(
+                "test@example.de",
+                List.of(
+                        new OrderItemRequest(
+                                category.getId(),
+                                1
+                        )
+                )
+        );
+
+        CreatedOrderResponse createdOrder =
+                orderService.createOrder(
+                        savedConcert.getId(),
+                        request
+                );
+
+        Long orderId = createdOrder.order().id();
+        String accessToken = createdOrder.accessToken();
+
+        ExecutorService executor =
+                Executors.newFixedThreadPool(2);
+
+        CountDownLatch ready =
+                new CountDownLatch(2);
+
+        CountDownLatch start =
+                new CountDownLatch(1);
+
+        Future<Boolean> cancelFuture =
+                executor.submit(() -> {
+                    ready.countDown();
+
+                    start.await();
+
+                    try {
+                        orderService.cancelOrder(
+                                savedConcert.getId(),
+                                orderId,
+                                accessToken
+                        );
+
+                        return true;
+                    } catch (OrderIsPaidOrExpiredException exception) {
+                        return false;
+                    }
+                });
+
+        Future<Boolean> paymentFuture =
+                executor.submit(() -> {
+                    ready.countDown();
+
+                    start.await();
+
+                    try {
+                        orderService.markOrderPaidFromPayment(
+                                orderId
+                        );
+
+                        return true;
+                    } catch (OrderCannotBePaidException exception) {
+                        return false;
+                    }
+                });
+
+        assertTrue(
+                ready.await(5, TimeUnit.SECONDS),
+                "Beide Threads sollten startbereit sein"
+        );
+
+        start.countDown();
+
+        boolean cancelSucceeded =
+                cancelFuture.get(10, TimeUnit.SECONDS);
+
+        boolean paymentSucceeded =
+                paymentFuture.get(10, TimeUnit.SECONDS);
+
+        executor.shutdownNow();
+
+        assertNotEquals(
+                cancelSucceeded,
+                paymentSucceeded,
+                "Genau eine Operation muss erfolgreich sein"
+        );
+
+        Order finalOrder = orderRepository
+                .findById(orderId)
+                .orElseThrow();
+
+        if (cancelSucceeded) {
+            assertEquals(
+                    OrderStatus.CANCELLED,
+                    finalOrder.getStatus()
+            );
+        }
+
+        if (paymentSucceeded) {
+            assertEquals(
+                    OrderStatus.PAID,
+                    finalOrder.getStatus()
+            );
+        }
     }
 
     private record OrderAttemptResult(

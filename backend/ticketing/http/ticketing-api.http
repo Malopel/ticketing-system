@@ -1,6 +1,6 @@
 ### Variablen
 @baseUrl = http://localhost:8080
-@concertId = 2
+@concertId = 1
 @categoryId = 1
 @orderId = 4
 @qrToken = 797e37a2-530a-4a16-a43d-47d7f11cf1aa
@@ -52,19 +52,19 @@ Content-Type: application/json
 
 {
   "name": "Normal",
-  "price": 25.00,
-  "capacity": 100
+  "price": 30.00,
+  "capacity": 1000
 }
 
 ### Test Ticketkategorie anlegen
-POST {{baseUrl}}/api/admin/concerts/2/ticket-categories
+POST {{baseUrl}}/api/admin/concerts/{{concertId}}/ticket-categories
 Authorization: Basic admin test-password
 Content-Type: application/json
 
 {
-  "name": "Normal",
-  "price": 25.00,
-  "capacity": 10
+  "name": "1. Preiskategorie",
+  "price": 50.00,
+  "capacity": 200
 }
 
 

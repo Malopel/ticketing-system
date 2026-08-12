@@ -345,6 +345,7 @@ function OrderStatusPage() {
                 <PaymentSection
                     order={order}
                     accessToken={accessToken}
+                    onOrderUpdated={setOrder}
                 />
             )}
 

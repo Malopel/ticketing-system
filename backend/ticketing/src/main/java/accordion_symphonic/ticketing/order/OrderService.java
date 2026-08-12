@@ -138,13 +138,14 @@ public class OrderService {
         return CreatedOrderResponse.fromEntity(savedOrder, accessToken.token());
     }
 
+    @Transactional
     public OrderResponse cancelOrder(Long concertId, Long orderId, String accessToken) {
         if (!concertRepository.existsById(concertId)) {
             throw new ConcertNotFoundException(concertId);
         }
 
         Order order = this.orderRepository
-                .findByIdAndConcertId(orderId, concertId)
+                .findByIdAndConcertIdForUpdate(orderId, concertId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         ensureCustomerHasAccess(order, accessToken);
@@ -165,7 +166,7 @@ public class OrderService {
             throw new ConcertNotFoundException(concertId);
         }
 
-        Order order = orderRepository.findByIdAndConcertId(orderId, concertId)
+        Order order = orderRepository.findByIdAndConcertIdForUpdate(orderId, concertId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         Order savedOrder = markOrderPaid(order);
@@ -233,7 +234,7 @@ public class OrderService {
 
     @Transactional
     public Order markOrderPaidFromPayment(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         return markOrderPaid(order);

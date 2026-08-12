@@ -88,3 +88,28 @@ export async function getOrder(
 
     return response.json();
 }
+
+export async function cancelOrder(
+    concertId: number,
+    orderId: number,
+    accessToken: string,
+): Promise<OrderResponse> {
+    const response = await fetch(
+        `/api/concerts/${concertId}/orders/${orderId}/cancel`,
+        {
+            method: 'PATCH',
+            headers: {
+                'X-Order-Access-Token': accessToken,
+            },
+        },
+    );
+
+    if (!response.ok) {
+        await throwApiError(
+            response,
+            'Bestellung konnte nicht storniert werden.',
+        );
+    }
+
+    return response.json();
+}
