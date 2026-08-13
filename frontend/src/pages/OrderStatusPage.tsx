@@ -1,3 +1,5 @@
+import './styles/OrderStatusPage.css'
+
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 
@@ -48,6 +50,10 @@ function OrderStatusPage() {
         orderId: number;
         seconds: number;
     } | null>(null);
+
+    const [refreshing, setRefreshing] = useState(false);
+    const [refreshError, setRefreshError] =
+        useState<string | null>(null);
 
     const expirationRefreshTriggered =
         useRef<number | null>(null);
@@ -251,6 +257,32 @@ function OrderStatusPage() {
                 .padStart(2, '0')}`
             : null;
 
+    async function handleRefreshStatus() {
+        if (!order || !accessToken) {
+            return;
+        }
+
+        try {
+            setRefreshing(true);
+            setRefreshError(null);
+
+            await fetchOrder(
+                order.concertId,
+                accessToken,
+            );
+        } catch (error) {
+            if (error instanceof Error) {
+                setRefreshError(error.message);
+            } else {
+                setRefreshError(
+                    'Bestellstatus konnte nicht aktualisiert werden.',
+                );
+            }
+        } finally {
+            setRefreshing(false);
+        }
+    }
+
     return (
         <main className="order-status-page">
             <Link
@@ -277,7 +309,28 @@ function OrderStatusPage() {
                             </strong>{' '}
                             für dich reserviert.
                         </p>
-                    )}
+                    )
+                }
+
+                {order.status === 'RESERVED' && (
+                    <div className="status-refresh">
+                        <button
+                            type="button"
+                            onClick={handleRefreshStatus}
+                            disabled={refreshing}
+                        >
+                            {refreshing
+                                ? 'Status wird aktualisiert...'
+                                : 'Status aktualisieren'}
+                        </button>
+
+                        {refreshError && (
+                            <p className="error-message">
+                                Fehler: {refreshError}
+                            </p>
+                        )}
+                    </div>
+                )}
 
                 {order.status === 'PAID' && (
                     <p>

@@ -1,0 +1,34 @@
+.payment-section {
+    width: 100%;
+    margin-top: var(--spacing-md);
+
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.payment-section h2 {
+    margin-bottom: var(--spacing-md);
+}
+
+.cancel-section {
+    margin-top: var(--spacing-lg);
+}
+
+.cancel-confirmation {
+    margin-top: var(--spacing-sm);
+}
+
+.cancel-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+@media (max-width: 600px) {
+    .payment-section {
+        padding: var(--spacing-md);
+    }
+}

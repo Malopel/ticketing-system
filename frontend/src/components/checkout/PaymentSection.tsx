@@ -1,3 +1,5 @@
+import './styles/PaymentSection.css'
+
 import {useState} from 'react';
 
 import {

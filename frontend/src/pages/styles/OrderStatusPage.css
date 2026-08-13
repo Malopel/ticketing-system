@@ -1,0 +1,88 @@
+.order-status-page {
+    max-width: 760px;
+}
+
+.order-page-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.order-page-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.order-page-header p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.order-status-card,
+.order-details,
+.ticket-delivery-card {
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.order-status-card {
+    margin-top: 0;
+}
+
+.order-status-card p {
+    margin-bottom: 0;
+}
+
+.order-details,
+.ticket-delivery-card {
+    margin-top: var(--spacing-md);
+}
+
+.order-details h2,
+.ticket-delivery-card h2 {
+    margin-bottom: var(--spacing-md);
+}
+
+.status-order-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-top: var(--spacing-md);
+
+    font-size: 1.1rem;
+}
+
+.status-order-total strong {
+    font-size: 1.4rem;
+}
+
+.ticket-delivery-card p {
+    margin-bottom: 0;
+}
+
+.status-refresh {
+    margin-top: var(--spacing-sm);
+}
+
+.status-refresh button {
+    background: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border-color);
+}
+
+@media (max-width: 600px) {
+    .order-status-card,
+    .order-details,
+    .ticket-delivery-card {
+        padding: var(--spacing-md);
+    }
+
+    .status-order-total {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+
+}

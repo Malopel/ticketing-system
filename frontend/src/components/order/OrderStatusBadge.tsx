@@ -1,3 +1,5 @@
+import './styles/OrderStatusBadge.css'
+
 import type {OrderResponse} from '../../api/orderApi';
 
 type OrderStatusBadgeProps = {

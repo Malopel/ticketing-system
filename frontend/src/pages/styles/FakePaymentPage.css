@@ -1,0 +1,38 @@
+.fake-payment-page {
+    display: grid;
+    place-items: center;
+
+    min-height: 80vh;
+    max-width: 520px;
+}
+
+.fake-payment-card {
+    width: 100%;
+
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.fake-payment-label {
+    margin: 0 0 var(--spacing-xs);
+
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.fake-payment-card .primary-button {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+}
+
+.payment-success {
+    font-size: 1.1rem;
+    font-weight: 700;
+}

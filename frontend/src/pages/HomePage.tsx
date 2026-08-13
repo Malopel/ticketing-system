@@ -1,3 +1,5 @@
+import './styles/HomePage.css'
+
 import { useEffect, useState } from 'react';
 import { getConcerts, type Concert } from '../api/concertApi';
 import ConcertCard from '../components/ConcertCard';

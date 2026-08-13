@@ -1,4 +1,4 @@
-import {useState, type FormEvent} from 'react';
+import {useRef, useState, type FormEvent} from 'react';
 
 type CustomerDetailsFormProps = {
     onSubmit: (customerEmail: string) => Promise<void>;
@@ -11,10 +11,16 @@ function CustomerDetailsForm({
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const submitInProgress = useRef(false);
+
     async function handleSubmit(
         event: FormEvent<HTMLFormElement>,
     ) {
         event.preventDefault();
+
+        if (submitInProgress.current) {
+            return;
+        }
 
         const email = customerEmail.trim();
 
@@ -22,6 +28,8 @@ function CustomerDetailsForm({
             setError('Bitte gib eine E-Mail-Adresse ein.');
             return;
         }
+
+        submitInProgress.current = true;
 
         try {
             setSubmitting(true);
@@ -37,6 +45,7 @@ function CustomerDetailsForm({
                 );
             }
         } finally {
+            submitInProgress.current = false;
             setSubmitting(false);
         }
     }

@@ -1,3 +1,5 @@
+import './styles/FakePaymentPage.css'
+
 import {useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import {completeFakePayment} from '../api/paymentApi';

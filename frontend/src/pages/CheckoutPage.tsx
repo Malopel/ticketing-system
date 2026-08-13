@@ -1,3 +1,5 @@
+import './styles/CheckoutPage.css'
+
 import {useEffect, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 
@@ -94,6 +96,10 @@ function CheckoutPage() {
     async function handleCreateOrder(
         customerEmail: string,
     ) {
+        await new Promise((resolve) =>
+            setTimeout(resolve, 5000),
+        );
+
         if (!concert) {
             throw new Error(
                 'Konzert konnte nicht geladen werden.',

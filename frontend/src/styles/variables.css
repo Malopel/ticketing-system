@@ -1,0 +1,16 @@
+:root {
+    --page-width: 1100px;
+
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+
+    --radius-sm: 6px;
+    --radius-md: 12px;
+
+    --border-color: #d9d9d9;
+    --background: #ffffff;
+    --background-muted: #f6f6f6;
+    --text: #1f1f1f;
+}

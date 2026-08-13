@@ -1,0 +1,19 @@
+.page-header {
+    max-width: 40rem;
+    margin: 0 auto var(--spacing-lg);
+    text-align: center;
+}
+
+.page-header p {
+    margin-bottom: 0;
+}
+
+.concert-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+
+    max-width: 1000px;
+    margin: 0 auto;
+}

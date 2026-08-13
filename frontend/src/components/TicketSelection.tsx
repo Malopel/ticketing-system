@@ -1,7 +1,10 @@
+import './styles/TicketSelection.css'
+
 import {useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
 import type {TicketCategory} from '../api/ticketCategoryApi';
+import {clampQuantitiesToAvailability} from '../utils/ticketSelectionUtils.ts';
 import TicketCategoryCard from './TicketCategoryCard';
 
 type TicketSelectionProps = {
@@ -32,19 +35,9 @@ function TicketSelection({
                         number
                     >;
 
-                return Object.fromEntries(
-                    ticketCategories.map((category) => {
-                        const storedQuantity =
-                            parsedQuantities[category.id] ?? 0;
-
-                        return [
-                            category.id,
-                            Math.min(
-                                storedQuantity,
-                                category.available,
-                            ),
-                        ];
-                    }),
+                return clampQuantitiesToAvailability(
+                    parsedQuantities,
+                    ticketCategories
                 );
             } catch {
                 sessionStorage.removeItem(

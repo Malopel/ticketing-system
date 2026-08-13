@@ -1,3 +1,5 @@
+import './styles/TicketCategoryCard.css'
+
 import type {TicketCategory} from '../api/ticketCategoryApi';
 
 type TicketCategoryCardProps = {
