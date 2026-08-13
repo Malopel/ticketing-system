@@ -140,6 +140,7 @@ function PaymentSection({
                         </p>
 
                         <button
+                            className="danger-button"
                             type="button"
                             onClick={() =>
                                 setShowCancelConfirmation(true)
@@ -169,6 +170,7 @@ function PaymentSection({
 
                         <div className="cancel-actions">
                             <button
+                                className="secondary-button"
                                 type="button"
                                 onClick={() =>
                                     setShowCancelConfirmation(false)}
@@ -178,6 +180,7 @@ function PaymentSection({
                             </button>
 
                             <button
+                                className="danger-button"
                                 type="button"
                                 onClick={handleCancelOrder}
                                 disabled={cancelingOrder}

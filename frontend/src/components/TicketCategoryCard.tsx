@@ -6,12 +6,14 @@ type TicketCategoryCardProps = {
     category: TicketCategory;
     quantity: number;
     onQuantityChange: (categoryId: number, quantity: number) => void;
+    canIncrease: boolean;
 };
 
 function TicketCategoryCard({
                                 category,
                                 quantity,
                                 onQuantityChange,
+                                canIncrease,
                             }: TicketCategoryCardProps) {
     function handleDecrease() {
         if (quantity > 0) {
@@ -20,7 +22,10 @@ function TicketCategoryCard({
     }
 
     function handleIncrease() {
-        if (quantity < category.available) {
+        if (
+            canIncrease &&
+            quantity < category.available
+        ) {
             onQuantityChange(category.id, quantity + 1)
         }
     }
@@ -29,6 +34,14 @@ function TicketCategoryCard({
         style: 'currency',
         currency: 'EUR',
     });
+
+    const criticalAvailabilityThreshold = Math.min(
+        100,
+        Math.ceil(category.capacity * 0.25),
+    );
+
+    const isLowAvailability =
+        category.available <= criticalAvailabilityThreshold;
 
     return (
         <article className="ticket-category-card">
@@ -39,9 +52,19 @@ function TicketCategoryCard({
                     {currencyFormatter.format(category.price)}
                 </p>
 
-                <small>
-                    Noch {category.available} Tickets verfügbar
-                </small>
+                {category.available === 0 ? (
+                    <p className="ticket-availability sold-out">
+                        Ausverkauft
+                    </p>
+                ) : isLowAvailability ? (
+                    <p className="ticket-availability low">
+                        Nur noch {category.available} verfügbar
+                    </p>
+                ) : (
+                    <p className="ticket-availability">
+                        Verfügbar
+                    </p>
+                )}
             </div>
 
             <div className="quantity-control">
@@ -62,7 +85,10 @@ function TicketCategoryCard({
                     type="button"
                     className="quantity-button"
                     onClick={handleIncrease}
-                    disabled={quantity >= category.available}
+                    disabled={
+                        quantity >= category.available ||
+                        !canIncrease
+                    }
                 >
                     +
                 </button>

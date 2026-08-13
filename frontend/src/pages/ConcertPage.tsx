@@ -11,6 +11,10 @@ import {
     getTicketCategories,
     type TicketCategory,
 } from '../api/ticketCategoryApi';
+import {
+    getShopConfig,
+    type ShopConfig,
+} from '../api/shopConfigApi';
 
 import TicketSelection from '../components/TicketSelection';
 
@@ -26,6 +30,8 @@ function ConcertPage() {
         useState<TicketCategory[]>([]);
     const [loadingTickets, setLoadingTickets] = useState(true);
     const [ticketError, setTicketError] = useState<string | null>(null);
+    const [shopConfig, setShopConfig] =
+        useState<ShopConfig | null>(null);
 
     useEffect(() => {
         async function loadConcert() {
@@ -55,7 +61,7 @@ function ConcertPage() {
     }, [concertId]);
 
     useEffect(() => {
-        async function loadTicketCategories() {
+        async function loadTicketData() {
             const id = Number(concertId);
 
             if (!Number.isInteger(id) || id <= 0) {
@@ -66,15 +72,22 @@ function ConcertPage() {
                 setLoadingTickets(true);
                 setTicketError(null);
 
-                const categories = await getTicketCategories(id);
+                const [
+                    categories,
+                    loadedShopConfig,
+                ] = await Promise.all([
+                    getTicketCategories(id),
+                    getShopConfig(),
+                ]);
 
                 setTicketCategories(categories);
+                setShopConfig(loadedShopConfig);
             } catch (error) {
                 if (error instanceof Error) {
                     setTicketError(error.message);
                 } else {
                     setTicketError(
-                        'Ticketkategorien konnten nicht geladen werden.',
+                        'Ticketinformationen konnten nicht geladen werden.',
                     );
                 }
             } finally {
@@ -82,7 +95,7 @@ function ConcertPage() {
             }
         }
 
-        void loadTicketCategories();
+        void loadTicketData();
     }, [concertId]);
 
     if (loading) {
@@ -156,12 +169,17 @@ function ConcertPage() {
                 </p>
             )}
 
-            {!ticketError && !loadingTickets && (
-                <TicketSelection
-                    concertId={concert.id}
-                    ticketCategories={ticketCategories}
-                />
-            )}
+            {!ticketError &&
+                !loadingTickets &&
+                shopConfig && (
+                    <TicketSelection
+                        concertId={concert.id}
+                        ticketCategories={ticketCategories}
+                        maxTicketsPerOrder={
+                            shopConfig.maxTicketsPerOrder
+                        }
+                    />
+                )}
         </main>
     );
 }

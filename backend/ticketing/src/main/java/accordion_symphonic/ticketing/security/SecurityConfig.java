@@ -93,6 +93,11 @@ public class SecurityConfig {
                                 "/api/fake-payments/{providerPaymentId}/complete")
                         .permitAll()
 
+                        //Shop-Config darf öffentlich abgerufen werden
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/shop-config")
+                        .permitAll()
+
                         // Admin-Bereich
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")

@@ -10,11 +10,13 @@ import TicketCategoryCard from './TicketCategoryCard';
 type TicketSelectionProps = {
     concertId: number;
     ticketCategories: TicketCategory[];
+    maxTicketsPerOrder: number;
 };
 
 function TicketSelection({
                              concertId,
                              ticketCategories,
+                             maxTicketsPerOrder
                          }: TicketSelectionProps) {
     const navigate = useNavigate();
 
@@ -104,6 +106,10 @@ function TicketSelection({
             <div className="ticket-selection-header">
                 <h2>Tickets auswählen</h2>
 
+                <p className="ticket-limit-hint">
+                    Maximal {maxTicketsPerOrder} Tickets pro Bestellung.
+                </p>
+
                 {availabilityChanged && (
                     <p className="availability-warning">
                         Die Ticketverfügbarkeit hat sich geändert.
@@ -131,6 +137,7 @@ function TicketSelection({
                         category={category}
                         quantity={quantities[category.id] ?? 0}
                         onQuantityChange={handleQuantityChange}
+                        canIncrease={totalQuantity < maxTicketsPerOrder}
                     />
                 ))}
             </div>
