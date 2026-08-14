@@ -1,5 +1,7 @@
 package accordion_symphonic.ticketing.concert;
 
+import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
+import accordion_symphonic.ticketing.concert.dto.ConcertResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 

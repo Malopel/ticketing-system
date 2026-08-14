@@ -1,15 +1,15 @@
 package accordion_symphonic.ticketing.mail;
 
 import accordion_symphonic.ticketing.concert.Concert;
+import accordion_symphonic.ticketing.mail.dto.MailProperties;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.Ticket;
 import accordion_symphonic.ticketing.ticket.TicketPdfService;
-import accordion_symphonic.ticketing.ticket.TicketResponse;
+import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import jakarta.mail.BodyPart;
 import jakarta.mail.Message;
 import jakarta.mail.Multipart;
-import jakarta.mail.Part;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;

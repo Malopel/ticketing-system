@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.ticket;
 
+import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.CacheControl;

@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.config;
 
+import accordion_symphonic.ticketing.config.dto.ShopConfigResponse;
 import accordion_symphonic.ticketing.order.OrderProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

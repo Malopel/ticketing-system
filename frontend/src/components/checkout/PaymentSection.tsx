@@ -12,12 +12,14 @@ type PaymentSectionProps = {
     order: OrderResponse;
     accessToken: string;
     onOrderUpdated: (orderResponse: OrderResponse) => void;
+    paymentDisabled: boolean;
 };
 
 function PaymentSection({
                             order,
                             accessToken,
                             onOrderUpdated,
+                            paymentDisabled,
                         }: PaymentSectionProps) {
     const [startingPayment, setStartingPayment] =
         useState(false);
@@ -43,6 +45,8 @@ function PaymentSection({
     );
 
     async function handleStartPayment() {
+        if (paymentDisabled) return;
+        
         try {
             setStartingPayment(true);
             setPaymentError(null);
@@ -123,13 +127,16 @@ function PaymentSection({
                 type="button"
                 onClick={handleStartPayment}
                 disabled={
+                    paymentDisabled ||
                     startingPayment ||
                     cancelingOrder
                 }
             >
                 {startingPayment
                     ? 'Zahlung wird gestartet...'
-                    : 'Jetzt bezahlen'}
+                    : paymentDisabled
+                        ? 'Reservierung abgelaufen'
+                        : 'Jetzt bezahlen'}
             </button>
 
             <div className="cancel-section">

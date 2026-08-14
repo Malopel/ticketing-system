@@ -1,12 +1,16 @@
 package accordion_symphonic.ticketing.payment;
 
 import accordion_symphonic.ticketing.order.*;
+import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
+import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +39,8 @@ class PaymentServiceTest {
         paymentService = new PaymentService(
                 orderRepository,
                 orderAccessTokenService,
-                paymentProvider
+                paymentProvider,
+                new OrderProperties(Duration.ofMinutes(30), 10, Duration.ofMinutes(20))
         );
     }
 
@@ -52,8 +57,10 @@ class PaymentServiceTest {
                 "http://localhost:5173/fake-payment/provider-payment-123"
         );
 
-        when(orderRepository.findByIdAndConcertId(orderId, concertId))
-                .thenReturn(Optional.of(order));
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        )).thenReturn(Optional.of(order));
 
         when(order.getAccessTokenHash())
                 .thenReturn(accessTokenHash);
@@ -80,8 +87,11 @@ class PaymentServiceTest {
 
         assertEquals(expectedSession, result);
 
+        verify(order).markAsPaymentPending(
+                any(LocalDateTime.class)
+        );
+
         verify(paymentProvider).createPayment(order);
-        verify(orderRepository, never()).save(any());
     }
 
     @Test
@@ -89,8 +99,10 @@ class PaymentServiceTest {
         Long concertId = 1L;
         Long orderId = 2L;
 
-        when(orderRepository.findByIdAndConcertId(orderId, concertId))
-                .thenReturn(Optional.of(order));
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        )).thenReturn(Optional.of(order));
 
         when(order.getAccessTokenHash())
                 .thenReturn("access-token-hash");
@@ -110,6 +122,10 @@ class PaymentServiceTest {
         );
 
         verifyNoInteractions(paymentProvider);
+
+        verify(order, never()).markAsPaymentPending(
+                any()
+        );
     }
 
     @Test
@@ -120,8 +136,10 @@ class PaymentServiceTest {
         String accessToken = "access-token";
         String accessTokenHash = "access-token-hash";
 
-        when(orderRepository.findByIdAndConcertId(orderId, concertId))
-                .thenReturn(Optional.of(order));
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        )).thenReturn(Optional.of(order));
 
         when(order.getAccessTokenHash())
                 .thenReturn(accessTokenHash);
@@ -147,6 +165,10 @@ class PaymentServiceTest {
         );
 
         verifyNoInteractions(paymentProvider);
+
+        verify(order, never()).markAsPaymentPending(
+                any()
+        );
     }
 
     @Test
@@ -157,8 +179,10 @@ class PaymentServiceTest {
         String accessToken = "access-token";
         String accessTokenHash = "access-token-hash";
 
-        when(orderRepository.findByIdAndConcertId(orderId, concertId))
-                .thenReturn(Optional.of(order));
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        )).thenReturn(Optional.of(order));
 
         when(order.getAccessTokenHash())
                 .thenReturn(accessTokenHash);
@@ -181,7 +205,11 @@ class PaymentServiceTest {
         );
 
         verify(order).expire();
-        verify(orderRepository).save(order);
+
+        verify(order, never()).markAsPaymentPending(
+                any()
+        );
+
         verifyNoInteractions(paymentProvider);
     }
 }

@@ -1,6 +1,7 @@
 package accordion_symphonic.ticketing.ticket;
 
 import accordion_symphonic.ticketing.order.Order;
+import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import jakarta.persistence.*;
 

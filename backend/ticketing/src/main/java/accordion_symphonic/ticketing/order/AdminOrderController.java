@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.order;
 
+import accordion_symphonic.ticketing.order.dto.OrderResponse;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.ContentDisposition;

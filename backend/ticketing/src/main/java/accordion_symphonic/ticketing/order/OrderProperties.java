@@ -7,7 +7,8 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "ticketing.order")
 public record OrderProperties(
         Duration reservationDuration,
-        Integer maxTicketsPerOrder
+        Integer maxTicketsPerOrder,
+        Duration paymentDuration
 ) {
 
     public OrderProperties {
@@ -25,6 +26,14 @@ public record OrderProperties(
 
         if (maxTicketsPerOrder <= 0) {
             throw new IllegalArgumentException("maxTicketsPerOrder must at least one");
+        }
+
+        if (paymentDuration == null) {
+            paymentDuration = Duration.ofMinutes(20);
+        }
+
+        if (paymentDuration.isZero() || paymentDuration.isNegative()) {
+            throw new IllegalArgumentException("paymentDuration must be positive");
         }
     }
 }

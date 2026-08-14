@@ -5,9 +5,16 @@ import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
-import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
+import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
+import accordion_symphonic.ticketing.order.dto.OrderRequest;
+import accordion_symphonic.ticketing.order.dto.OrderResponse;
+import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryException;
+import accordion_symphonic.ticketing.order.exception.OrderIsPaidOrExpiredException;
+import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
+import accordion_symphonic.ticketing.order.exception.TooManyTicketsInOrderException;
+import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticket.TicketPdfService;
-import accordion_symphonic.ticketing.ticket.TicketResponse;
+import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
@@ -72,7 +79,7 @@ class OrderServiceTest {
                 orderAccessTokenService,
                 ticketEmailService,
                 ticketPdfService,
-                new OrderProperties(Duration.ofMinutes(30), 10),
+                new OrderProperties(Duration.ofMinutes(30), 10, Duration.ofMinutes(20)),
                 eventPublisher
         );
     }
@@ -92,6 +99,10 @@ class OrderServiceTest {
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                 LocalDateTime.now(),
                 LocalDateTime.now().plusHours(1)
+        );
+
+        order.markAsPaymentPending(
+                LocalDateTime.now().plusMinutes(20)
         );
 
         List<TicketResponse> tickets = List.of();
@@ -134,6 +145,9 @@ class OrderServiceTest {
                 LocalDateTime.now().plusHours(1)
         );
 
+        order.markAsPaymentPending(
+                LocalDateTime.now().plusMinutes(20)
+        );
         order.markAsPaid();
 
         when(orderRepository.findByIdForUpdate(42L))
@@ -400,6 +414,9 @@ class OrderServiceTest {
                 LocalDateTime.now().plusHours(1)
         );
 
+        order.markAsPaymentPending(
+                LocalDateTime.now().plusMinutes(20)
+        );
         order.markAsPaid();
 
         when(concertRepository.existsById(concertId))

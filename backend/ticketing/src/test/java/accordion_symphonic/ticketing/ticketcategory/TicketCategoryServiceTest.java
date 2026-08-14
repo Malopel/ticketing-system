@@ -2,9 +2,10 @@ package accordion_symphonic.ticketing.ticketcategory;
 
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
-import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
+import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
+import accordion_symphonic.ticketing.ticketcategory.dto.TicketCategoryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

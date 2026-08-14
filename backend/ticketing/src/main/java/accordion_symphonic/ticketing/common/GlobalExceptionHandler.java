@@ -1,14 +1,15 @@
 package accordion_symphonic.ticketing.common;
 
-import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
-import accordion_symphonic.ticketing.availability.NotEnoughTicketsAvailableException;
-import accordion_symphonic.ticketing.order.*;
-import accordion_symphonic.ticketing.payment.InvalidPaymentWebhookSignatureException;
-import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.payment.UnsupportedPaymentStatusException;
-import accordion_symphonic.ticketing.ticket.TicketIsNotValidException;
-import accordion_symphonic.ticketing.ticket.TicketNotFoundException;
-import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
+import accordion_symphonic.ticketing.common.dto.ErrorResponse;
+import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
+import accordion_symphonic.ticketing.availability.exception.NotEnoughTicketsAvailableException;
+import accordion_symphonic.ticketing.order.exception.*;
+import accordion_symphonic.ticketing.payment.exception.InvalidPaymentWebhookSignatureException;
+import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
+import accordion_symphonic.ticketing.payment.exception.UnsupportedPaymentStatusException;
+import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
+import accordion_symphonic.ticketing.ticket.exception.TicketNotFoundException;
+import accordion_symphonic.ticketing.ticketcategory.exception.TicketCategoryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,20 +52,6 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
                 ErrorCode.ORDER_NOT_FOUND,
-                exception.getMessage()
-        );
-    }
-
-    @ExceptionHandler(OrderIsExpiredOrCancelledException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleOrderIsExpiredOrCancelledException(
-            OrderIsExpiredOrCancelledException exception
-    ) {
-        return new ErrorResponse(
-                Instant.now(),
-                HttpStatus.CONFLICT.value(),
-                "Conflict",
-                ErrorCode.ORDER_CANNOT_BE_PAID,
                 exception.getMessage()
         );
     }

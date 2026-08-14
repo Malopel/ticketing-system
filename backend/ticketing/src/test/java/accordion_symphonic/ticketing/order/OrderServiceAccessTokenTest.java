@@ -4,6 +4,8 @@ import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
+import accordion_symphonic.ticketing.order.dto.OrderResponse;
+import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.ticket.TicketPdfService;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
@@ -75,7 +77,7 @@ class OrderServiceAccessTokenTest {
                 orderAccessTokenService,
                 ticketEmailService,
                 ticketPdfService,
-                new OrderProperties(Duration.ofMinutes(30),10),
+                new OrderProperties(Duration.ofMinutes(30),10, Duration.ofMinutes(20)),
                 eventPublisher
         );
 

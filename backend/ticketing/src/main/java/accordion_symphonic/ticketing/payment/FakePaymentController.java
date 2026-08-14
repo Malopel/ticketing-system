@@ -1,7 +1,7 @@
 package accordion_symphonic.ticketing.payment;
 
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.order.OrderResponse;
+import accordion_symphonic.ticketing.order.dto.OrderResponse;
 import accordion_symphonic.ticketing.order.OrderService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;

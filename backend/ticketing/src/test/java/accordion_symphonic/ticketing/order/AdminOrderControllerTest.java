@@ -1,6 +1,7 @@
 package accordion_symphonic.ticketing.order;
 
 import accordion_symphonic.ticketing.common.GlobalExceptionHandler;
+import accordion_symphonic.ticketing.order.exception.OrderHasNoTicketsException;
 import accordion_symphonic.ticketing.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

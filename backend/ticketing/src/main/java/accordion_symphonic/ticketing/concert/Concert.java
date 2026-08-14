@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.concert;
 
+import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

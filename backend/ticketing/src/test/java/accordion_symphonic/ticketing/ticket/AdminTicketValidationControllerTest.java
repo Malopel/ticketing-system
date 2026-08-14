@@ -4,6 +4,8 @@ import accordion_symphonic.ticketing.common.GlobalExceptionHandler;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.security.SecurityConfig;
 import accordion_symphonic.ticketing.order.Order;
+import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
+import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

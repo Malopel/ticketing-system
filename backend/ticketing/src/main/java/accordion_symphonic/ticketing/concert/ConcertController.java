@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.concert;
 
+import accordion_symphonic.ticketing.concert.dto.ConcertResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;

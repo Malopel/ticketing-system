@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.payment;
 
+import accordion_symphonic.ticketing.payment.dto.PaymentWebhookRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.json.JsonMapper;

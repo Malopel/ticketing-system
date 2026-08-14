@@ -9,8 +9,6 @@ public final class ErrorCode {
     public static final String TICKET_CATEGORY_NOT_FOUND = "TICKET_CATEGORY_NOT_FOUND";
 
     public static final String ORDER_NOT_FOUND = "ORDER_NOT_FOUND";
-    public static final String ORDER_ACCESS_DENIED = "ORDER_ACCESS_DENIED";
-    public static final String ORDER_ALREADY_FINALIZED = "ORDER_ALREADY_FINALIZED";
     public static final String ORDER_CANNOT_BE_PAID = "ORDER_CANNOT_BE_PAID";
     public static final String ORDER_HAS_NO_TICKETS = "ORDER_HAS_NO_TICKETS";
 

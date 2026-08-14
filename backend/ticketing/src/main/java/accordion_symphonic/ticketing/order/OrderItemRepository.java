@@ -17,6 +17,9 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             or (
                 item.order.status = accordion_symphonic.ticketing.order.OrderStatus.RESERVED
                 and item.order.expiresAt > :now
+            ) or (
+                item.order.status = accordion_symphonic.ticketing.order.OrderStatus.PAYMENT_PENDING
+                and item.order.paymentExpiresAt > :now
             )
         )
         """)

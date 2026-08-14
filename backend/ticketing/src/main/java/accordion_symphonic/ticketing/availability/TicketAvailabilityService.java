@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.availability;
 
+import accordion_symphonic.ticketing.availability.exception.NotEnoughTicketsAvailableException;
 import accordion_symphonic.ticketing.order.OrderItemRepository;
 import org.springframework.stereotype.Service;
 

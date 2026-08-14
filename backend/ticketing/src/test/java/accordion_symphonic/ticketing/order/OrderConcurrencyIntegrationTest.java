@@ -1,9 +1,13 @@
 package accordion_symphonic.ticketing.order;
 
-import accordion_symphonic.ticketing.availability.NotEnoughTicketsAvailableException;
+import accordion_symphonic.ticketing.availability.exception.NotEnoughTicketsAvailableException;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
-import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
+import accordion_symphonic.ticketing.order.dto.CreatedOrderResponse;
+import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
+import accordion_symphonic.ticketing.order.dto.OrderRequest;
+import accordion_symphonic.ticketing.order.exception.OrderIsPaidOrExpiredException;
+import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.Test;

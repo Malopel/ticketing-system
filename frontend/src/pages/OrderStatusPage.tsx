@@ -399,6 +399,7 @@ function OrderStatusPage() {
                     order={order}
                     accessToken={accessToken}
                     onOrderUpdated={setOrder}
+                    paymentDisabled={remainingSeconds === 0}
                 />
             )}
 

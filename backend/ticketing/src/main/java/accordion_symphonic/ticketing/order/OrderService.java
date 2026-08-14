@@ -2,16 +2,21 @@ package accordion_symphonic.ticketing.order;
 
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
-import accordion_symphonic.ticketing.concert.ConcertNotFoundException;
+import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
-import accordion_symphonic.ticketing.payment.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.ticket.TicketResponse;
+import accordion_symphonic.ticketing.order.dto.CreatedOrderResponse;
+import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
+import accordion_symphonic.ticketing.order.dto.OrderRequest;
+import accordion_symphonic.ticketing.order.dto.OrderResponse;
+import accordion_symphonic.ticketing.order.exception.*;
+import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
+import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticket.TicketPdfService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
-import accordion_symphonic.ticketing.ticketcategory.TicketCategoryNotFoundException;
+import accordion_symphonic.ticketing.ticketcategory.exception.TicketCategoryNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 
 import org.springframework.transaction.annotation.Propagation;
@@ -271,7 +276,7 @@ public class OrderService {
             return order;
         }
 
-        if (order.getStatus() != OrderStatus.RESERVED) {
+        if (order.getStatus() != OrderStatus.PAYMENT_PENDING) {
             throw new OrderCannotBePaidException(order.getId());
         }
 
@@ -292,7 +297,10 @@ public class OrderService {
     }
 
     private void expireOrderIfNeeded(Order order) {
-        if (order.shouldExpire()) {
+        if (
+                order.shouldExpire() ||
+                order.shouldExpirePayment()
+        ) {
             order.expire();
         }
     }

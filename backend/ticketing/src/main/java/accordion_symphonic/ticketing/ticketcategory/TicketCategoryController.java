@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.ticketcategory;
 
+import accordion_symphonic.ticketing.ticketcategory.dto.TicketCategoryResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

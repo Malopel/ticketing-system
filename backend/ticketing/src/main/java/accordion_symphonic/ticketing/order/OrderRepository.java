@@ -14,8 +14,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByConcertId(Long concertId);
 
-    List<Order> findByCustomerEmail(String customerEmail);
-
     Optional<Order> findByIdAndConcertId(Long id, Long concertId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

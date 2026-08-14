@@ -41,6 +41,8 @@ public class Order {
 
     private LocalDateTime paidAt;
 
+    private LocalDateTime paymentExpiresAt;
+
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
@@ -64,6 +66,7 @@ public class Order {
         this.totalAmount = BigDecimal.ZERO;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
+        this.paymentExpiresAt = null;
     }
 
     public void addItem(OrderItem item) {
@@ -75,16 +78,32 @@ public class Order {
     public void markAsPaid() {
         if (this.status == OrderStatus.PAID) return;
 
-        if (this.status != OrderStatus.RESERVED) {
-            throw new IllegalStateException("Only reserved orders can be paid.");
+        if (this.status != OrderStatus.PAYMENT_PENDING) {
+            throw new IllegalStateException("Only payment-pending orders can be marked as paid.");
         }
 
         this.status = OrderStatus.PAID;
         this.paidAt = LocalDateTime.now();
     }
 
+    public void markAsPaymentPending(
+            LocalDateTime paymentExpiresAt
+    ) {
+        if (this.status == OrderStatus.PAYMENT_PENDING) return;
+
+        if (this.status != OrderStatus.RESERVED) {
+            throw new IllegalStateException("Only reserved orders can be marked as payment pending.");
+        }
+
+        this.paymentExpiresAt = paymentExpiresAt;
+        this.status = OrderStatus.PAYMENT_PENDING;
+    }
+
     public void expire() {
-        if (this.status == OrderStatus.RESERVED) {
+        if (
+                this.status == OrderStatus.RESERVED ||
+                this.status == OrderStatus.PAYMENT_PENDING
+        ) {
             this.status = OrderStatus.EXPIRED;
         }
     }
@@ -152,5 +171,11 @@ public class Order {
     public boolean shouldExpire() {
         return this.status == OrderStatus.RESERVED
                 && this.expiresAt.isBefore(LocalDateTime.now());
+    }
+
+    public boolean shouldExpirePayment() {
+        return this.status == OrderStatus.PAYMENT_PENDING
+                && this.paymentExpiresAt != null
+                && this.paymentExpiresAt.isBefore(LocalDateTime.now());
     }
 }
