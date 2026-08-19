@@ -12,11 +12,11 @@ public class OrderController {
 
     private static final String ORDER_ACCESS_TOKEN_HEADER = "X-Order-Access-Token";
 
-    private final OrderService orderService;
+    private final CustomerOrderService customerOrderService;
     private final OrderCreationService orderCreationService;
 
-    public OrderController(OrderService orderService, OrderCreationService orderCreationService) {
-        this.orderService = orderService;
+    public OrderController(CustomerOrderService customerOrderService, OrderCreationService orderCreationService) {
+        this.customerOrderService = customerOrderService;
         this.orderCreationService = orderCreationService;
     }
 
@@ -29,7 +29,7 @@ public class OrderController {
                     required = false
             ) String accessToken
     ) {
-        return orderService.getCustomerOrder(concertId, orderId, accessToken);
+        return customerOrderService.getCustomerOrder(concertId, orderId, accessToken);
     }
 
     @PostMapping
@@ -49,6 +49,6 @@ public class OrderController {
                     required = false
             ) String accessToken
     ) {
-        return orderService.cancelOrder(concertId, orderId, accessToken);
+        return customerOrderService.cancelOrder(concertId, orderId, accessToken);
     }
 }

@@ -45,7 +45,7 @@ class OrderConcurrencyIntegrationTest {
             new PostgreSQLContainer<>("postgres:17-alpine");
 
     @Autowired
-    private OrderService orderService;
+    private CustomerOrderService customerOrderService;
 
     @Autowired
     private OrderCreationService orderCreationService;
@@ -209,7 +209,7 @@ class OrderConcurrencyIntegrationTest {
                     start.await();
 
                     try {
-                        orderService.cancelOrder(
+                        customerOrderService.cancelOrder(
                                 savedConcert.getId(),
                                 orderId,
                                 accessToken

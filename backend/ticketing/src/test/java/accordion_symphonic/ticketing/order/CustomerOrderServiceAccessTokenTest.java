@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -24,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceAccessTokenTest {
+class CustomerOrderServiceAccessTokenTest {
 
     private static final Long CONCERT_ID = 1L;
     private static final Long ORDER_ID = 42L;
@@ -41,7 +40,7 @@ class OrderServiceAccessTokenTest {
     @Mock
     private TicketAvailabilityService ticketAvailabilityService;
 
-    private OrderService orderService;
+    private CustomerOrderService customerOrderService;
 
     private Order order;
     private String validAccessToken;
@@ -50,7 +49,7 @@ class OrderServiceAccessTokenTest {
     void setUp() {
         OrderAccessTokenService orderAccessTokenService = new OrderAccessTokenService();
 
-        orderService = new OrderService(
+        customerOrderService = new CustomerOrderService(
                 orderRepository,
                 concertRepository,
                 orderAccessTokenService
@@ -87,7 +86,7 @@ class OrderServiceAccessTokenTest {
             CONCERT_ID
         )).thenReturn(Optional.of(order));
 
-        OrderResponse response = orderService.getCustomerOrder(
+        OrderResponse response = customerOrderService.getCustomerOrder(
                 CONCERT_ID,
                 ORDER_ID,
                 validAccessToken
@@ -106,7 +105,7 @@ class OrderServiceAccessTokenTest {
 
         assertThrows(
                 OrderNotFoundException.class,
-                () -> orderService.getCustomerOrder(
+                () -> customerOrderService.getCustomerOrder(
                         CONCERT_ID,
                         ORDER_ID,
                         "wrong-token"
@@ -123,7 +122,7 @@ class OrderServiceAccessTokenTest {
 
         assertThrows(
                 OrderNotFoundException.class,
-                () -> orderService.getCustomerOrder(
+                () -> customerOrderService.getCustomerOrder(
                         CONCERT_ID,
                         ORDER_ID,
                         null
@@ -141,7 +140,7 @@ class OrderServiceAccessTokenTest {
         when(orderRepository.save(order))
                 .thenReturn(order);
 
-        OrderResponse response = orderService.cancelOrder(
+        OrderResponse response = customerOrderService.cancelOrder(
                 CONCERT_ID,
                 ORDER_ID,
                 validAccessToken
@@ -162,7 +161,7 @@ class OrderServiceAccessTokenTest {
 
         assertThrows(
                 OrderNotFoundException.class,
-                () -> orderService.cancelOrder(
+                () -> customerOrderService.cancelOrder(
                         CONCERT_ID,
                         ORDER_ID,
                         "wrong-token"
@@ -192,7 +191,7 @@ class OrderServiceAccessTokenTest {
         when(orderRepository.findByIdAndConcertId(ORDER_ID, CONCERT_ID))
                 .thenReturn(Optional.of(expiredOrder));
 
-        OrderResponse response = orderService.getCustomerOrder(
+        OrderResponse response = customerOrderService.getCustomerOrder(
                 CONCERT_ID,
                 ORDER_ID,
                 validAccessToken

@@ -8,10 +8,8 @@ import accordion_symphonic.ticketing.order.exception.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class OrderService {
+public class CustomerOrderService {
 
     private final OrderRepository orderRepository;
 
@@ -19,7 +17,7 @@ public class OrderService {
 
     private final OrderAccessTokenService orderAccessTokenService;
 
-    public OrderService(
+    public CustomerOrderService(
             OrderRepository orderRepository,
             ConcertRepository concertRepository,
             OrderAccessTokenService orderAccessTokenService

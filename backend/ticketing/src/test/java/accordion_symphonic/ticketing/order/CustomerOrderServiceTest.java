@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceTest {
+class CustomerOrderServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
@@ -30,11 +30,11 @@ class OrderServiceTest {
     @Mock
     private OrderAccessTokenService orderAccessTokenService;
 
-    private OrderService orderService;
+    private CustomerOrderService customerOrderService;
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(
+        customerOrderService = new CustomerOrderService(
                 orderRepository,
                 concertRepository,
                 orderAccessTokenService
@@ -80,7 +80,7 @@ class OrderServiceTest {
         when(orderRepository.save(order))
                 .thenReturn(order);
 
-        OrderResponse response = orderService.cancelOrder(
+        OrderResponse response = customerOrderService.cancelOrder(
                 concertId,
                 orderId,
                 accessToken
@@ -137,7 +137,7 @@ class OrderServiceTest {
 
         assertThrows(
                 OrderNotFoundException.class,
-                () -> orderService.cancelOrder(
+                () -> customerOrderService.cancelOrder(
                         concertId,
                         orderId,
                         accessToken
@@ -195,7 +195,7 @@ class OrderServiceTest {
 
         assertThrows(
                 OrderCannotBeCancelledException.class,
-                () -> orderService.cancelOrder(
+                () -> customerOrderService.cancelOrder(
                         concertId,
                         orderId,
                         accessToken
@@ -248,7 +248,7 @@ class OrderServiceTest {
 
         assertThrows(
                 OrderCannotBeCancelledException.class,
-                () -> orderService.cancelOrder(
+                () -> customerOrderService.cancelOrder(
                         concertId,
                         orderId,
                         accessToken
@@ -302,14 +302,14 @@ class OrderServiceTest {
         when(orderRepository.save(order))
                 .thenReturn(order);
 
-        orderService.cancelOrder(
+        customerOrderService.cancelOrder(
                 concertId,
                 orderId,
                 accessToken
         );
 
         OrderResponse secondResponse =
-                orderService.cancelOrder(
+                customerOrderService.cancelOrder(
                         concertId,
                         orderId,
                         accessToken

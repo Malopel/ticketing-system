@@ -53,13 +53,13 @@ class OrderControllerSecurityTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private OrderService orderService;
+    private CustomerOrderService customerOrderService;
     @MockitoBean
     private OrderCreationService orderCreationService;
 
     @Test
     void customerCanReadOrderWithAccessToken() throws Exception {
-        when(orderService.getCustomerOrder(CONCERT_ID, ORDER_ID, VALID_TOKEN))
+        when(customerOrderService.getCustomerOrder(CONCERT_ID, ORDER_ID, VALID_TOKEN))
                 .thenReturn(reservedOrderResponse());
 
         mockMvc.perform(get("/api/concerts/{concertId}/orders/{orderId}",
@@ -71,7 +71,7 @@ class OrderControllerSecurityTest {
                 .andExpect(jsonPath("$.customerEmail").value("kunde@example.com"))
                 .andExpect(jsonPath("$.status").value("RESERVED"));
 
-        verify(orderService).getCustomerOrder(
+        verify(customerOrderService).getCustomerOrder(
                 CONCERT_ID,
                 ORDER_ID,
                 VALID_TOKEN
@@ -80,7 +80,7 @@ class OrderControllerSecurityTest {
 
     @Test
     void customerWithoutAccessTokenReceivesNotFoundInsteadOfUnauthorized() throws Exception {
-        when(orderService.getCustomerOrder(CONCERT_ID, ORDER_ID, null))
+        when(customerOrderService.getCustomerOrder(CONCERT_ID, ORDER_ID, null))
                 .thenThrow(new OrderNotFoundException(ORDER_ID));
 
         mockMvc.perform(get("/api/concerts/{concertId}/orders/{orderId}",
@@ -88,7 +88,7 @@ class OrderControllerSecurityTest {
                         ORDER_ID))
                 .andExpect(status().isNotFound());
 
-        verify(orderService).getCustomerOrder(
+        verify(customerOrderService).getCustomerOrder(
                 CONCERT_ID,
                 ORDER_ID,
                 null
@@ -97,7 +97,7 @@ class OrderControllerSecurityTest {
 
     @Test
     void customerCanCancelOrderWithAccessToken() throws Exception {
-        when(orderService.cancelOrder(CONCERT_ID, ORDER_ID, VALID_TOKEN))
+        when(customerOrderService.cancelOrder(CONCERT_ID, ORDER_ID, VALID_TOKEN))
                 .thenReturn(cancelledOrderResponse());
 
         mockMvc.perform(patch("/api/concerts/{concertId}/orders/{orderId}/cancel",
@@ -108,7 +108,7 @@ class OrderControllerSecurityTest {
                 .andExpect(jsonPath("$.id").value(ORDER_ID))
                 .andExpect(jsonPath("$.status").value("CANCELLED"));
 
-        verify(orderService).cancelOrder(
+        verify(customerOrderService).cancelOrder(
                 CONCERT_ID,
                 ORDER_ID,
                 VALID_TOKEN
@@ -119,7 +119,7 @@ class OrderControllerSecurityTest {
     void customerWithWrongAccessTokenCannotCancelOrder() throws Exception {
         String wrongToken = "wrong-token";
 
-        when(orderService.cancelOrder(CONCERT_ID, ORDER_ID, wrongToken))
+        when(customerOrderService.cancelOrder(CONCERT_ID, ORDER_ID, wrongToken))
                 .thenThrow(new OrderNotFoundException(ORDER_ID));
 
         mockMvc.perform(patch("/api/concerts/{concertId}/orders/{orderId}/cancel",
@@ -128,7 +128,7 @@ class OrderControllerSecurityTest {
                         .header("X-Order-Access-Token", wrongToken))
                 .andExpect(status().isNotFound());
 
-        verify(orderService).cancelOrder(
+        verify(customerOrderService).cancelOrder(
                 CONCERT_ID,
                 ORDER_ID,
                 wrongToken
@@ -231,7 +231,7 @@ class OrderControllerSecurityTest {
                         """))
                 .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(orderService);
+        verifyNoInteractions(customerOrderService);
     }
 
     @Test
@@ -246,7 +246,7 @@ class OrderControllerSecurityTest {
                         """))
                 .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(orderService);
+        verifyNoInteractions(customerOrderService);
     }
 
     @Test
@@ -266,7 +266,7 @@ class OrderControllerSecurityTest {
                         """))
                 .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(orderService);
+        verifyNoInteractions(customerOrderService);
     }
 
     @Test
