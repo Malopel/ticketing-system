@@ -1,7 +1,7 @@
 package accordion_symphonic.ticketing.mail;
 
 import accordion_symphonic.ticketing.order.OrderPaidEvent;
-import accordion_symphonic.ticketing.order.OrderService;
+import accordion_symphonic.ticketing.ticket.TicketDeliveryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -14,10 +14,10 @@ public class OrderPaidEmailListener {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(OrderPaidEmailListener.class);
 
-    private final OrderService orderService;
+    private final TicketDeliveryService ticketDeliveryService;
 
-    public OrderPaidEmailListener(OrderService orderService) {
-        this.orderService = orderService;
+    public OrderPaidEmailListener(TicketDeliveryService ticketDeliveryService) {
+        this.ticketDeliveryService = ticketDeliveryService;
     }
 
     @TransactionalEventListener(
@@ -25,7 +25,7 @@ public class OrderPaidEmailListener {
     )
     public void handleOrderPaid(OrderPaidEvent event) {
         try {
-            orderService.resendTicketEmail(
+            ticketDeliveryService.resendTicketEmail(
                     event.concertId(),
                     event.orderId()
             );

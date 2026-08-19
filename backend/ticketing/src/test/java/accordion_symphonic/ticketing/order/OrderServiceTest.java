@@ -4,7 +4,6 @@ import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
-import accordion_symphonic.ticketing.mail.TicketEmailService;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;
 import accordion_symphonic.ticketing.order.dto.OrderResponse;
@@ -12,8 +11,6 @@ import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryExce
 import accordion_symphonic.ticketing.order.exception.OrderCannotBeCancelledException;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.exception.TooManyTicketsInOrderException;
-import accordion_symphonic.ticketing.ticket.TicketPdfService;
-import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,22 +42,12 @@ class OrderServiceTest {
     private ConcertRepository concertRepository;
 
     @Mock
-    private TicketService ticketService;
-
-    @Mock
     private TicketAvailabilityService ticketAvailabilityService;
 
     @Mock
     private OrderAccessTokenService orderAccessTokenService;
 
-    @Mock
-    private TicketEmailService ticketEmailService;
-
     private OrderService orderService;
-
-    @Mock
-    private TicketPdfService ticketPdfService;
-
 
     @BeforeEach
     void setUp() {
@@ -68,11 +55,8 @@ class OrderServiceTest {
                 orderRepository,
                 ticketCategoryRepository,
                 concertRepository,
-                ticketService,
                 ticketAvailabilityService,
                 orderAccessTokenService,
-                ticketEmailService,
-                ticketPdfService,
                 new OrderProperties(Duration.ofMinutes(30), 10, Duration.ofMinutes(20)
         ));
     }
@@ -129,7 +113,7 @@ class OrderServiceTest {
 
     @Test
     void createOrderRejectsMoreThanMaxTicketsPerOrder() {
-        Long concertId = 1L;
+        long concertId = 1L;
 
         Concert concert = new Concert(
                 "Accordion Night",

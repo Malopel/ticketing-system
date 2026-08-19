@@ -3,6 +3,8 @@ package accordion_symphonic.ticketing.order;
 import accordion_symphonic.ticketing.common.GlobalExceptionHandler;
 import accordion_symphonic.ticketing.order.exception.OrderHasNoTicketsException;
 import accordion_symphonic.ticketing.security.SecurityConfig;
+import accordion_symphonic.ticketing.ticket.TicketDeliveryService;
+import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -46,13 +48,16 @@ class AdminOrderControllerTest {
     @MockitoBean
     private OrderService orderService;
 
+    @MockitoBean
+    private TicketDeliveryService ticketDeliveryService;
+
     @Test
     void downloadTicketPdfReturnsPdfForAdmin() throws Exception {
         Long concertId = 1L;
         Long orderId = 42L;
         byte[] pdfBytes = "%PDF-test".getBytes(StandardCharsets.UTF_8);
 
-        when(orderService.createTicketPdfForOrder(concertId, orderId))
+        when(ticketDeliveryService.createTicketPdfForOrder(concertId, orderId))
                 .thenReturn(pdfBytes);
 
         mockMvc.perform(get("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/pdf", concertId, orderId)
@@ -65,7 +70,7 @@ class AdminOrderControllerTest {
                 ))
                 .andExpect(content().bytes(pdfBytes));
 
-        verify(orderService).createTicketPdfForOrder(concertId, orderId);
+        verify(ticketDeliveryService).createTicketPdfForOrder(concertId, orderId);
     }
 
     @Test
@@ -93,7 +98,7 @@ class AdminOrderControllerTest {
                         .header("Authorization", basicAuthHeader()))
                 .andExpect(status().isNoContent());
 
-        verify(orderService).resendTicketEmail(concertId, orderId);
+        verify(ticketDeliveryService).resendTicketEmail(concertId, orderId);
     }
 
     @Test
@@ -101,7 +106,7 @@ class AdminOrderControllerTest {
         mockMvc.perform(post("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/resend-email", 1L, 42L))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(orderService);
+        verifyNoInteractions(ticketDeliveryService);
     }
 
     @Test
@@ -110,7 +115,7 @@ class AdminOrderControllerTest {
         Long orderId = 42L;
 
         doThrow(new OrderHasNoTicketsException(orderId))
-                .when(orderService)
+                .when(ticketDeliveryService)
                 .createTicketPdfForOrder(concertId, orderId);
 
         mockMvc.perform(get("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/pdf", concertId, orderId)
@@ -118,7 +123,7 @@ class AdminOrderControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_HAS_NO_TICKETS));
 
-        verify(orderService).createTicketPdfForOrder(concertId, orderId);
+        verify(ticketDeliveryService).createTicketPdfForOrder(concertId, orderId);
     }
 
     @Test
@@ -127,7 +132,7 @@ class AdminOrderControllerTest {
         Long orderId = 42L;
 
         doThrow(new OrderHasNoTicketsException(orderId))
-                .when(orderService)
+                .when(ticketDeliveryService)
                 .resendTicketEmail(concertId, orderId);
 
         mockMvc.perform(post("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/resend-email", concertId, orderId)
@@ -135,6 +140,6 @@ class AdminOrderControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_HAS_NO_TICKETS));
 
-        verify(orderService).resendTicketEmail(concertId, orderId);
+        verify(ticketDeliveryService).resendTicketEmail(concertId, orderId);
     }
 }

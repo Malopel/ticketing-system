@@ -1,6 +1,7 @@
 package accordion_symphonic.ticketing.order;
 
 import accordion_symphonic.ticketing.order.dto.OrderResponse;
+import accordion_symphonic.ticketing.ticket.TicketDeliveryService;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.ContentDisposition;
@@ -16,8 +17,11 @@ public class AdminOrderController {
 
     private final OrderService orderService;
 
-    public AdminOrderController(OrderService orderService) {
+    private final TicketDeliveryService ticketDeliveryService;
+
+    public AdminOrderController(OrderService orderService, TicketDeliveryService ticketDeliveryService) {
         this.orderService = orderService;
+        this.ticketDeliveryService = ticketDeliveryService;
     }
 
     @GetMapping
@@ -25,20 +29,12 @@ public class AdminOrderController {
         return orderService.getOrdersForConcert(concertId);
     }
 
-    @PatchMapping("/{orderId}/paid")
-    public OrderResponse markOrderAsPaid(
-            @PathVariable Long concertId,
-            @PathVariable Long orderId
-    ) {
-        return orderService.markOrderAsPaid(concertId, orderId);
-    }
-
     @GetMapping(value = "/{orderId}/tickets/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadTicketPdf(
             @PathVariable Long concertId,
             @PathVariable Long orderId
     ) {
-        byte[] pdf = orderService.createTicketPdfForOrder(concertId, orderId);
+        byte[] pdf = ticketDeliveryService.createTicketPdfForOrder(concertId, orderId);
 
         String filename = "tickets-order-" + orderId + ".pdf";
 
@@ -59,7 +55,7 @@ public class AdminOrderController {
             @PathVariable Long concertId,
             @PathVariable Long orderId
     ) {
-        orderService.resendTicketEmail(concertId, orderId);
+        ticketDeliveryService.resendTicketEmail(concertId, orderId);
 
         return ResponseEntity.noContent().build();
     }

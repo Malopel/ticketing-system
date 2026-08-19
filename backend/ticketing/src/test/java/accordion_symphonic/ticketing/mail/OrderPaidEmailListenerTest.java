@@ -2,6 +2,7 @@ package accordion_symphonic.ticketing.mail;
 
 import accordion_symphonic.ticketing.order.OrderPaidEvent;
 import accordion_symphonic.ticketing.order.OrderService;
+import accordion_symphonic.ticketing.ticket.TicketDeliveryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,13 +16,13 @@ import static org.mockito.Mockito.*;
 class OrderPaidEmailListenerTest {
 
     @Mock
-    private OrderService orderService;
+    private TicketDeliveryService ticketDeliveryService;
 
     private OrderPaidEmailListener listener;
 
     @BeforeEach
     void setUp() {
-        listener = new OrderPaidEmailListener(orderService);
+        listener = new OrderPaidEmailListener(ticketDeliveryService);
     }
 
     @Test
@@ -31,7 +32,7 @@ class OrderPaidEmailListenerTest {
 
         listener.handleOrderPaid(event);
 
-        verify(orderService).resendTicketEmail(
+        verify(ticketDeliveryService).resendTicketEmail(
                 1L,
                 42L
         );
@@ -43,14 +44,14 @@ class OrderPaidEmailListenerTest {
                 new OrderPaidEvent(1L, 42L);
 
         doThrow(new RuntimeException("SMTP unavailable"))
-                .when(orderService)
+                .when(ticketDeliveryService)
                 .resendTicketEmail(1L, 42L);
 
         assertDoesNotThrow(
                 () -> listener.handleOrderPaid(event)
         );
 
-        verify(orderService).resendTicketEmail(
+        verify(ticketDeliveryService).resendTicketEmail(
                 1L,
                 42L
         );
