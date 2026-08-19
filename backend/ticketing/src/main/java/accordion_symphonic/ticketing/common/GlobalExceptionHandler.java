@@ -56,10 +56,10 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(OrderIsPaidOrExpiredException.class)
+    @ExceptionHandler(OrderCannotBeCancelledException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleOrderIsPaidOrExpiredException(
-            OrderIsPaidOrExpiredException exception
+            OrderCannotBeCancelledException exception
     ) {
         return new ErrorResponse(
                 Instant.now(),

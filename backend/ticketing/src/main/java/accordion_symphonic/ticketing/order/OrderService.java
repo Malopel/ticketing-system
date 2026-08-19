@@ -11,7 +11,6 @@ import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;
 import accordion_symphonic.ticketing.order.dto.OrderResponse;
 import accordion_symphonic.ticketing.order.exception.*;
-import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticket.TicketPdfService;
@@ -21,7 +20,6 @@ import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -47,8 +45,6 @@ public class OrderService {
 
     private final OrderProperties orderProperties;
 
-    private final ApplicationEventPublisher eventPublisher;
-
     public OrderService(
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
@@ -58,8 +54,7 @@ public class OrderService {
             OrderAccessTokenService orderAccessTokenService,
             TicketEmailService ticketEmailService,
             TicketPdfService ticketPdfService,
-            OrderProperties orderProperties,
-            ApplicationEventPublisher eventPublisher) {
+            OrderProperties orderProperties) {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
@@ -69,7 +64,6 @@ public class OrderService {
         this.ticketEmailService = ticketEmailService;
         this.ticketPdfService = ticketPdfService;
         this.orderProperties = orderProperties;
-        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -144,25 +138,40 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse cancelOrder(Long concertId, Long orderId, String accessToken) {
+    public OrderResponse cancelOrder(
+            Long concertId,
+            Long orderId,
+            String accessToken
+    ) {
         if (!concertRepository.existsById(concertId)) {
             throw new ConcertNotFoundException(concertId);
         }
 
-        Order order = this.orderRepository
-                .findByIdAndConcertIdForUpdate(orderId, concertId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        Order order = orderRepository
+                .findByIdAndConcertIdForUpdate(
+                        orderId,
+                        concertId
+                )
+                .orElseThrow(
+                        () -> new OrderNotFoundException(orderId)
+                );
 
         ensureCustomerHasAccess(order, accessToken);
+
         expireOrderIfNeeded(order);
 
-        if(order.isPaidOrExpired()) {
-            throw new OrderIsPaidOrExpiredException(orderId);
+        if (
+                order.getStatus() != OrderStatus.RESERVED &&
+                        order.getStatus() != OrderStatus.CANCELLED
+        ) {
+            throw new OrderCannotBeCancelledException(orderId);
         }
+
         order.cancel();
 
-        Order savedOrder = this.orderRepository.save(order);
-        return OrderResponse.fromEntity(savedOrder);
+        return OrderResponse.fromEntity(
+                orderRepository.save(order)
+        );
     }
 
     @Transactional
@@ -174,7 +183,10 @@ public class OrderService {
         Order order = orderRepository.findByIdAndConcertIdForUpdate(orderId, concertId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
-        Order savedOrder = markOrderPaid(order);
+        order.markAsPaymentPending(LocalDateTime.now().plus(orderProperties.paymentDuration()));
+        order.markAsPaid();
+
+        Order savedOrder = this.orderRepository.save(order);
 
         return OrderResponse.fromEntity(savedOrder);
     }
@@ -237,14 +249,6 @@ public class OrderService {
         ticketEmailService.sendEmail(order, tickets);
     }
 
-    @Transactional
-    public Order markOrderPaidFromPayment(Long orderId) {
-        Order order = orderRepository.findByIdForUpdate(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-
-        return markOrderPaid(order);
-    }
-
     private void validateMaxTicketsPerOrder(OrderRequest request) {
         int requestedTickets = request.items().stream()
                 .mapToInt(OrderItemRequest::quantity)
@@ -267,33 +271,6 @@ public class OrderService {
         if ((!hasAccess)) {
             throw new OrderNotFoundException(order.getId());
         }
-    }
-
-    private Order markOrderPaid(Order order) {
-        expireOrderIfNeeded(order);
-
-        if (order.getStatus() == OrderStatus.PAID) {
-            return order;
-        }
-
-        if (order.getStatus() != OrderStatus.PAYMENT_PENDING) {
-            throw new OrderCannotBePaidException(order.getId());
-        }
-
-        order.markAsPaid();
-
-        Order savedOrder = orderRepository.save(order);
-
-        ticketService.createTicketsForOrder(savedOrder);
-
-        eventPublisher.publishEvent(
-                new OrderPaidEvent(
-                        savedOrder.getConcert().getId(),
-                        savedOrder.getId()
-                )
-        );
-
-        return savedOrder;
     }
 
     private void expireOrderIfNeeded(Order order) {

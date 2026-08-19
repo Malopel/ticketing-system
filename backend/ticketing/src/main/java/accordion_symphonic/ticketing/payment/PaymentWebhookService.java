@@ -15,16 +15,16 @@ public class PaymentWebhookService {
 
     private final PaymentWebhookSignatureService signatureService;
     private final PaymentEventRepository paymentEventRepository;
-    private final OrderService orderService;
+    private final PaymentCompletionService paymentCompletionService;
 
     public PaymentWebhookService(
             PaymentWebhookSignatureService signatureService,
             PaymentEventRepository paymentEventRepository,
-            OrderService orderService
+            PaymentCompletionService paymentCompletionService
     ) {
         this.signatureService = signatureService;
         this.paymentEventRepository = paymentEventRepository;
-        this.orderService = orderService;
+        this.paymentCompletionService = paymentCompletionService;
     }
 
     @Transactional
@@ -45,7 +45,7 @@ public class PaymentWebhookService {
             throw new UnsupportedPaymentStatusException(request.status());
         }
 
-        Order paidOrder = orderService.markOrderPaidFromPayment(
+        Order paidOrder = paymentCompletionService.completePayment(
                 request.orderId()
         );
 

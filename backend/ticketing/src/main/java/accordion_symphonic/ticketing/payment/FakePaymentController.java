@@ -17,14 +17,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class FakePaymentController {
 
     private final FakePaymentProvider fakePaymentProvider;
-    private final OrderService orderService;
+    private final PaymentCompletionService paymentCompletionService;
 
     public FakePaymentController(
             FakePaymentProvider fakePaymentProvider,
-            OrderService orderService
+            PaymentCompletionService paymentCompletionService
     ) {
         this.fakePaymentProvider = fakePaymentProvider;
-        this.orderService = orderService;
+        this.paymentCompletionService = paymentCompletionService;
     }
 
     @PostMapping("/{providerPaymentId}/complete")
@@ -39,7 +39,7 @@ public class FakePaymentController {
                 ));
 
         Order paidOrder =
-                orderService.markOrderPaidFromPayment(orderId);
+                paymentCompletionService.completePayment(orderId);
 
         return OrderResponse.fromEntity(paidOrder);
     }

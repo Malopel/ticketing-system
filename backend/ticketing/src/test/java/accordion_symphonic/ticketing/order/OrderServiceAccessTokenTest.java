@@ -19,8 +19,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,9 +56,6 @@ class OrderServiceAccessTokenTest {
     @Mock
     private TicketPdfService ticketPdfService;
 
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-
     private Order order;
     private String validAccessToken;
 
@@ -77,8 +72,7 @@ class OrderServiceAccessTokenTest {
                 orderAccessTokenService,
                 ticketEmailService,
                 ticketPdfService,
-                new OrderProperties(Duration.ofMinutes(30),10, Duration.ofMinutes(20)),
-                eventPublisher
+                new OrderProperties(Duration.ofMinutes(30),10, Duration.ofMinutes(20))
         );
 
         OrderAccessTokenService.GeneratedOrderAccessToken generatedToken =

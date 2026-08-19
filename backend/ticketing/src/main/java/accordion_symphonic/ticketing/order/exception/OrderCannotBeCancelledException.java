@@ -1,8 +1,8 @@
 package accordion_symphonic.ticketing.order.exception;
 
-public class OrderIsPaidOrExpiredException extends RuntimeException {
+public class OrderCannotBeCancelledException extends RuntimeException {
 
-    public OrderIsPaidOrExpiredException(Long id) {
+    public OrderCannotBeCancelledException(Long id) {
         super("Order with id " + id + " is paid or expired");
     }
 }

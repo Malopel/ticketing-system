@@ -6,7 +6,8 @@ import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.order.dto.CreatedOrderResponse;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;
-import accordion_symphonic.ticketing.order.exception.OrderIsPaidOrExpiredException;
+import accordion_symphonic.ticketing.order.exception.OrderCannotBeCancelledException;
+import accordion_symphonic.ticketing.payment.PaymentService;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
@@ -55,6 +55,9 @@ class OrderConcurrencyIntegrationTest {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @Test
     void concurrentOrdersDoNotOversellTicketCategory() throws Exception {
@@ -210,7 +213,7 @@ class OrderConcurrencyIntegrationTest {
                         );
 
                         return true;
-                    } catch (OrderIsPaidOrExpiredException exception) {
+                    } catch (OrderCannotBeCancelledException exception) {
                         return false;
                     }
                 });
@@ -222,10 +225,11 @@ class OrderConcurrencyIntegrationTest {
                     start.await();
 
                     try {
-                        orderService.markOrderPaidFromPayment(
-                                orderId
+                        paymentService.createPayment(
+                                savedConcert.getId(),
+                                orderId,
+                                accessToken
                         );
-
                         return true;
                     } catch (OrderCannotBePaidException exception) {
                         return false;
@@ -266,7 +270,7 @@ class OrderConcurrencyIntegrationTest {
 
         if (paymentSucceeded) {
             assertEquals(
-                    OrderStatus.PAID,
+                    OrderStatus.PAYMENT_PENDING,
                     finalOrder.getStatus()
             );
         }

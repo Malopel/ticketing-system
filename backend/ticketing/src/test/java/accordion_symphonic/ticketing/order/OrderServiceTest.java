@@ -9,12 +9,10 @@ import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;
 import accordion_symphonic.ticketing.order.dto.OrderResponse;
 import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryException;
-import accordion_symphonic.ticketing.order.exception.OrderIsPaidOrExpiredException;
+import accordion_symphonic.ticketing.order.exception.OrderCannotBeCancelledException;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.exception.TooManyTicketsInOrderException;
-import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.ticket.TicketPdfService;
-import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.TicketService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
@@ -23,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -64,9 +61,6 @@ class OrderServiceTest {
     @Mock
     private TicketPdfService ticketPdfService;
 
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-
 
     @BeforeEach
     void setUp() {
@@ -79,122 +73,8 @@ class OrderServiceTest {
                 orderAccessTokenService,
                 ticketEmailService,
                 ticketPdfService,
-                new OrderProperties(Duration.ofMinutes(30), 10, Duration.ofMinutes(20)),
-                eventPublisher
-        );
-    }
-
-    @Test
-    void markOrderPaidFromPaymentCreatesTicketsAndPublishesEvent() {
-        Concert concert = new Concert(
-                "Accordion Night",
-                "Beschreibung",
-                LocalDateTime.now().plusDays(30),
-                "Heidelberg"
-        );
-
-        Order order = new Order(
-                concert,
-                "kunde@example.com",
-                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                LocalDateTime.now(),
-                LocalDateTime.now().plusHours(1)
-        );
-
-        order.markAsPaymentPending(
-                LocalDateTime.now().plusMinutes(20)
-        );
-
-        List<TicketResponse> tickets = List.of();
-
-        when(orderRepository.findByIdForUpdate(42L))
-                .thenReturn(Optional.of(order));
-
-        when(orderRepository.save(order))
-                .thenReturn(order);
-
-        when(ticketService.createTicketsForOrder(order))
-                .thenReturn(tickets);
-
-        Order paidOrder = orderService.markOrderPaidFromPayment(42L);
-
-        assertEquals(OrderStatus.PAID, paidOrder.getStatus());
-
-        verify(orderRepository).save(order);
-        verify(ticketService).createTicketsForOrder(order);
-
-        verify(eventPublisher).publishEvent(
-                any(OrderPaidEvent.class)
-        );
-    }
-
-    @Test
-    void markOrderPaidFromPaymentDoesNotCreateTicketsOrSendEmailWhenOrderIsAlreadyPaid() {
-        Concert concert = new Concert(
-                "Accordion Night",
-                "Beschreibung",
-                LocalDateTime.now().plusDays(30),
-                "Heidelberg"
-        );
-
-        Order order = new Order(
-                concert,
-                "kunde@example.com",
-                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                LocalDateTime.now(),
-                LocalDateTime.now().plusHours(1)
-        );
-
-        order.markAsPaymentPending(
-                LocalDateTime.now().plusMinutes(20)
-        );
-        order.markAsPaid();
-
-        when(orderRepository.findByIdForUpdate(42L))
-                .thenReturn(Optional.of(order));
-
-        Order paidOrder = orderService.markOrderPaidFromPayment(42L);
-
-        assertEquals(OrderStatus.PAID, paidOrder.getStatus());
-
-        verify(orderRepository).findByIdForUpdate(42L);
-        verify(orderRepository, never()).save(any());
-        verify(ticketService, never()).createTicketsForOrder(any());
-
-        verify(eventPublisher, never()).publishEvent(any());
-    }
-
-    @Test
-    void markOrderPaidFromPaymentRejectsExpiredOrderAndDoesNotCreateTicketsOrSendEmail() {
-        Concert concert = new Concert(
-                "Accordion Night",
-                "Beschreibung",
-                LocalDateTime.now().plusDays(30),
-                "Heidelberg"
-        );
-
-        Order order = new Order(
-                concert,
-                "kunde@example.com",
-                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                LocalDateTime.now().minusHours(2),
-                LocalDateTime.now().minusHours(1)
-        );
-
-        when(orderRepository.findByIdForUpdate(42L))
-                .thenReturn(Optional.of(order));
-
-        assertThrows(
-                OrderCannotBePaidException.class,
-                () -> orderService.markOrderPaidFromPayment(42L)
-        );
-
-        assertEquals(OrderStatus.EXPIRED, order.getStatus());
-
-        verify(orderRepository, never()).save(order);
-        verify(ticketService, never()).createTicketsForOrder(any());
-
-        verify(eventPublisher, never()).publishEvent(any());
+                new OrderProperties(Duration.ofMinutes(30), 10, Duration.ofMinutes(20)
+        ));
     }
 
     @Test
@@ -435,7 +315,7 @@ class OrderServiceTest {
                 .thenReturn(true);
 
         assertThrows(
-                OrderIsPaidOrExpiredException.class,
+                OrderCannotBeCancelledException.class,
                 () -> orderService.cancelOrder(
                         concertId,
                         orderId,
@@ -488,7 +368,7 @@ class OrderServiceTest {
                 .thenReturn(true);
 
         assertThrows(
-                OrderIsPaidOrExpiredException.class,
+                OrderCannotBeCancelledException.class,
                 () -> orderService.cancelOrder(
                         concertId,
                         orderId,

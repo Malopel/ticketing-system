@@ -33,7 +33,7 @@ class PaymentWebhookServiceTest {
     private PaymentEventRepository paymentEventRepository;
 
     @Mock
-    private OrderService orderService;
+    private PaymentCompletionService paymentCompletionService;
 
     private PaymentWebhookService paymentWebhookService;
 
@@ -44,7 +44,7 @@ class PaymentWebhookServiceTest {
         paymentWebhookService = new PaymentWebhookService(
                 signatureService,
                 paymentEventRepository,
-                orderService
+                paymentCompletionService
         );
 
         Concert concert = new Concert(
@@ -77,7 +77,7 @@ class PaymentWebhookServiceTest {
         when(paymentEventRepository.existsByEventId("evt_001"))
                 .thenReturn(false);
 
-        when(orderService.markOrderPaidFromPayment(42L))
+        when(paymentCompletionService.completePayment(42L))
                 .thenReturn(paidOrder);
 
         paymentWebhookService.processWebhook(
@@ -86,7 +86,7 @@ class PaymentWebhookServiceTest {
                 request
         );
 
-        verify(orderService).markOrderPaidFromPayment(42L);
+        verify(paymentCompletionService).completePayment(42L);
 
         ArgumentCaptor<PaymentEvent> paymentEventCaptor =
                 ArgumentCaptor.forClass(PaymentEvent.class);
@@ -120,7 +120,7 @@ class PaymentWebhookServiceTest {
                 )
         );
 
-        verifyNoInteractions(orderService);
+        verifyNoInteractions(paymentCompletionService);
         verify(paymentEventRepository, never()).save(any());
     }
 
@@ -145,7 +145,7 @@ class PaymentWebhookServiceTest {
         );
 
         verify(paymentEventRepository).existsByEventId("evt_001");
-        verifyNoInteractions(orderService);
+        verifyNoInteractions(paymentCompletionService);
         verify(paymentEventRepository, never()).save(any());
     }
 
@@ -164,7 +164,7 @@ class PaymentWebhookServiceTest {
                 .thenReturn(false)
                 .thenReturn(true);
 
-        when(orderService.markOrderPaidFromPayment(42L))
+        when(paymentCompletionService.completePayment(42L))
                 .thenReturn(paidOrder);
 
         paymentWebhookService.processWebhook(
@@ -179,7 +179,7 @@ class PaymentWebhookServiceTest {
                 request
         );
 
-        verify(orderService, times(1)).markOrderPaidFromPayment(42L);
+        verify(paymentCompletionService, times(1)).completePayment(42L);
         verify(paymentEventRepository, times(1)).save(any(PaymentEvent.class));
     }
 }
