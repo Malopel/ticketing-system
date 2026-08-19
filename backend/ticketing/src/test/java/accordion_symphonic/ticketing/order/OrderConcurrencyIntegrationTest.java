@@ -48,6 +48,9 @@ class OrderConcurrencyIntegrationTest {
     private OrderService orderService;
 
     @Autowired
+    private OrderCreationService orderCreationService;
+
+    @Autowired
     private ConcertRepository concertRepository;
 
     @Autowired
@@ -95,7 +98,7 @@ class OrderConcurrencyIntegrationTest {
                 startSignal.await();
 
                 try {
-                    orderService.createOrder(
+                    orderCreationService.createOrder(
                             savedConcert.getId(),
                             new OrderRequest(
                                     "kunde" + customerNumber + "@example.com",
@@ -182,7 +185,7 @@ class OrderConcurrencyIntegrationTest {
         );
 
         CreatedOrderResponse createdOrder =
-                orderService.createOrder(
+                orderCreationService.createOrder(
                         savedConcert.getId(),
                         request
                 );

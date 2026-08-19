@@ -11,6 +11,7 @@ public final class ErrorCode {
     public static final String ORDER_NOT_FOUND = "ORDER_NOT_FOUND";
     public static final String ORDER_CANNOT_BE_PAID = "ORDER_CANNOT_BE_PAID";
     public static final String ORDER_HAS_NO_TICKETS = "ORDER_HAS_NO_TICKETS";
+    public static final String ORDER_CANNOT_BE_CANCELLED = "ORDER_CANNOT_BE_CANCELLED";
 
     public static final String NOT_ENOUGH_TICKETS_AVAILABLE = "NOT_ENOUGH_TICKETS_AVAILABLE";
     public static final String TOO_MANY_TICKETS_IN_ORDER = "TOO_MANY_TICKETS_IN_ORDER";

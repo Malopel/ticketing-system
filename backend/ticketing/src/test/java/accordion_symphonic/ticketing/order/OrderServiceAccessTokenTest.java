@@ -52,11 +52,8 @@ class OrderServiceAccessTokenTest {
 
         orderService = new OrderService(
                 orderRepository,
-                ticketCategoryRepository,
                 concertRepository,
-                ticketAvailabilityService,
-                orderAccessTokenService,
-                new OrderProperties(Duration.ofMinutes(30),10, Duration.ofMinutes(20))
+                orderAccessTokenService
         );
 
         OrderAccessTokenService.GeneratedOrderAccessToken generatedToken =

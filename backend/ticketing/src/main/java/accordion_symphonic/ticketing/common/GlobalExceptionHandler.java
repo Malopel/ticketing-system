@@ -58,14 +58,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OrderCannotBeCancelledException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleOrderIsPaidOrExpiredException(
+    public ErrorResponse handleOrderCannotBeCancelled(
             OrderCannotBeCancelledException exception
     ) {
         return new ErrorResponse(
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
-                ErrorCode.ORDER_CANNOT_BE_PAID,
+                ErrorCode.ORDER_CANNOT_BE_CANCELLED,
                 exception.getMessage()
         );
     }

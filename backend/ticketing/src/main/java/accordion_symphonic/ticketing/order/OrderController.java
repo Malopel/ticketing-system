@@ -13,9 +13,11 @@ public class OrderController {
     private static final String ORDER_ACCESS_TOKEN_HEADER = "X-Order-Access-Token";
 
     private final OrderService orderService;
+    private final OrderCreationService orderCreationService;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, OrderCreationService orderCreationService) {
         this.orderService = orderService;
+        this.orderCreationService = orderCreationService;
     }
 
     @GetMapping("/{orderId}")
@@ -35,7 +37,7 @@ public class OrderController {
             @PathVariable Long concertId,
             @Valid @RequestBody OrderRequest order
     ) {
-        return orderService.createOrder(concertId, order);
+        return orderCreationService.createOrder(concertId, order);
     }
 
     @PatchMapping("/{orderId}/cancel")

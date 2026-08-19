@@ -164,10 +164,6 @@ public class Order {
         return this.items;
     }
 
-    public boolean isPaidOrExpired() {
-        return this.status == OrderStatus.PAID || this.status == OrderStatus.EXPIRED;
-    }
-
     public boolean shouldExpire() {
         return this.status == OrderStatus.RESERVED
                 && this.expiresAt.isBefore(LocalDateTime.now());

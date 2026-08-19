@@ -54,6 +54,8 @@ class OrderControllerSecurityTest {
 
     @MockitoBean
     private OrderService orderService;
+    @MockitoBean
+    private OrderCreationService orderCreationService;
 
     @Test
     void customerCanReadOrderWithAccessToken() throws Exception {
@@ -172,7 +174,7 @@ class OrderControllerSecurityTest {
                 returnedAccessToken
         );
 
-        when(orderService.createOrder(
+        when(orderCreationService.createOrder(
                 org.mockito.ArgumentMatchers.eq(CONCERT_ID),
                 org.mockito.ArgumentMatchers.any(OrderRequest.class)
         )).thenReturn(createdOrderResponse);
@@ -199,7 +201,7 @@ class OrderControllerSecurityTest {
         ArgumentCaptor<OrderRequest> requestCaptor =
                 ArgumentCaptor.forClass(OrderRequest.class);
 
-        verify(orderService).createOrder(
+        verify(orderCreationService).createOrder(
                 org.mockito.ArgumentMatchers.eq(CONCERT_ID),
                 requestCaptor.capture()
         );
@@ -269,7 +271,7 @@ class OrderControllerSecurityTest {
 
     @Test
     void createOrderWithTooManyTicketsReturnsConflict() throws Exception {
-        when(orderService.createOrder(eq(CONCERT_ID), any(OrderRequest.class)))
+        when(orderCreationService.createOrder(eq(CONCERT_ID), any(OrderRequest.class)))
                 .thenThrow(new TooManyTicketsInOrderException(11, 10));
 
         mockMvc.perform(post("/api/concerts/{concertId}/orders", CONCERT_ID)
@@ -298,7 +300,7 @@ class OrderControllerSecurityTest {
 
     @Test
     void createOrderWithDuplicateTicketCategoryReturnsConflict() throws Exception {
-        when(orderService.createOrder(eq(CONCERT_ID), any(OrderRequest.class)))
+        when(orderCreationService.createOrder(eq(CONCERT_ID), any(OrderRequest.class)))
                 .thenThrow(new DuplicateTicketCategoryException(7L));
 
         mockMvc.perform(post("/api/concerts/{concertId}/orders", CONCERT_ID)

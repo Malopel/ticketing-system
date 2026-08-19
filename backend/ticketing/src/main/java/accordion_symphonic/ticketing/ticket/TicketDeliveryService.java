@@ -43,12 +43,12 @@ public class TicketDeliveryService {
             Long concertId,
             Long orderId
     ) {
-        Order oder = getOrder(concertId, orderId);
+        Order order = getOrder(concertId, orderId);
 
         List<TicketResponse> tickets =
                 getTickets(concertId, orderId);
 
-        return ticketPdfService.createTicketPdf(oder, tickets);
+        return ticketPdfService.createTicketPdf(order, tickets);
     }
 
     @Transactional(
