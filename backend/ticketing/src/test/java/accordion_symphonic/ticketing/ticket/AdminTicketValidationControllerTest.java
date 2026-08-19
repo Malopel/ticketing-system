@@ -1,10 +1,10 @@
 package accordion_symphonic.ticketing.ticket;
 
-import accordion_symphonic.ticketing.common.GlobalExceptionHandler;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.security.SecurityConfig;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
+import accordion_symphonic.ticketing.ticket.exception.TicketExceptionHandler;
 import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AdminTicketValidationController.class)
 @Import({
         SecurityConfig.class,
-        GlobalExceptionHandler.class
+        TicketExceptionHandler.class
 })
 @TestPropertySource(properties = {
         "ticketing.security.admin.username=admin",

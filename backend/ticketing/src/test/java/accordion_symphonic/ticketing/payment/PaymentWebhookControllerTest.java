@@ -1,6 +1,6 @@
 package accordion_symphonic.ticketing.payment;
 
-import accordion_symphonic.ticketing.common.GlobalExceptionHandler;
+import accordion_symphonic.ticketing.payment.exception.PaymentExceptionHandler;
 import accordion_symphonic.ticketing.payment.dto.PaymentWebhookRequest;
 import accordion_symphonic.ticketing.payment.exception.InvalidPaymentWebhookSignatureException;
 import accordion_symphonic.ticketing.security.SecurityConfig;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = PaymentWebhookController.class)
 @Import({
         SecurityConfig.class,
-        GlobalExceptionHandler.class
+        PaymentExceptionHandler.class
 })
 @TestPropertySource(properties = {
         "ticketing.security.admin.username=admin",

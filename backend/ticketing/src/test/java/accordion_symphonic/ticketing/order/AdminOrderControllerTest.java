@@ -1,10 +1,9 @@
 package accordion_symphonic.ticketing.order;
 
-import accordion_symphonic.ticketing.common.GlobalExceptionHandler;
+import accordion_symphonic.ticketing.order.exception.OrderExceptionHandler;
 import accordion_symphonic.ticketing.order.exception.OrderHasNoTicketsException;
 import accordion_symphonic.ticketing.security.SecurityConfig;
 import accordion_symphonic.ticketing.ticket.TicketDeliveryService;
-import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -34,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AdminOrderController.class)
 @Import({
         SecurityConfig.class,
-        GlobalExceptionHandler.class
+        OrderExceptionHandler.class
 })
 @TestPropertySource(properties = {
         "ticketing.security.admin.username=admin",
