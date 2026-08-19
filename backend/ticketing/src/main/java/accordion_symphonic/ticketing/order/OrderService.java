@@ -81,23 +81,6 @@ public class OrderService {
         );
     }
 
-    @Transactional
-    public List<OrderResponse> getOrdersForConcert(Long concertId) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new ConcertNotFoundException(concertId);
-        }
-
-        List<Order> orders = orderRepository.findByConcertId(concertId);
-
-        for (Order order : orders) {
-            expireOrderIfNeeded(order);
-        }
-
-        return orders.stream()
-                .map(OrderResponse::fromEntity)
-                .toList();
-    }
-
     private void ensureCustomerHasAccess(Order order, String accessToken) {
         boolean hasAccess = orderAccessTokenService.matches(
                 accessToken,

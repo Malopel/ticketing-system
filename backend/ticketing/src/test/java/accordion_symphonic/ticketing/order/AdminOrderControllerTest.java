@@ -46,7 +46,7 @@ class AdminOrderControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private OrderService orderService;
+    private AdminOrderQueryService adminOrderQueryService;
 
     @MockitoBean
     private TicketDeliveryService ticketDeliveryService;
@@ -78,7 +78,7 @@ class AdminOrderControllerTest {
         mockMvc.perform(get("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/pdf", 1L, 42L))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(orderService);
+        verifyNoInteractions(adminOrderQueryService);
     }
 
     private String basicAuthHeader() {
@@ -106,7 +106,7 @@ class AdminOrderControllerTest {
         mockMvc.perform(post("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/resend-email", 1L, 42L))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(ticketDeliveryService);
+        verifyNoInteractions(adminOrderQueryService);
     }
 
     @Test

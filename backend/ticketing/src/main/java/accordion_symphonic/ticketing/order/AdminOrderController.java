@@ -15,18 +15,18 @@ import java.util.List;
 @RequestMapping("/api/admin/concerts/{concertId}/orders")
 public class AdminOrderController {
 
-    private final OrderService orderService;
+    private final AdminOrderQueryService adminOrderQueryService;
 
     private final TicketDeliveryService ticketDeliveryService;
 
-    public AdminOrderController(OrderService orderService, TicketDeliveryService ticketDeliveryService) {
-        this.orderService = orderService;
+    public AdminOrderController(AdminOrderQueryService adminOrderQueryService, TicketDeliveryService ticketDeliveryService) {
+        this.adminOrderQueryService = adminOrderQueryService;
         this.ticketDeliveryService = ticketDeliveryService;
     }
 
     @GetMapping
     public List<OrderResponse> getOrdersForConcert(@PathVariable Long concertId) {
-        return orderService.getOrdersForConcert(concertId);
+        return adminOrderQueryService.getOrdersForConcert(concertId);
     }
 
     @GetMapping(value = "/{orderId}/tickets/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
