@@ -2,9 +2,11 @@ package accordion_symphonic.ticketing.ticketcategory;
 
 import accordion_symphonic.ticketing.concert.Concert;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
+@Getter
 @Entity
 public class TicketCategory {
 
@@ -37,23 +39,4 @@ public class TicketCategory {
         this.capacity = capacity;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public Concert getConcert() {
-        return concert;
-    }
 }

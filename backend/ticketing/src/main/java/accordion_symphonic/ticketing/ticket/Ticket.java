@@ -4,9 +4,11 @@ import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.UUID;
 
+@Getter
 @Entity
 public class Ticket {
 
@@ -36,26 +38,6 @@ public class Ticket {
         this.ticketCategory = ticketCategory;
         this.qrToken = UUID.randomUUID().toString();
         this.status = TicketStatus.VALID;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public Order getOrder() {
-        return this.order;
-    }
-
-    public TicketCategory getTicketCategory() {
-        return this.ticketCategory;
-    }
-
-    public String getQrToken() {
-        return this.qrToken;
-    }
-
-    public TicketStatus getStatus() {
-        return this.status;
     }
 
     public void useTicket() {

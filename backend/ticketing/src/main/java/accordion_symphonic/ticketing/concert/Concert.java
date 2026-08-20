@@ -2,9 +2,11 @@ package accordion_symphonic.ticketing.concert;
 
 import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 public class Concert {
 
@@ -39,30 +41,6 @@ public class Concert {
         this.description = update.description();
         this.startTime = update.startTime();
         this.location = update.location();
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public LocalDateTime getStartTime() {
-        return this.startTime;
-    }
-
-    public String getLocation() {
-        return this.location;
-    }
-
-    public ConcertStatus getStatus() {
-        return this.status;
     }
 
     public void publish() {

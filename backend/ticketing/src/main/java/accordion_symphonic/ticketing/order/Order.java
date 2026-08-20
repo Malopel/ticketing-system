@@ -8,6 +8,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
+@Getter
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -43,6 +47,7 @@ public class Order {
 
     private LocalDateTime paymentExpiresAt;
 
+    @Getter(AccessLevel.NONE)
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
@@ -124,44 +129,8 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public Long getId() {
-        return this.id;
-    }
-
-    public Concert getConcert() {
-        return this.concert;
-    }
-
-    public String getCustomerEmail() {
-        return this.customerEmail;
-    }
-
-    public String getAccessTokenHash() {
-        return this.accessTokenHash;
-    }
-
-    public OrderStatus getStatus() {
-        return this.status;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return this.totalAmount;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return this.expiresAt;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return this.paidAt;
-    }
-
     public List<OrderItem> getItems() {
-        return this.items;
+        return List.copyOf(items);
     }
 
     public boolean shouldExpire() {

@@ -2,9 +2,11 @@ package accordion_symphonic.ticketing.payment;
 
 import accordion_symphonic.ticketing.order.Order;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Table(
         name = "payment_event",
@@ -54,27 +56,4 @@ public class PaymentEvent {
         this.processedAt = processedAt;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getEventId() {
-        return eventId;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public PaymentStatus getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public LocalDateTime getReceivedAt() {
-        return receivedAt;
-    }
-
-    public LocalDateTime getProcessedAt() {
-        return processedAt;
-    }
 }

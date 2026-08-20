@@ -2,9 +2,11 @@ package accordion_symphonic.ticketing.order;
 
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
+@Getter
 @Entity
 public class OrderItem {
 
@@ -41,23 +43,4 @@ public class OrderItem {
         return this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
     }
 
-    public Long getId() {
-        return this.id;
-    }
-
-    public Order getOrder() {
-        return this.order;
-    }
-
-    public TicketCategory getTicketCategory() {
-        return this.ticketCategory;
-    }
-
-    public int getQuantity() {
-        return this.quantity;
-    }
-
-    public BigDecimal getUnitPrice() {
-        return this.unitPrice;
-    }
 }
