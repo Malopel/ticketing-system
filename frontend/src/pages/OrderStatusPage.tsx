@@ -7,27 +7,17 @@ import {
     getOrder,
     type OrderResponse,
 } from '../api/orderApi';
+import {useOrderCountdown} from '../hooks/useOrderCountdown';
 
 import PaymentSection
     from '../components/checkout/PaymentSection';
-import OrderStatusBadge from '../components/order/OrderStatusBadge';
+import OrderStatusCard from '../components/order/OrderStatusCard';
+import OrderDetails from '../components/order/OrderDetails';
 
 type StoredOrderAccess = {
     concertId: number;
     accessToken: string;
 };
-
-function calculateRemainingSeconds(
-    expiresAt: string,
-): number {
-    const remainingMilliseconds =
-        new Date(expiresAt).getTime() - Date.now();
-
-    return Math.max(
-        0,
-        Math.ceil(remainingMilliseconds / 1000),
-    );
-}
 
 function OrderStatusPage() {
     const {orderId} = useParams<{
@@ -46,17 +36,12 @@ function OrderStatusPage() {
     const [error, setError] =
         useState<string | null>(null);
 
-    const [countdown, setCountdown] = useState<{
-        orderId: number;
-        seconds: number;
-    } | null>(null);
-
     const [refreshing, setRefreshing] = useState(false);
     const [refreshError, setRefreshError] =
         useState<string | null>(null);
 
     const expirationRefreshTriggered =
-        useRef<number | null>(null);
+        useRef<string | null>(null);
 
     const fetchOrder = useCallback(
         async (
@@ -74,6 +59,9 @@ function OrderStatusPage() {
         },
         [id],
     );
+
+    const remainingSeconds =
+        useOrderCountdown(order);
 
     useEffect(() => {
         async function initializeOrder() {
@@ -134,53 +122,26 @@ function OrderStatusPage() {
     }, [id, fetchOrder]);
 
     useEffect(() => {
-        if (!order || order.status !== 'RESERVED') {
-            return;
-        }
-
-        const currentOrderId = order.id;
-        const expiresAt = order.expiresAt;
-
-        const intervalId = window.setInterval(() => {
-            setCountdown({
-                orderId: currentOrderId,
-                seconds:
-                    calculateRemainingSeconds(expiresAt),
-            });
-        }, 1000);
-
-        return () => {
-            window.clearInterval(intervalId);
-        };
-    }, [order]);
-
-    const remainingSeconds =
-        order?.status === 'RESERVED'
-            ? countdown?.orderId === order.id
-                ? countdown.seconds
-                : calculateRemainingSeconds(
-                    order.expiresAt,
-                )
-            : null;
-
-    useEffect(() => {
         if (
             !order ||
-            order.status !== 'RESERVED' ||
             remainingSeconds !== 0 ||
             !accessToken
         ) {
             return;
         }
 
+        const refreshKey =
+            `${order.id}:${order.status}`;
+
         if (
             expirationRefreshTriggered.current ===
-            order.id
+            refreshKey
         ) {
             return;
         }
 
-        expirationRefreshTriggered.current = order.id;
+        expirationRefreshTriggered.current =
+            refreshKey;
 
         const concertId = order.concertId;
         const currentOrderId = order.id;
@@ -188,11 +149,12 @@ function OrderStatusPage() {
 
         async function refreshOrderAfterExpiration() {
             try {
-                const refreshedOrder = await getOrder(
-                    concertId,
-                    currentOrderId,
-                    currentAccessToken,
-                );
+                const refreshedOrder =
+                    await getOrder(
+                        concertId,
+                        currentOrderId,
+                        currentAccessToken,
+                    );
 
                 setOrder(refreshedOrder);
             } catch (error) {
@@ -207,7 +169,75 @@ function OrderStatusPage() {
         }
 
         void refreshOrderAfterExpiration();
-    }, [remainingSeconds, order, accessToken]);
+    }, [
+        remainingSeconds,
+        order,
+        accessToken,
+    ]);
+
+    const pollingOrderId = order?.id;
+    const pollingConcertId = order?.concertId;
+    const pollingStatus = order?.status;
+
+    useEffect(() => {
+        if (
+            pollingOrderId === undefined ||
+            pollingConcertId === undefined ||
+            pollingStatus !== 'PAYMENT_PENDING' ||
+            !accessToken
+        ) {
+            return;
+        }
+
+        const currentOrderId = pollingOrderId;
+        const currentConcertId = pollingConcertId;
+        const currentAccessToken = accessToken;
+
+        let timeoutId: number;
+        let active = true;
+
+        async function pollOrderStatus() {
+            try {
+                const refreshedOrder =
+                    await getOrder(
+                        currentConcertId,
+                        currentOrderId,
+                        currentAccessToken,
+                    );
+
+                if (!active) {
+                    return;
+                }
+
+                setOrder(refreshedOrder);
+            } catch {
+                // Ein einzelner Polling-Fehler soll nicht
+                // die ganze Bestellseite zerstören.
+            }
+
+            if (active) {
+                timeoutId = window.setTimeout(
+                    pollOrderStatus,
+                    2500,
+                );
+            }
+        }
+
+        timeoutId = window.setTimeout(
+            pollOrderStatus,
+            2500,
+        );
+
+        return () => {
+            active = false;
+            window.clearTimeout(timeoutId);
+        };
+    }, [
+        pollingOrderId,
+        pollingConcertId,
+        pollingStatus,
+        accessToken,
+    ]);
 
     if (loading) {
         return <p>Bestellung wird geladen...</p>;
@@ -230,32 +260,6 @@ function OrderStatusPage() {
     if (!order || !accessToken) {
         return null;
     }
-
-    const currencyFormatter = new Intl.NumberFormat(
-        'de-DE',
-        {
-            style: 'currency',
-            currency: 'EUR',
-        },
-    );
-
-    const remainingMinutes =
-        remainingSeconds !== null
-            ? Math.floor(remainingSeconds / 60)
-            : null;
-
-    const remainingSecondsPart =
-        remainingSeconds !== null
-            ? remainingSeconds % 60
-            : null;
-
-    const formattedRemainingTime =
-        remainingMinutes !== null &&
-        remainingSecondsPart !== null
-            ? `${remainingMinutes}:${remainingSecondsPart
-                .toString()
-                .padStart(2, '0')}`
-            : null;
 
     async function handleRefreshStatus() {
         if (!order || !accessToken) {
@@ -297,102 +301,15 @@ function OrderStatusPage() {
                 <p>{order.concertTitle}</p>
             </header>
 
-            <section className="order-status-card">
-                <OrderStatusBadge status={order.status}/>
+            <OrderStatusCard
+                order={order}
+                remainingSeconds={remainingSeconds}
+                refreshing={refreshing}
+                refreshError={refreshError}
+                onRefresh={handleRefreshStatus}
+            />
 
-                {order.status === 'RESERVED' &&
-                    formattedRemainingTime && (
-                        <p>
-                            Deine Tickets sind noch{' '}
-                            <strong>
-                                {formattedRemainingTime} Minuten
-                            </strong>{' '}
-                            für dich reserviert.
-                        </p>
-                    )
-                }
-
-                {order.status === 'RESERVED' && (
-                    <div className="status-refresh">
-                        <button
-                            type="button"
-                            onClick={handleRefreshStatus}
-                            disabled={refreshing}
-                        >
-                            {refreshing
-                                ? 'Status wird aktualisiert...'
-                                : 'Status aktualisieren'}
-                        </button>
-
-                        {refreshError && (
-                            <p className="error-message">
-                                Fehler: {refreshError}
-                            </p>
-                        )}
-                    </div>
-                )}
-
-                {order.status === 'PAID' && (
-                    <p>
-                        Deine Bestellung wurde erfolgreich bezahlt.
-                    </p>
-                )}
-
-                {order.status === 'EXPIRED' && (
-                    <p>
-                        Die Reservierungszeit ist abgelaufen.
-                        Diese Bestellung kann nicht mehr bezahlt werden.
-                    </p>
-                )}
-
-                {order.status === 'CANCELLED' && (
-                    <p>
-                        Diese Bestellung wurde storniert.
-                    </p>
-                )}
-            </section>
-
-            <section className="order-details">
-                <h2>Deine Bestellung</h2>
-
-                <div className="order-items">
-                    {order.items.map((item) => (
-                        <div
-                            key={item.id}
-                            className="order-item"
-                        >
-                            <div>
-                                <strong>
-                                    {item.ticketCategoryName}
-                                </strong>
-
-                                <span>
-                                {item.quantity} ×{' '}
-                                    {currencyFormatter.format(
-                                        item.unitPrice,
-                                    )}
-                            </span>
-                            </div>
-
-                            <strong>
-                                {currencyFormatter.format(
-                                    item.totalPrice,
-                                )}
-                            </strong>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="status-order-total">
-                    <span>Gesamt</span>
-
-                    <strong>
-                        {currencyFormatter.format(
-                            order.totalAmount,
-                        )}
-                    </strong>
-                </div>
-            </section>
+            <OrderDetails order={order}/>
 
             {order.status === 'RESERVED' && (
                 <PaymentSection

@@ -17,6 +17,13 @@ function OrderStatusBadge({
                 </span>
             );
 
+        case 'PAYMENT_PENDING':
+            return (
+                <span className="order-status-badge order-status-reserved">
+                    🕒 Zahlung ausstehend
+                </span>
+            );
+
         case 'PAID':
             return (
                 <span className="order-status-badge order-status-paid">

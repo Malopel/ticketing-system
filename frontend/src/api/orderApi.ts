@@ -21,6 +21,7 @@ export type OrderItemResponse = {
 
 export type OrderStatus =
     | 'RESERVED'
+    | 'PAYMENT_PENDING'
     | 'PAID'
     | 'EXPIRED'
     | 'CANCELLED';
@@ -30,11 +31,16 @@ export type OrderResponse = {
     concertId: number;
     concertTitle: string;
     customerEmail: string;
+
     status: OrderStatus;
+
     totalAmount: number;
+
     createdAt: string;
     expiresAt: string;
     paidAt: string | null;
+    paymentExpiresAt: string | null;
+
     items: OrderItemResponse[];
 };
 

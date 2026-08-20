@@ -46,7 +46,7 @@ function PaymentSection({
 
     async function handleStartPayment() {
         if (paymentDisabled) return;
-        
+
         try {
             setStartingPayment(true);
             setPaymentError(null);
