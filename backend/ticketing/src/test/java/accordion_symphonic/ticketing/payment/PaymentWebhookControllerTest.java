@@ -3,6 +3,8 @@ package accordion_symphonic.ticketing.payment;
 import accordion_symphonic.ticketing.payment.exception.PaymentExceptionHandler;
 import accordion_symphonic.ticketing.payment.dto.PaymentWebhookRequest;
 import accordion_symphonic.ticketing.payment.exception.InvalidPaymentWebhookSignatureException;
+import accordion_symphonic.ticketing.payment.service.PaymentWebhookService;
+import accordion_symphonic.ticketing.payment.web.PaymentWebhookController;
 import accordion_symphonic.ticketing.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

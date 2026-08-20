@@ -1,7 +1,8 @@
-package accordion_symphonic.ticketing.ticket;
+package accordion_symphonic.ticketing.ticket.service;
 
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.order.Order;
+import accordion_symphonic.ticketing.ticket.TicketStatus;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;

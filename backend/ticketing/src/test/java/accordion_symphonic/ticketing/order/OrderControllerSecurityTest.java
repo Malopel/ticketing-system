@@ -8,6 +8,9 @@ import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryExce
 import accordion_symphonic.ticketing.order.exception.OrderExceptionHandler;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.exception.TooManyTicketsInOrderException;
+import accordion_symphonic.ticketing.order.service.CustomerOrderService;
+import accordion_symphonic.ticketing.order.service.OrderCreationService;
+import accordion_symphonic.ticketing.order.web.OrderController;
 import accordion_symphonic.ticketing.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

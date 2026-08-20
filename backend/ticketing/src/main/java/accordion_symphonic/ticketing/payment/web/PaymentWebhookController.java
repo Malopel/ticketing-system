@@ -1,5 +1,6 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.web;
 
+import accordion_symphonic.ticketing.payment.service.PaymentWebhookService;
 import accordion_symphonic.ticketing.payment.dto.PaymentWebhookRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

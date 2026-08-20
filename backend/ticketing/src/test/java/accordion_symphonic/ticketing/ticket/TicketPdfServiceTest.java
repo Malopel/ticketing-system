@@ -3,6 +3,8 @@ package accordion_symphonic.ticketing.ticket;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
+import accordion_symphonic.ticketing.ticket.service.QrCodeService;
+import accordion_symphonic.ticketing.ticket.service.TicketPdfService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.service;
 
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderPaidEvent;
@@ -6,7 +6,7 @@ import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.ticket.TicketCreationService;
+import accordion_symphonic.ticketing.ticket.service.TicketCreationService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

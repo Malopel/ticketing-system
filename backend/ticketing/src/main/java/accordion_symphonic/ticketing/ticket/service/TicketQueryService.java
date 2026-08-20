@@ -1,10 +1,11 @@
-package accordion_symphonic.ticketing.ticket;
+package accordion_symphonic.ticketing.ticket.service;
 
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
+import accordion_symphonic.ticketing.ticket.TicketRepository;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import org.springframework.stereotype.Service;
 

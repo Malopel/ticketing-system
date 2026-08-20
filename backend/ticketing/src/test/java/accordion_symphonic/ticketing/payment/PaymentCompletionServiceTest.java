@@ -6,7 +6,8 @@ import accordion_symphonic.ticketing.order.OrderPaidEvent;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.ticket.TicketCreationService;
+import accordion_symphonic.ticketing.payment.service.PaymentCompletionService;
+import accordion_symphonic.ticketing.ticket.service.TicketCreationService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

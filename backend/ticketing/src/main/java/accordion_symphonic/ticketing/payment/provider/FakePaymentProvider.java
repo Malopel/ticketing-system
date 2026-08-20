@@ -1,6 +1,8 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.provider;
 
 import accordion_symphonic.ticketing.order.Order;
+import accordion_symphonic.ticketing.payment.PaymentProvider;
+import accordion_symphonic.ticketing.payment.PaymentSession;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 

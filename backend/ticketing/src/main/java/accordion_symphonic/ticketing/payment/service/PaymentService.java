@@ -1,11 +1,13 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.service;
 
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.order.OrderAccessTokenService;
+import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
 import accordion_symphonic.ticketing.order.OrderProperties;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
+import accordion_symphonic.ticketing.payment.PaymentProvider;
+import accordion_symphonic.ticketing.payment.PaymentSession;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 
 import org.springframework.stereotype.Service;

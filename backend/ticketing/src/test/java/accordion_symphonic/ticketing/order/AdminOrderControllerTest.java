@@ -2,8 +2,10 @@ package accordion_symphonic.ticketing.order;
 
 import accordion_symphonic.ticketing.order.exception.OrderExceptionHandler;
 import accordion_symphonic.ticketing.order.exception.OrderHasNoTicketsException;
+import accordion_symphonic.ticketing.order.service.AdminOrderQueryService;
+import accordion_symphonic.ticketing.order.web.AdminOrderController;
 import accordion_symphonic.ticketing.security.SecurityConfig;
-import accordion_symphonic.ticketing.ticket.TicketDeliveryService;
+import accordion_symphonic.ticketing.ticket.service.TicketDeliveryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;

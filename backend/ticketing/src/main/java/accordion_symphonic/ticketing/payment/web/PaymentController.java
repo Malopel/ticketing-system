@@ -1,5 +1,7 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.web;
 
+import accordion_symphonic.ticketing.payment.PaymentSession;
+import accordion_symphonic.ticketing.payment.service.PaymentService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

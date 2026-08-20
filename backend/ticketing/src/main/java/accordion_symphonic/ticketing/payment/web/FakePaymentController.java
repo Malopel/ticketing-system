@@ -1,7 +1,9 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.web;
 
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.dto.OrderResponse;
+import accordion_symphonic.ticketing.payment.service.PaymentCompletionService;
+import accordion_symphonic.ticketing.payment.provider.FakePaymentProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

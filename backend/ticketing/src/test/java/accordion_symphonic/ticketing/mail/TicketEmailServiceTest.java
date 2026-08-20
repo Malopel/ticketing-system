@@ -4,7 +4,7 @@ import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.mail.dto.MailProperties;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.Ticket;
-import accordion_symphonic.ticketing.ticket.TicketPdfService;
+import accordion_symphonic.ticketing.ticket.service.TicketPdfService;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import jakarta.mail.BodyPart;

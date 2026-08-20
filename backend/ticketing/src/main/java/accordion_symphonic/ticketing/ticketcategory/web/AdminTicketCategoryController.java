@@ -1,5 +1,6 @@
-package accordion_symphonic.ticketing.ticketcategory;
+package accordion_symphonic.ticketing.ticketcategory.web;
 
+import accordion_symphonic.ticketing.ticketcategory.TicketCategoryService;
 import accordion_symphonic.ticketing.ticketcategory.dto.TicketCategoryRequest;
 import accordion_symphonic.ticketing.ticketcategory.dto.TicketCategoryResponse;
 import jakarta.validation.Valid;

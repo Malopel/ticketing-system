@@ -1,4 +1,4 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

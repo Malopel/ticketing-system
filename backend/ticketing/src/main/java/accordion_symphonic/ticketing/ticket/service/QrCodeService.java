@@ -1,4 +1,4 @@
-package accordion_symphonic.ticketing.ticket;
+package accordion_symphonic.ticketing.ticket.service;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

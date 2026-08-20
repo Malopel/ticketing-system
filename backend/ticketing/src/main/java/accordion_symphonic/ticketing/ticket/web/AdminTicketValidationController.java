@@ -1,6 +1,8 @@
-package accordion_symphonic.ticketing.ticket;
+package accordion_symphonic.ticketing.ticket.web;
 
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
+import accordion_symphonic.ticketing.ticket.service.QrCodeService;
+import accordion_symphonic.ticketing.ticket.service.TicketValidationService;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.CacheControl;

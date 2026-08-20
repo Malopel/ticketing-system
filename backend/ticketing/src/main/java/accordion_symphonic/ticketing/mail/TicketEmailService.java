@@ -2,7 +2,7 @@ package accordion_symphonic.ticketing.mail;
 
 import accordion_symphonic.ticketing.mail.dto.MailProperties;
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.ticket.TicketPdfService;
+import accordion_symphonic.ticketing.ticket.service.TicketPdfService;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

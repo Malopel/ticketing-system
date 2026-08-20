@@ -1,7 +1,10 @@
-package accordion_symphonic.ticketing.ticket;
+package accordion_symphonic.ticketing.ticket.service;
 
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
+import accordion_symphonic.ticketing.ticket.Ticket;
+import accordion_symphonic.ticketing.ticket.TicketRepository;
+import accordion_symphonic.ticketing.ticket.TicketStatus;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticket.exception.TicketNotFoundException;

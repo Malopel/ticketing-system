@@ -1,10 +1,14 @@
-package accordion_symphonic.ticketing.order;
+package accordion_symphonic.ticketing.order.service;
 
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
+import accordion_symphonic.ticketing.order.Order;
+import accordion_symphonic.ticketing.order.OrderItem;
+import accordion_symphonic.ticketing.order.OrderProperties;
+import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.dto.CreatedOrderResponse;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;

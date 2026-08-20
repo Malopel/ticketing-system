@@ -1,6 +1,9 @@
-package accordion_symphonic.ticketing.payment;
+package accordion_symphonic.ticketing.payment.service;
 
 import accordion_symphonic.ticketing.order.Order;
+import accordion_symphonic.ticketing.payment.PaymentEvent;
+import accordion_symphonic.ticketing.payment.PaymentEventRepository;
+import accordion_symphonic.ticketing.payment.PaymentStatus;
 import accordion_symphonic.ticketing.payment.dto.PaymentWebhookRequest;
 import accordion_symphonic.ticketing.payment.exception.InvalidPaymentWebhookSignatureException;
 import accordion_symphonic.ticketing.payment.exception.UnsupportedPaymentStatusException;

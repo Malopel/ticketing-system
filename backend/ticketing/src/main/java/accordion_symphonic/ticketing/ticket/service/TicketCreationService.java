@@ -1,7 +1,9 @@
-package accordion_symphonic.ticketing.ticket;
+package accordion_symphonic.ticketing.ticket.service;
 
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderItem;
+import accordion_symphonic.ticketing.ticket.Ticket;
+import accordion_symphonic.ticketing.ticket.TicketRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

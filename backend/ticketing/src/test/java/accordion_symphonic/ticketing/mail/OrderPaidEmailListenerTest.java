@@ -1,7 +1,7 @@
 package accordion_symphonic.ticketing.mail;
 
 import accordion_symphonic.ticketing.order.OrderPaidEvent;
-import accordion_symphonic.ticketing.ticket.TicketDeliveryService;
+import accordion_symphonic.ticketing.ticket.service.TicketDeliveryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

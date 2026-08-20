@@ -7,6 +7,7 @@ import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticket.exception.TicketNotFoundException;
+import accordion_symphonic.ticketing.ticket.service.TicketValidationService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
