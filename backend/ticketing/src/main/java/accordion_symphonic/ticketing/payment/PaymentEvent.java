@@ -55,5 +55,4 @@ public class PaymentEvent {
         this.receivedAt = receivedAt;
         this.processedAt = processedAt;
     }
-
 }

@@ -1,51 +1,48 @@
 package accordion_symphonic.ticketing.ticket;
 
 import accordion_symphonic.ticketing.concert.Concert;
-import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
+import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.exception.TicketIsNotValidException;
 import accordion_symphonic.ticketing.ticket.exception.TicketNotFoundException;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-class TicketServiceTest {
+@ExtendWith(MockitoExtension.class)
+class TicketValidationServiceTest {
 
-    private TicketRepository ticketRepository;
+    @Mock
     private ConcertRepository concertRepository;
-    private OrderRepository orderRepository;
-    private TicketService ticketService;
 
-    private QrCodeService qrCodeService;
+    @Mock
+    private TicketRepository ticketRepository;
+
+    @Mock
+    private Ticket ticket;
+
+    private TicketValidationService ticketValidationService;
 
     @BeforeEach
     void setUp() {
-        ticketRepository = mock(TicketRepository.class);
-        concertRepository = mock(ConcertRepository.class);
-        orderRepository = mock(OrderRepository.class);
-        qrCodeService = mock(QrCodeService.class);
-
-        ticketService = new TicketService(
-                ticketRepository,
+        ticketValidationService = new TicketValidationService(
                 concertRepository,
-                orderRepository,
-                qrCodeService
+                ticketRepository
         );
     }
+
 
     @Test
     void validateTicketReturnsTicketWithoutUsingIt() {
@@ -56,7 +53,7 @@ class TicketServiceTest {
         when(ticketRepository.findByQrTokenAndOrderConcertId(ticket.getQrToken(), concertId))
                 .thenReturn(Optional.of(ticket));
 
-        TicketResponse response = ticketService.validateTicket(concertId, ticket.getQrToken());
+        TicketResponse response = ticketValidationService.validateTicket(concertId, ticket.getQrToken());
 
         assertEquals(ticket.getQrToken(), response.qrToken());
         assertEquals(TicketStatus.VALID, response.status());
@@ -74,7 +71,7 @@ class TicketServiceTest {
                 .thenReturn(Optional.of(ticket));
         when(ticketRepository.save(ticket)).thenReturn(ticket);
 
-        TicketResponse response = ticketService.useTicket(concertId, ticket.getQrToken());
+        TicketResponse response = ticketValidationService.useTicket(concertId, ticket.getQrToken());
 
         assertEquals(TicketStatus.USED, response.status());
         assertEquals(TicketStatus.USED, ticket.getStatus());
@@ -85,48 +82,68 @@ class TicketServiceTest {
     @Test
     void useTicketRejectsAlreadyUsedTicket() {
         Long concertId = 1L;
-        Ticket ticket = createValidTicket();
-        ticket.useTicket();
+        String qrToken = "qr-token";
 
-        when(concertRepository.existsById(concertId)).thenReturn(true);
-        when(ticketRepository.findByQrTokenAndOrderConcertId(ticket.getQrToken(), concertId))
-                .thenReturn(Optional.of(ticket));
+        when(concertRepository.existsById(concertId))
+                .thenReturn(true);
+
+        when(ticketRepository.findByQrTokenAndOrderConcertId(
+                qrToken,
+                concertId
+        )).thenReturn(Optional.of(ticket));
+
+        when(ticket.getStatus())
+                .thenReturn(TicketStatus.USED);
 
         assertThrows(
                 TicketIsNotValidException.class,
-                () -> ticketService.useTicket(concertId, ticket.getQrToken())
+                () -> ticketValidationService.useTicket(
+                        concertId,
+                        qrToken
+                )
         );
 
-        verify(ticketRepository, never()).save(ticket);
+        verify(ticket, never()).useTicket();
+        verify(ticketRepository, never()).save(any());
     }
 
     @Test
     void validateTicketThrowsWhenConcertDoesNotExist() {
         Long concertId = 1L;
-        String qrToken = "unknown-token";
 
-        when(concertRepository.existsById(concertId)).thenReturn(false);
+        when(concertRepository.existsById(concertId))
+                .thenReturn(false);
 
         assertThrows(
                 ConcertNotFoundException.class,
-                () -> ticketService.validateTicket(concertId, qrToken)
+                () -> ticketValidationService.validateTicket(
+                        concertId,
+                        "qr-token"
+                )
         );
 
-        verify(ticketRepository, never()).findByQrTokenAndOrderConcertId(qrToken, concertId);
+        verifyNoInteractions(ticketRepository);
     }
 
     @Test
     void validateTicketThrowsWhenTicketDoesNotExistForConcert() {
         Long concertId = 1L;
-        String qrToken = "unknown-token";
+        String qrToken = "qr-token";
 
-        when(concertRepository.existsById(concertId)).thenReturn(true);
-        when(ticketRepository.findByQrTokenAndOrderConcertId(qrToken, concertId))
-                .thenReturn(Optional.empty());
+        when(concertRepository.existsById(concertId))
+                .thenReturn(true);
+
+        when(ticketRepository.findByQrTokenAndOrderConcertId(
+                qrToken,
+                concertId
+        )).thenReturn(Optional.empty());
 
         assertThrows(
                 TicketNotFoundException.class,
-                () -> ticketService.validateTicket(concertId, qrToken)
+                () -> ticketValidationService.validateTicket(
+                        concertId,
+                        qrToken
+                )
         );
     }
 

@@ -6,7 +6,7 @@ import accordion_symphonic.ticketing.order.OrderPaidEvent;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.ticket.TicketService;
+import accordion_symphonic.ticketing.ticket.TicketCreationService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class PaymentCompletionServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private TicketService ticketService;
+    private TicketCreationService ticketCreationService;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -41,7 +41,7 @@ class PaymentCompletionServiceTest {
     void setUp() {
         paymentCompletionService = new PaymentCompletionService(
                 orderRepository,
-                ticketService,
+                ticketCreationService,
                 eventPublisher
         );
     }
@@ -61,8 +61,8 @@ class PaymentCompletionServiceTest {
                 paidOrder.getStatus()
         );
 
-        verify(ticketService)
-                .createTicketsForOrder(order);
+        verify(ticketCreationService)
+                .ensureTicketsCreatedForOrder(order);
 
         verify(eventPublisher).publishEvent(
                 any(OrderPaidEvent.class)
@@ -85,7 +85,7 @@ class PaymentCompletionServiceTest {
                 paidOrder.getStatus()
         );
 
-        verifyNoInteractions(ticketService);
+        verifyNoInteractions(ticketCreationService);
         verifyNoInteractions(eventPublisher);
     }
 
@@ -110,7 +110,7 @@ class PaymentCompletionServiceTest {
                 order.getStatus()
         );
 
-        verifyNoInteractions(ticketService);
+        verifyNoInteractions(ticketCreationService);
         verifyNoInteractions(eventPublisher);
     }
 
@@ -131,7 +131,7 @@ class PaymentCompletionServiceTest {
                 order.getStatus()
         );
 
-        verifyNoInteractions(ticketService);
+        verifyNoInteractions(ticketCreationService);
         verifyNoInteractions(eventPublisher);
     }
 

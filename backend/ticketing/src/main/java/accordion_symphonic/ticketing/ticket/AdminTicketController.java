@@ -12,14 +12,14 @@ import java.util.List;
 @RequestMapping("/api/admin/concerts/{concertId}/orders/{orderId}/tickets")
 public class AdminTicketController {
 
-    private final TicketService ticketService;
+    private final TicketQueryService ticketQueryService;
 
-    public AdminTicketController(TicketService ticketService) {
-        this.ticketService = ticketService;
+    public AdminTicketController(TicketQueryService ticketQueryService) {
+        this.ticketQueryService = ticketQueryService;
     }
 
     @GetMapping
     public List<TicketResponse> getTickets(@PathVariable Long concertId, @PathVariable Long orderId) {
-        return this.ticketService.getTicketsByConcertIdAndOrderId(concertId, orderId);
+        return this.ticketQueryService.getTicketsByConcertIdAndOrderId(concertId, orderId);
     }
 }

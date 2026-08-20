@@ -47,7 +47,9 @@ class AdminTicketValidationControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private TicketService ticketService;
+    private QrCodeService qrCodeService;
+    @MockitoBean
+    private TicketValidationService ticketValidationService;
 
     @Test
     void validateTicketReturnsTicketForAdmin() throws Exception {
@@ -55,7 +57,7 @@ class AdminTicketValidationControllerTest {
         Ticket ticket = createValidTicket();
         String qrToken = ticket.getQrToken();
 
-        when(ticketService.validateTicket(concertId, qrToken))
+        when(ticketValidationService.validateTicket(concertId, qrToken))
                 .thenReturn(TicketResponse.fromEntity(ticket));
 
         mockMvc.perform(get("/api/admin/concerts/{concertId}/tickets/validate/{qrToken}", concertId, qrToken)
@@ -64,7 +66,7 @@ class AdminTicketValidationControllerTest {
                 .andExpect(jsonPath("$.qrToken").value(qrToken))
                 .andExpect(jsonPath("$.status").value("VALID"));
 
-        verify(ticketService).validateTicket(concertId, qrToken);
+        verify(ticketValidationService).validateTicket(concertId, qrToken);
     }
 
     @Test
@@ -75,7 +77,7 @@ class AdminTicketValidationControllerTest {
 
         ticket.useTicket();
 
-        when(ticketService.useTicket(concertId, qrToken))
+        when(ticketValidationService.useTicket(concertId, qrToken))
                 .thenReturn(TicketResponse.fromEntity(ticket));
 
         mockMvc.perform(patch("/api/admin/concerts/{concertId}/tickets/{qrToken}/use", concertId, qrToken)
@@ -84,7 +86,7 @@ class AdminTicketValidationControllerTest {
                 .andExpect(jsonPath("$.qrToken").value(qrToken))
                 .andExpect(jsonPath("$.status").value("USED"));
 
-        verify(ticketService).useTicket(concertId, qrToken);
+        verify(ticketValidationService).useTicket(concertId, qrToken);
     }
 
     @Test
@@ -93,7 +95,7 @@ class AdminTicketValidationControllerTest {
         String qrToken = "already-used-ticket";
 
         doThrow(new TicketIsNotValidException(qrToken))
-                .when(ticketService)
+                .when(ticketValidationService)
                 .useTicket(concertId, qrToken);
 
         mockMvc.perform(patch("/api/admin/concerts/{concertId}/tickets/{qrToken}/use", concertId, qrToken)
@@ -144,21 +146,36 @@ class AdminTicketValidationControllerTest {
     @Test
     void getTicketQrCodeReturnsPngForAdmin() throws Exception {
         Long concertId = 1L;
-        String qrToken = "ticket-token";
-        byte[] qrCodePng = new byte[] {
+        Ticket ticket = createValidTicket();
+        String qrToken = ticket.getQrToken();
+
+        byte[] qrCodePng = new byte[]{
                 (byte) 0x89, 0x50, 0x4E, 0x47
         };
 
-        when(ticketService.generateQrCodePng(concertId, qrToken))
+        when(ticketValidationService.validateTicket(concertId, qrToken))
+                .thenReturn(TicketResponse.fromEntity(ticket));
+
+        when(qrCodeService.generateQrCodePng(qrToken))
                 .thenReturn(qrCodePng);
 
-        mockMvc.perform(get("/api/admin/concerts/{concertId}/tickets/{qrToken}/qr-code", concertId, qrToken)
-                        .header("Authorization", basicAuthHeader()))
+        mockMvc.perform(
+                        get(
+                                "/api/admin/concerts/{concertId}/tickets/{qrToken}/qr-code",
+                                concertId,
+                                qrToken
+                        )
+                                .header("Authorization", basicAuthHeader())
+                )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_PNG))
                 .andExpect(content().bytes(qrCodePng));
 
-        verify(ticketService).generateQrCodePng(concertId, qrToken);
+        verify(ticketValidationService)
+                .validateTicket(concertId, qrToken);
+
+        verify(qrCodeService)
+                .generateQrCodePng(qrToken);
     }
 
     @Test

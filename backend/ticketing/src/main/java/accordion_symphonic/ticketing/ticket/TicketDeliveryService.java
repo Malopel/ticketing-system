@@ -20,20 +20,20 @@ public class TicketDeliveryService {
     private final ConcertRepository concertRepository;
     private final OrderRepository orderRepository;
 
-    private final TicketService ticketService;
+    private final TicketQueryService ticketQueryService;
     private final TicketPdfService ticketPdfService;
     private final TicketEmailService ticketEmailService;
 
     public TicketDeliveryService(
             ConcertRepository concertRepository,
             OrderRepository orderRepository,
-            TicketService ticketService,
+            TicketQueryService ticketQueryService,
             TicketPdfService ticketPdfService,
             TicketEmailService ticketEmailService
     ) {
         this.concertRepository = concertRepository;
         this.orderRepository = orderRepository;
-        this.ticketService = ticketService;
+        this.ticketQueryService = ticketQueryService;
         this.ticketPdfService = ticketPdfService;
         this.ticketEmailService = ticketEmailService;
     }
@@ -78,7 +78,7 @@ public class TicketDeliveryService {
 
     private List<TicketResponse> getTickets(Long concertId, Long orderId) {
         List<TicketResponse> tickets =
-                ticketService.getTicketsByConcertIdAndOrderId(concertId, orderId);
+                ticketQueryService.getTicketsByConcertIdAndOrderId(concertId, orderId);
 
         if (tickets.isEmpty()) {
             throw new OrderHasNoTicketsException(orderId);

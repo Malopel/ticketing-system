@@ -4,10 +4,9 @@ import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderPaidEvent;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
-import accordion_symphonic.ticketing.order.dto.OrderResponse;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
-import accordion_symphonic.ticketing.ticket.TicketService;
+import accordion_symphonic.ticketing.ticket.TicketCreationService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,16 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentCompletionService {
 
     private final OrderRepository orderRepository;
-    private final TicketService ticketService;
+    private final TicketCreationService ticketCreationService;
     private final ApplicationEventPublisher eventPublisher;
 
     public PaymentCompletionService(
             OrderRepository orderRepository,
-            TicketService ticketService,
+            TicketCreationService ticketCreationService,
             ApplicationEventPublisher eventPublisher
     ) {
         this.orderRepository = orderRepository;
-        this.ticketService = ticketService;
+        this.ticketCreationService = ticketCreationService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -55,7 +54,7 @@ public class PaymentCompletionService {
 
         order.markAsPaid();
 
-        ticketService.createTicketsForOrder(order);
+        ticketCreationService.ensureTicketsCreatedForOrder(order);
 
         eventPublisher.publishEvent(
                 new OrderPaidEvent(
