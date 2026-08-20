@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.payment.service;
 
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderPaidEvent;
 import accordion_symphonic.ticketing.order.OrderRepository;
@@ -49,6 +50,11 @@ public class PaymentCompletionService {
         }
 
         if (order.getStatus() != OrderStatus.PAYMENT_PENDING) {
+            throw new OrderCannotBePaidException(orderId);
+        }
+
+        if (order.getConcert().getStatus()
+                == ConcertStatus.CANCELLED) {
             throw new OrderCannotBePaidException(orderId);
         }
 

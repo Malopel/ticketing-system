@@ -6,6 +6,11 @@ public final class ErrorCode {
     public static final String VALIDATION_ERROR = "VALIDATION_ERROR";
 
     public static final String CONCERT_NOT_FOUND = "CONCERT_NOT_FOUND";
+    public static final String CONCERT_CANNOT_BE_CANCELLED = "CONCERT_CANNOT_BE_CANCELLED";
+    public static final String CONCERT_IS_CANCELLED = "CONCERT_IS_CANCELLED";
+    public static final String CONCERT_CANNOT_BE_PUBLISHED = "CONCERT_CANNOT_BE_PUBLISHED";
+    public static final String CONCERT_CANNOT_BE_ARCHIVED = "CONCERT_CANNOT_BE_ARCHIVED";
+
     public static final String TICKET_CATEGORY_NOT_FOUND = "TICKET_CATEGORY_NOT_FOUND";
 
     public static final String ORDER_NOT_FOUND = "ORDER_NOT_FOUND";
@@ -21,6 +26,7 @@ public final class ErrorCode {
 
     public static final String INVALID_TICKET = "INVALID_TICKET";
     public static final String TICKET_NOT_FOUND = "TICKET_NOT_FOUND";
+
     private ErrorCode() {
     }
 }

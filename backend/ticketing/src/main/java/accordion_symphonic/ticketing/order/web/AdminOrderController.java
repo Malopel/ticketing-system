@@ -56,7 +56,7 @@ public class AdminOrderController {
             @PathVariable Long concertId,
             @PathVariable Long orderId
     ) {
-        ticketDeliveryService.resendTicketEmail(concertId, orderId);
+        ticketDeliveryService.sendTicketEmail(concertId, orderId);
 
         return ResponseEntity.noContent().build();
     }

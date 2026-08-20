@@ -136,6 +136,47 @@ class PaymentCompletionServiceTest {
         verifyNoInteractions(eventPublisher);
     }
 
+    @Test
+    void completePaymentRejectsCancelledConcert() {
+        Concert concert = new Concert(
+                "Accordion Night",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Heidelberg"
+        );
+
+        concert.publish();
+        concert.cancel();
+
+        Order order = new Order(
+                concert,
+                "kunde@example.com",
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
+        );
+
+        order.markAsPaymentPending(
+                LocalDateTime.now().plusMinutes(20)
+        );
+
+        when(orderRepository.findByIdForUpdate(42L))
+                .thenReturn(Optional.of(order));
+
+        assertThrows(
+                OrderCannotBePaidException.class,
+                () -> paymentCompletionService.completePayment(42L)
+        );
+
+        assertEquals(
+                OrderStatus.PAYMENT_PENDING,
+                order.getStatus()
+        );
+
+        verifyNoInteractions(ticketCreationService);
+        verifyNoInteractions(eventPublisher);
+    }
+
     private Order createPaymentPendingOrder() {
         Order order = createReservedOrder();
 

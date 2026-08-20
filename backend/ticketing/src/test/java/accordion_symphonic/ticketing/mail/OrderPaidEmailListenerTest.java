@@ -31,7 +31,7 @@ class OrderPaidEmailListenerTest {
 
         listener.handleOrderPaid(event);
 
-        verify(ticketDeliveryService).resendTicketEmail(
+        verify(ticketDeliveryService).sendTicketEmail(
                 1L,
                 42L
         );
@@ -44,13 +44,13 @@ class OrderPaidEmailListenerTest {
 
         doThrow(new RuntimeException("SMTP unavailable"))
                 .when(ticketDeliveryService)
-                .resendTicketEmail(1L, 42L);
+                .sendTicketEmail(1L, 42L);
 
         assertDoesNotThrow(
                 () -> listener.handleOrderPaid(event)
         );
 
-        verify(ticketDeliveryService).resendTicketEmail(
+        verify(ticketDeliveryService).sendTicketEmail(
                 1L,
                 42L
         );

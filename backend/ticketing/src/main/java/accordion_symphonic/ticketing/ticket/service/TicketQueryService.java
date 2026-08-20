@@ -6,6 +6,7 @@ import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.ticket.TicketRepository;
+import accordion_symphonic.ticketing.ticket.dto.TicketOrderData;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import org.springframework.stereotype.Service;
 
@@ -32,19 +33,33 @@ public class TicketQueryService {
             Long concertId,
             Long orderId
     ) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new ConcertNotFoundException(concertId);
-        }
+        return getTicketOrderData(
+                concertId,
+                orderId
+        ).tickets();
+    }
 
+    public TicketOrderData getTicketOrderData(
+            Long concertId,
+            Long orderId
+    ) {
         Order order = orderRepository
                 .findByIdAndConcertId(orderId, concertId)
-                .orElseThrow(
-                        () -> new OrderNotFoundException(orderId)
-                );
+                .orElseGet(() -> {
+                    if (!concertRepository.existsById(concertId)) {
+                        throw new ConcertNotFoundException(concertId);
+                    }
 
-        return ticketRepository.findByOrderId(order.getId())
-                .stream()
-                .map(TicketResponse::fromEntity)
-                .toList();
+                    throw new OrderNotFoundException(orderId);
+                });
+
+        List<TicketResponse> tickets =
+                ticketRepository.findByOrderId(orderId)
+                        .stream()
+                        .map(TicketResponse::fromEntity)
+                        .toList();
+
+        return new TicketOrderData(order, tickets);
     }
 }
+

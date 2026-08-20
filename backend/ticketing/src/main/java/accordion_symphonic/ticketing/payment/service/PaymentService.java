@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.payment.service;
 
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
 import accordion_symphonic.ticketing.order.OrderProperties;
@@ -63,6 +64,11 @@ public class PaymentService {
         }
 
         if (order.getStatus() != OrderStatus.RESERVED) {
+            throw new OrderCannotBePaidException(orderId);
+        }
+
+        if (order.getConcert().getStatus()
+                == ConcertStatus.CANCELLED) {
             throw new OrderCannotBePaidException(orderId);
         }
 

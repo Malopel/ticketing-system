@@ -99,7 +99,7 @@ class AdminOrderControllerTest {
                         .header("Authorization", basicAuthHeader()))
                 .andExpect(status().isNoContent());
 
-        verify(ticketDeliveryService).resendTicketEmail(concertId, orderId);
+        verify(ticketDeliveryService).sendTicketEmail(concertId, orderId);
     }
 
     @Test
@@ -134,13 +134,13 @@ class AdminOrderControllerTest {
 
         doThrow(new OrderHasNoTicketsException(orderId))
                 .when(ticketDeliveryService)
-                .resendTicketEmail(concertId, orderId);
+                .sendTicketEmail(concertId, orderId);
 
         mockMvc.perform(post("/api/admin/concerts/{concertId}/orders/{orderId}/tickets/resend-email", concertId, orderId)
                         .header("Authorization", basicAuthHeader()))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_HAS_NO_TICKETS));
 
-        verify(ticketDeliveryService).resendTicketEmail(concertId, orderId);
+        verify(ticketDeliveryService).sendTicketEmail(concertId, orderId);
     }
 }

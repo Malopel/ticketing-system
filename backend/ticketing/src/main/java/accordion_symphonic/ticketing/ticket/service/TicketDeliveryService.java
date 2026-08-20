@@ -1,38 +1,24 @@
 package accordion_symphonic.ticketing.ticket.service;
 
-import accordion_symphonic.ticketing.concert.ConcertRepository;
-import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import accordion_symphonic.ticketing.mail.TicketEmailService;
-import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.exception.OrderHasNoTicketsException;
-import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
-import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
+import accordion_symphonic.ticketing.ticket.dto.TicketOrderData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 public class TicketDeliveryService {
-
-    private final ConcertRepository concertRepository;
-    private final OrderRepository orderRepository;
 
     private final TicketQueryService ticketQueryService;
     private final TicketPdfService ticketPdfService;
     private final TicketEmailService ticketEmailService;
 
     public TicketDeliveryService(
-            ConcertRepository concertRepository,
-            OrderRepository orderRepository,
             TicketQueryService ticketQueryService,
             TicketPdfService ticketPdfService,
             TicketEmailService ticketEmailService
     ) {
-        this.concertRepository = concertRepository;
-        this.orderRepository = orderRepository;
         this.ticketQueryService = ticketQueryService;
         this.ticketPdfService = ticketPdfService;
         this.ticketEmailService = ticketEmailService;
@@ -43,47 +29,46 @@ public class TicketDeliveryService {
             Long concertId,
             Long orderId
     ) {
-        Order order = getOrder(concertId, orderId);
+        TicketOrderData data =
+                getTicketOrderData(concertId, orderId);
 
-        List<TicketResponse> tickets =
-                getTickets(concertId, orderId);
-
-        return ticketPdfService.createTicketPdf(order, tickets);
+        return ticketPdfService.createTicketPdf(
+                data.order(),
+                data.tickets()
+        );
     }
 
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             readOnly = true
     )
-    public void resendTicketEmail(
+    public void sendTicketEmail(
             Long concertId,
             Long orderId
     ) {
-        Order order = getOrder(concertId, orderId);
+        TicketOrderData data =
+                getTicketOrderData(concertId, orderId);
 
-        List<TicketResponse> tickets =
-                getTickets(concertId, orderId);
-
-        ticketEmailService.sendEmail(order, tickets);
+        ticketEmailService.sendEmail(
+                data.order(),
+                data.tickets()
+        );
     }
 
-    private Order getOrder(Long concertId, Long orderId) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new ConcertNotFoundException(concertId);
-        }
+    private TicketOrderData getTicketOrderData(
+            Long concertId,
+            Long orderId
+    ) {
+        TicketOrderData data =
+                ticketQueryService.getTicketOrderData(
+                        concertId,
+                        orderId
+                );
 
-        return orderRepository.findByIdAndConcertId(orderId, concertId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
-    }
-
-    private List<TicketResponse> getTickets(Long concertId, Long orderId) {
-        List<TicketResponse> tickets =
-                ticketQueryService.getTicketsByConcertIdAndOrderId(concertId, orderId);
-
-        if (tickets.isEmpty()) {
+        if (data.tickets().isEmpty()) {
             throw new OrderHasNoTicketsException(orderId);
         }
 
-        return tickets;
+        return data;
     }
 }

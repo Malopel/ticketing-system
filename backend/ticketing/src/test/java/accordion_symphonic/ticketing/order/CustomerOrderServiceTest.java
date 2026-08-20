@@ -79,9 +79,6 @@ class CustomerOrderServiceTest {
         ))
                 .thenReturn(true);
 
-        when(orderRepository.save(order))
-                .thenReturn(order);
-
         OrderResponse response = customerOrderService.cancelOrder(
                 concertId,
                 orderId,
@@ -97,8 +94,6 @@ class CustomerOrderServiceTest {
                 OrderStatus.CANCELLED,
                 order.getStatus()
         );
-
-        verify(orderRepository).save(order);
     }
 
     @Test
@@ -301,9 +296,6 @@ class CustomerOrderServiceTest {
         ))
                 .thenReturn(true);
 
-        when(orderRepository.save(order))
-                .thenReturn(order);
-
         customerOrderService.cancelOrder(
                 concertId,
                 orderId,
@@ -326,7 +318,5 @@ class CustomerOrderServiceTest {
                 OrderStatus.CANCELLED,
                 order.getStatus()
         );
-
-        verify(orderRepository, times(2)).save(order);
     }
 }

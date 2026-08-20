@@ -51,4 +51,11 @@ public class AdminConcertController {
     public ConcertResponse archiveConcert(@PathVariable Long concertId) {
         return concertService.archiveConcert(concertId);
     }
+
+    @PatchMapping("/{concertId}/cancel")
+    public ConcertResponse cancelConcert(
+            @PathVariable Long concertId
+    ) {
+        return concertService.cancelConcert(concertId);
+    }
 }

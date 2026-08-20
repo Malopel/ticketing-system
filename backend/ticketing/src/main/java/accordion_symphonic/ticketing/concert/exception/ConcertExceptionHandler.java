@@ -23,4 +23,52 @@ public class ConcertExceptionHandler {
                 exception.getMessage()
         );
     }
+
+    @ExceptionHandler(ConcertCannotBeCancelledException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConcertCannotBeCancelled(ConcertCannotBeCancelledException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ErrorCode.CONCERT_CANNOT_BE_CANCELLED,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ConcertCannotBeArchivedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConcertCannotBeArchived(ConcertCannotBeArchivedException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ErrorCode.CONCERT_CANNOT_BE_ARCHIVED,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ConcertCannotBePublishedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConcertCannotBePublished(ConcertCannotBePublishedException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ErrorCode.CONCERT_CANNOT_BE_PUBLISHED,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ConcertIsCancelledException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ErrorResponse handleConcertIsCancelled(ConcertIsCancelledException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_ACCEPTABLE.value(),
+                "Not acceptable",
+                ErrorCode.CONCERT_IS_CANCELLED,
+                exception.getMessage()
+        );
+    }
 }

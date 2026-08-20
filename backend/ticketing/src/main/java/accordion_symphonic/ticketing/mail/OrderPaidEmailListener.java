@@ -25,7 +25,7 @@ public class OrderPaidEmailListener {
     )
     public void handleOrderPaid(OrderPaidEvent event) {
         try {
-            ticketDeliveryService.resendTicketEmail(
+            ticketDeliveryService.sendTicketEmail(
                     event.concertId(),
                     event.orderId()
             );

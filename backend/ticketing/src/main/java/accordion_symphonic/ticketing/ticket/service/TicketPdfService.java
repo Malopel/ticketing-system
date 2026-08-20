@@ -127,7 +127,6 @@ public class TicketPdfService {
         return switch (status) {
             case VALID -> "Gueltig";
             case USED -> "Bereits verwendet";
-            case CANCELLED -> "Storniert";
         };
     }
 

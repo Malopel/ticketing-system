@@ -42,17 +42,9 @@ public class Ticket {
 
     public void useTicket() {
         if(this.status != TicketStatus.VALID) {
-            throw new TicketIsNotValidException();
+            throw new TicketIsNotValidException(qrToken);
         }
 
         this.status = TicketStatus.USED;
-    }
-
-    public void cancelTicket() {
-        if(this.status != TicketStatus.VALID) {
-            throw new TicketIsNotValidException();
-        }
-
-        this.status = TicketStatus.CANCELLED;
     }
 }

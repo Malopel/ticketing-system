@@ -26,19 +26,6 @@ public class PaymentExceptionHandler {
         );
     }
 
-    @ExceptionHandler(UnsupportedPaymentStatusException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleUnsupportedPaymentStatus(
-            UnsupportedPaymentStatusException exception
-    ) {
-        return new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                exception.getMessage()
-        );
-    }
-
     @ExceptionHandler(OrderCannotBePaidException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleOrderCannotBePaid(

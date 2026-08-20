@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 
 @RestControllerAdvice
-public class TicketCategoryException {
+public class TicketCategoryExceptionHandler {
     @ExceptionHandler(TicketCategoryNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleTicketCategoryNotFound(TicketCategoryNotFoundException exception) {

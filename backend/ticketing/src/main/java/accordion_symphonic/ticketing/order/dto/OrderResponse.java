@@ -16,6 +16,7 @@ public record OrderResponse(
         BigDecimal totalAmount,
         LocalDateTime createdAt,
         LocalDateTime expiresAt,
+        LocalDateTime paymentExpiresAt,
         LocalDateTime paidAt,
         List<OrderItemResponse> items
 ) {
@@ -29,6 +30,7 @@ public record OrderResponse(
                 order.getTotalAmount(),
                 order.getCreatedAt(),
                 order.getExpiresAt(),
+                order.getPaymentExpiresAt(),
                 order.getPaidAt(),
                 order.getItems().stream().map(OrderItemResponse::fromEntity).toList()
         );

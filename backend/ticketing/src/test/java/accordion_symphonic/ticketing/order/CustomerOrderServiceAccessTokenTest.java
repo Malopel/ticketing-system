@@ -1,13 +1,11 @@
 package accordion_symphonic.ticketing.order;
 
-import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.order.dto.OrderResponse;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.service.CustomerOrderService;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
-import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,13 +32,7 @@ class CustomerOrderServiceAccessTokenTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private TicketCategoryRepository ticketCategoryRepository;
-
-    @Mock
     private ConcertRepository concertRepository;
-
-    @Mock
-    private TicketAvailabilityService ticketAvailabilityService;
 
     private CustomerOrderService customerOrderService;
 
@@ -139,9 +131,6 @@ class CustomerOrderServiceAccessTokenTest {
             CONCERT_ID
         )).thenReturn(Optional.of(order));
 
-        when(orderRepository.save(order))
-                .thenReturn(order);
-
         OrderResponse response = customerOrderService.cancelOrder(
                 CONCERT_ID,
                 ORDER_ID,
@@ -151,7 +140,7 @@ class CustomerOrderServiceAccessTokenTest {
         assertEquals(OrderStatus.CANCELLED, response.status());
         assertEquals(OrderStatus.CANCELLED, order.getStatus());
 
-        verify(orderRepository).save(order);
+        verify(orderRepository, never()).save(any());
     }
 
     @Test

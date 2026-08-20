@@ -148,6 +148,7 @@ class OrderControllerSecurityTest {
                 new BigDecimal("50.00"),
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(7),
+                LocalDateTime.now().plusDays(14),
                 null,
                 List.of()
         );
@@ -163,6 +164,7 @@ class OrderControllerSecurityTest {
                 new BigDecimal("50.00"),
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(7),
+                LocalDateTime.now().plusDays(14),
                 null,
                 List.of()
         );

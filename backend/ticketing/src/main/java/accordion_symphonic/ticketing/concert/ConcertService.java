@@ -4,6 +4,7 @@ import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
 import accordion_symphonic.ticketing.concert.dto.ConcertResponse;
 import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -49,36 +50,43 @@ public class ConcertService {
         return ConcertResponse.fromEntity(savedConcert);
     }
 
+    @Transactional
     public ConcertResponse updateConcert(Long id, ConcertRequest request) {
         Concert concert = this.concertRepository.findById(id)
                 .orElseThrow(() -> new ConcertNotFoundException(id));
 
         concert.updateConcert(request);
 
-        Concert updatedConcert = this.concertRepository.save(concert);
-
-        return ConcertResponse.fromEntity(updatedConcert);
+        return ConcertResponse.fromEntity(concert);
     }
 
+    @Transactional
     public ConcertResponse publishConcert(Long id) {
         Concert concert = this.concertRepository.findById(id)
                 .orElseThrow(() -> new ConcertNotFoundException(id));
 
         concert.publish();
 
-        Concert publishedConcert = this.concertRepository.save(concert);
-
-        return ConcertResponse.fromEntity(publishedConcert);
+        return ConcertResponse.fromEntity(concert);
     }
 
+    @Transactional
     public ConcertResponse archiveConcert(Long id) {
         Concert concert = this.concertRepository.findById(id)
                 .orElseThrow(() -> new ConcertNotFoundException(id));
 
         concert.archive();
 
-        Concert archivedConcert = this.concertRepository.save(concert);
+        return ConcertResponse.fromEntity(concert);
+    }
 
-        return ConcertResponse.fromEntity(archivedConcert);
+    @Transactional
+    public ConcertResponse cancelConcert(Long id) {
+        Concert concert = concertRepository.findById(id)
+                .orElseThrow(() -> new ConcertNotFoundException(id));
+
+        concert.cancel();
+
+        return ConcertResponse.fromEntity(concert);
     }
 }

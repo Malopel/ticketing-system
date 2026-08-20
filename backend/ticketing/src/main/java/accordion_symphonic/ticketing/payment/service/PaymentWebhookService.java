@@ -3,10 +3,8 @@ package accordion_symphonic.ticketing.payment.service;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.payment.PaymentEvent;
 import accordion_symphonic.ticketing.payment.PaymentEventRepository;
-import accordion_symphonic.ticketing.payment.PaymentStatus;
 import accordion_symphonic.ticketing.payment.dto.PaymentWebhookRequest;
 import accordion_symphonic.ticketing.payment.exception.InvalidPaymentWebhookSignatureException;
-import accordion_symphonic.ticketing.payment.exception.UnsupportedPaymentStatusException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,10 +39,6 @@ public class PaymentWebhookService {
 
         if (paymentEventRepository.existsByEventId(request.eventId())) {
             return;
-        }
-
-        if (request.status() != PaymentStatus.PAID) {
-            throw new UnsupportedPaymentStatusException(request.status());
         }
 
         Order paidOrder = paymentCompletionService.completePayment(

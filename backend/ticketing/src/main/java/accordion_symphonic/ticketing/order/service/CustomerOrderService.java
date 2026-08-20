@@ -45,7 +45,9 @@ public class CustomerOrderService {
         return OrderResponse.fromEntity(order);
     }
 
-    @Transactional
+    @Transactional(
+            noRollbackFor = OrderCannotBeCancelledException.class
+    )
     public OrderResponse cancelOrder(
             Long concertId,
             Long orderId,
@@ -77,9 +79,7 @@ public class CustomerOrderService {
 
         order.cancel();
 
-        return OrderResponse.fromEntity(
-                orderRepository.save(order)
-        );
+        return OrderResponse.fromEntity(order);
     }
 
     private void ensureCustomerHasAccess(Order order, String accessToken) {

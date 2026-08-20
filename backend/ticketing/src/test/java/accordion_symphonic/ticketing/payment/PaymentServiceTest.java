@@ -5,6 +5,8 @@ import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.payment.service.PaymentService;
+import accordion_symphonic.ticketing.concert.Concert;
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,9 @@ class PaymentServiceTest {
     private Order order;
 
     private PaymentService paymentService;
+
+    @Mock
+    private Concert concert;
 
     @BeforeEach
     void setUp() {
@@ -77,6 +82,12 @@ class PaymentServiceTest {
 
         when(order.getStatus())
                 .thenReturn(OrderStatus.RESERVED);
+
+        when(order.getConcert())
+                .thenReturn(concert);
+
+        when(concert.getStatus())
+                .thenReturn(ConcertStatus.PUBLISHED);
 
         when(paymentProvider.createPayment(order))
                 .thenReturn(expectedSession);
@@ -211,6 +222,54 @@ class PaymentServiceTest {
         verify(order, never()).markAsPaymentPending(
                 any()
         );
+
+        verifyNoInteractions(paymentProvider);
+    }
+
+    @Test
+    void createPaymentRejectsCancelledConcert() {
+        Long concertId = 1L;
+        Long orderId = 2L;
+
+        String accessToken = "access-token";
+        String accessTokenHash = "access-token-hash";
+
+        when(orderRepository.findByIdAndConcertIdForUpdate(
+                orderId,
+                concertId
+        )).thenReturn(Optional.of(order));
+
+        when(order.getAccessTokenHash())
+                .thenReturn(accessTokenHash);
+
+        when(orderAccessTokenService.matches(
+                accessToken,
+                accessTokenHash
+        )).thenReturn(true);
+
+        when(order.shouldExpire())
+                .thenReturn(false);
+
+        when(order.getStatus())
+                .thenReturn(OrderStatus.RESERVED);
+
+        when(order.getConcert())
+                .thenReturn(concert);
+
+        when(concert.getStatus())
+                .thenReturn(ConcertStatus.CANCELLED);
+
+        assertThrows(
+                OrderCannotBePaidException.class,
+                () -> paymentService.createPayment(
+                        concertId,
+                        orderId,
+                        accessToken
+                )
+        );
+
+        verify(order, never())
+                .markAsPaymentPending(any());
 
         verifyNoInteractions(paymentProvider);
     }

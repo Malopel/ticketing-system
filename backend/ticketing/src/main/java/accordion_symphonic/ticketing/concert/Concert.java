@@ -1,6 +1,9 @@
 package accordion_symphonic.ticketing.concert;
 
 import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
+import accordion_symphonic.ticketing.concert.exception.ConcertCannotBeArchivedException;
+import accordion_symphonic.ticketing.concert.exception.ConcertCannotBeCancelledException;
+import accordion_symphonic.ticketing.concert.exception.ConcertCannotBePublishedException;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -44,10 +47,34 @@ public class Concert {
     }
 
     public void publish() {
+        if (status == ConcertStatus.PUBLISHED) return;
+
+        if (status != ConcertStatus.DRAFT) {
+            throw new ConcertCannotBePublishedException(this.id);
+        }
+
         this.status = ConcertStatus.PUBLISHED;
     }
 
     public void archive() {
+        if (status == ConcertStatus.ARCHIVED) return;
+
+        if (status != ConcertStatus.PUBLISHED) {
+            throw new ConcertCannotBeArchivedException(this.id);
+        }
+
         this.status = ConcertStatus.ARCHIVED;
+    }
+
+    public void cancel() {
+        if (status == ConcertStatus.CANCELLED) {
+            return;
+        }
+
+        if (status != ConcertStatus.PUBLISHED) {
+            throw new ConcertCannotBeCancelledException(this.id);
+        }
+
+        status = ConcertStatus.CANCELLED;
     }
 }
