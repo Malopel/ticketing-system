@@ -1,0 +1,106 @@
+.admin-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+.admin-page-header h1 {
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.admin-page-header p {
+    margin: 0;
+    color: #666;
+}
+
+.admin-error-message {
+    padding: 16px;
+
+    border: 1px solid #d7a3a3;
+    border-radius: 8px;
+
+    background: #fff;
+    color: #8a2020;
+}
+
+.admin-empty-state {
+    padding: 32px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background: white;
+    text-align: center;
+}
+
+.admin-empty-state h2 {
+    margin-top: 0;
+}
+
+.admin-concert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admin-concert-row {
+    padding: 20px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background: white;
+}
+
+.admin-concert-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-concert-title-row h2 {
+    margin: 0;
+
+    font-size: 1.1rem;
+}
+
+.admin-concert-meta {
+    margin-top: 8px;
+    margin-bottom: 0;
+
+    color: #666;
+}
+
+.admin-status {
+    display: inline-block;
+
+    padding: 4px 8px;
+
+    border-radius: 999px;
+
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.admin-status-draft {
+    background: #eee;
+    color: #444;
+}
+
+.admin-status-published {
+    background: #e4f4e8;
+    color: #246b36;
+}
+
+.admin-status-cancelled {
+    background: #f8e5e5;
+    color: #8a2020;
+}
+
+.admin-status-archived {
+    background: #e8e8e8;
+    color: #555;
+}

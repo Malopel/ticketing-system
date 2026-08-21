@@ -30,7 +30,13 @@
     border-radius: 6px;
 
     background: white;
+    color: #222;
+
     cursor: pointer;
+}
+
+.admin-logout-button:hover {
+    background: #f0f0f0;
 }
 
 .admin-body {
