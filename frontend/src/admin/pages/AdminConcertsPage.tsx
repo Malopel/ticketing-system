@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom';
+
 import {
     useEffect,
     useState,
@@ -68,6 +70,13 @@ function AdminConcertsPage() {
                         Konzerte anlegen und verwalten.
                     </p>
                 </div>
+
+                <Link
+                    to="/admin/concerts/new"
+                    className="admin-primary-action"
+                >
+                    Neues Konzert
+                </Link>
             </header>
 
             {isLoading && (

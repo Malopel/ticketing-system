@@ -104,3 +104,75 @@
     background: #e8e8e8;
     color: #555;
 }
+
+.admin-primary-action {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 10px 14px;
+
+    border-radius: 6px;
+
+    background: #222;
+    color: white;
+
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.admin-primary-action:hover {
+    background: #444;
+}
+
+.admin-concert-form {
+    max-width: 720px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    padding: 24px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background: white;
+}
+
+.admin-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-form-field label {
+    font-weight: 600;
+}
+
+.admin-form-field input,
+.admin-form-field textarea {
+    padding: 10px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    font: inherit;
+    color: #222;
+    background: white;
+}
+
+.admin-form-field textarea {
+    resize: vertical;
+}
+
+.admin-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-secondary-action {
+    color: #444;
+    text-decoration: none;
+}

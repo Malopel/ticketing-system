@@ -13,6 +13,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminConcertsPage from './pages/AdminConcertsPage';
 import AdminOrdersPage from './pages/AdminOrdersPage';
 import AdminScannerPage from './pages/AdminScannerPage';
+import AdminConcertCreatePage
+    from './pages/AdminConcertCreatePage';
 
 function AdminApp() {
     return (
@@ -33,6 +35,11 @@ function AdminApp() {
                         <Route
                             path="concerts"
                             element={<AdminConcertsPage/>}
+                        />
+
+                        <Route
+                            path="concerts/new"
+                            element={<AdminConcertCreatePage/>}
                         />
 
                         <Route
