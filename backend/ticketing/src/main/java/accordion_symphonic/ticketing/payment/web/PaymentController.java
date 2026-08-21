@@ -21,8 +21,8 @@ public class PaymentController {
 
     @PostMapping
     public PaymentSession createPayment(
-            @PathVariable Long concertId,
-            @PathVariable Long orderId,
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("orderId") Long orderId,
             @RequestHeader(
                     name = ORDER_ACCESS_TOKEN_HEADER,
                     required = false

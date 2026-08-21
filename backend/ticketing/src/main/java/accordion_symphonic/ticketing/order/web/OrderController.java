@@ -24,8 +24,8 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     public OrderResponse getOrder(
-            @PathVariable Long concertId,
-            @PathVariable Long orderId,
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("orderId") Long orderId,
             @RequestHeader(
                     name = ORDER_ACCESS_TOKEN_HEADER,
                     required = false
@@ -36,7 +36,7 @@ public class OrderController {
 
     @PostMapping
     public CreatedOrderResponse createOrder(
-            @PathVariable Long concertId,
+            @PathVariable("concertId") Long concertId,
             @Valid @RequestBody OrderRequest order
     ) {
         return orderCreationService.createOrder(concertId, order);
@@ -44,8 +44,8 @@ public class OrderController {
 
     @PatchMapping("/{orderId}/cancel")
     public OrderResponse cancelOrder(
-            @PathVariable Long concertId,
-            @PathVariable Long orderId,
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("orderId") Long orderId,
             @RequestHeader(
                     name = ORDER_ACCESS_TOKEN_HEADER,
                     required = false

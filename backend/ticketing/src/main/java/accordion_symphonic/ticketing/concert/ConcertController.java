@@ -25,7 +25,7 @@ public class ConcertController {
 
     @GetMapping("/{concertId}")
     public ConcertResponse getPublishedConcertById(
-            @PathVariable Long concertId
+            @PathVariable("concertId") Long concertId
     ) {
         return concertService.getPublishedConcertById(concertId);
     }

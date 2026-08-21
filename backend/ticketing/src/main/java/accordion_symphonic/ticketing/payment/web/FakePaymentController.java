@@ -30,7 +30,7 @@ public class FakePaymentController {
 
     @PostMapping("/{providerPaymentId}/complete")
     public OrderResponse completePayment(
-            @PathVariable String providerPaymentId
+            @PathVariable("providerPaymentId") String providerPaymentId
     ) {
         Long orderId = fakePaymentProvider
                 .findOrderId(providerPaymentId)

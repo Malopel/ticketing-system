@@ -32,8 +32,8 @@ public class AdminOrderController {
 
     @GetMapping(value = "/{orderId}/tickets/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadTicketPdf(
-            @PathVariable Long concertId,
-            @PathVariable Long orderId
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("orderId") Long orderId
     ) {
         byte[] pdf = ticketDeliveryService.createTicketPdfForOrder(concertId, orderId);
 
@@ -53,8 +53,8 @@ public class AdminOrderController {
 
     @PostMapping("/{orderId}/tickets/resend-email")
     public ResponseEntity<Void> resendTicketEmail(
-            @PathVariable Long concertId,
-            @PathVariable Long orderId
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("orderId") Long orderId
     ) {
         ticketDeliveryService.sendTicketEmail(concertId, orderId);
 

@@ -20,7 +20,10 @@ public class AdminTicketController {
     }
 
     @GetMapping
-    public List<TicketResponse> getTickets(@PathVariable Long concertId, @PathVariable Long orderId) {
+    public List<TicketResponse> getTickets(
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("orderId") Long orderId
+    ) {
         return this.ticketQueryService.getTicketsByConcertIdAndOrderId(concertId, orderId);
     }
 }

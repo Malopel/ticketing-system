@@ -28,16 +28,16 @@ public class AdminTicketValidationController {
 
     @GetMapping("/validate/{qrToken}")
     public TicketResponse validateTicket(
-            @PathVariable Long concertId,
-            @PathVariable String qrToken
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("qrToken") String qrToken
     ) {
         return ticketValidationService.validateTicket(concertId, qrToken);
     }
 
     @PatchMapping("/{qrToken}/use")
     public TicketResponse useTicket(
-            @PathVariable Long concertId,
-            @PathVariable String qrToken
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("qrToken") String qrToken
     ) {
         return ticketValidationService.useTicket(concertId, qrToken);
     }
@@ -47,8 +47,8 @@ public class AdminTicketValidationController {
             produces = MediaType.IMAGE_PNG_VALUE
     )
     public ResponseEntity<byte[]> getTicketQrCode(
-            @PathVariable Long concertId,
-            @PathVariable String qrToken
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("qrToken") String qrToken
     ) {
         TicketResponse ticket =
                 ticketValidationService.validateTicket(

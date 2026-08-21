@@ -29,7 +29,7 @@ public class AdminTicketCategoryController {
 
     @PostMapping
     public TicketCategoryResponse createCategory(
-            @PathVariable Long concertId,
+            @PathVariable("concertId") Long concertId,
             @Valid @RequestBody TicketCategoryRequest request
     ) {
         return ticketCategoryService.createCategory(concertId, request);
@@ -37,8 +37,8 @@ public class AdminTicketCategoryController {
 
     @PutMapping("/{categoryId}")
     public TicketCategoryResponse updateCategory(
-            @PathVariable Long concertId,
-            @PathVariable Long categoryId,
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("categoryId") Long categoryId,
             @Valid @RequestBody TicketCategoryRequest request
     ) {
         return ticketCategoryService.updateCategory(concertId, categoryId, request);
@@ -46,7 +46,10 @@ public class AdminTicketCategoryController {
 
     @DeleteMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable Long concertId, @PathVariable Long categoryId) {
+    public void deleteCategory(
+            @PathVariable("concertId") Long concertId,
+            @PathVariable("categoryId") Long categoryId
+    ) {
         ticketCategoryService.deleteCategory(concertId, categoryId);
     }
 }

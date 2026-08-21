@@ -20,8 +20,9 @@ public class TicketCategoryController {
     }
 
     @GetMapping
-    public List<TicketCategoryResponse> getCategoriesForConcert(@PathVariable Long concertId) {
-
+    public List<TicketCategoryResponse> getCategoriesForConcert(
+            @PathVariable("concertId") Long concertId
+    ) {
         return ticketCategoryService.getCategoriesForConcert(concertId);
     }
 }

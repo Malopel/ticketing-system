@@ -33,28 +33,37 @@ public class AdminConcertController {
     }
 
     @PostMapping
-    public ConcertResponse addConcert(@Valid @RequestBody ConcertRequest concertRequest) {
+    public ConcertResponse addConcert(
+            @Valid @RequestBody ConcertRequest concertRequest
+    ) {
         return concertService.createConcert(concertRequest);
     }
 
     @PutMapping("/{concertId}")
-    public ConcertResponse updateConcert(@Valid @RequestBody ConcertRequest concertRequest, @PathVariable Long concertId) {
+    public ConcertResponse updateConcert(
+            @Valid @RequestBody ConcertRequest concertRequest,
+            @PathVariable("concertId") Long concertId
+    ) {
         return concertService.updateConcert(concertId, concertRequest);
     }
 
     @PatchMapping("/{concertId}/publish")
-    public ConcertResponse publishConcert(@PathVariable Long concertId) {
+    public ConcertResponse publishConcert(
+            @PathVariable("concertId") Long concertId
+    ) {
         return concertService.publishConcert(concertId);
     }
 
     @PatchMapping("/{concertId}/archive")
-    public ConcertResponse archiveConcert(@PathVariable Long concertId) {
+    public ConcertResponse archiveConcert(
+            @PathVariable("concertId") Long concertId
+    ) {
         return concertService.archiveConcert(concertId);
     }
 
     @PatchMapping("/{concertId}/cancel")
     public ConcertResponse cancelConcert(
-            @PathVariable Long concertId
+            @PathVariable("concertId") Long concertId
     ) {
         return concertService.cancelConcert(concertId);
     }
