@@ -1,24 +1,12 @@
-import {useAdminAuth} from '../auth/adminAuthContext';
-
 function AdminDashboardPage() {
-    const {logout} = useAdminAuth();
-
     return (
-        <main>
-            <h1>Adminbereich</h1>
+        <>
+            <h1>Dashboard</h1>
 
             <p>
-                Verwaltung von Konzerten,
-                Bestellungen und Tickets.
+                Willkommen im Administrationsbereich.
             </p>
-
-            <button
-                type="button"
-                onClick={logout}
-            >
-                Abmelden
-            </button>
-        </main>
+        </>
     );
 }
 
