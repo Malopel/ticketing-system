@@ -7,13 +7,13 @@ import {
 import {
     getAdminTicketCategories,
     type AdminTicketCategory,
-} from '../api/adminTicketCategoryApi'
+} from '../api/adminTicketCategoryApi';
 
 export function useAdminTicketCategories(
     concertId: number | null,
 ) {
     const [ticketCategories, setTicketCategories] =
-    useState<AdminTicketCategory[]>([]);
+        useState<AdminTicketCategory[]>([]);
 
     const [isLoading, setIsLoading] =
         useState(true);
@@ -21,54 +21,75 @@ export function useAdminTicketCategories(
     const [error, setError] =
         useState<string | null>(null);
 
-    const load = useCallback(async (
-        signal?: AbortSignal,
-    ) => {
+    useEffect(() => {
         if (concertId === null) {
             return;
         }
 
-        try {
-            const data = await getAdminTicketCategories(
-                concertId,
-                signal,
-            );
+        const currentConcertId = concertId;
 
-            setTicketCategories(data);
-            setError(null);
-        } catch (error) {
-            if (
-                error instanceof DOMException &&
-                error.name === 'AbortError'
-            ) {
-                return;
-            }
-
-            setError(
-                'Ticketkategorien konnten nicht geladen werden.',
-            );
-        } finally {
-            if (!signal?.aborted) {
-                setIsLoading(false);
-            }
-        }
-    }, [concertId]);
-
-    useEffect(() => {
         const controller = new AbortController();
 
-        void load(controller.signal);
+        async function loadInitial() {
+            try {
+                const data =
+                    await getAdminTicketCategories(
+                        currentConcertId,
+                        controller.signal,
+                    );
+
+                if (!controller.signal.aborted) {
+                    setTicketCategories(data);
+                    setError(null);
+                }
+            } catch (error) {
+                if (
+                    error instanceof DOMException &&
+                    error.name === 'AbortError'
+                ) {
+                    return;
+                }
+
+                if (!controller.signal.aborted) {
+                    setError(
+                        'Ticketkategorien konnten nicht geladen werden.',
+                    );
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
+            }
+        }
+
+        void loadInitial();
 
         return () => {
             controller.abort();
         };
-    }, [load]);
+    }, [concertId]);
 
     const reload = useCallback(async () => {
-        setIsLoading(true);
+        if (concertId === null) {
+            return;
+        }
 
-        await load();
-    }, [load]);
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const data =
+                await getAdminTicketCategories(concertId);
+
+            setTicketCategories(data);
+        } catch {
+            setError(
+                'Ticketkategorien konnten nicht geladen werden.',
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    }, [concertId]);
 
     return {
         ticketCategories,
