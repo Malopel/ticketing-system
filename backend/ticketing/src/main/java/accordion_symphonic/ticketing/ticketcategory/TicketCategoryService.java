@@ -46,6 +46,28 @@ public class TicketCategoryService {
                 .toList();
     }
 
+    public List<TicketCategoryResponse> getCategoriesForAdmin(
+            Long concertId
+    ) {
+        concertRepository.findById(concertId)
+                .orElseThrow(() ->
+                        new ConcertNotFoundException(concertId)
+                );
+
+        return ticketCategoryRepository.findByConcertId(concertId)
+                .stream()
+                .map(category ->
+                        TicketCategoryResponse.fromEntity(
+                                category,
+                                ticketAvailabilityService.getAvailableTickets(
+                                        category.getId(),
+                                        category.getCapacity()
+                                )
+                        )
+                )
+                .toList();
+    }
+
     public TicketCategoryResponse createCategory(Long concertId, TicketCategoryRequest request) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() -> new ConcertNotFoundException(concertId));

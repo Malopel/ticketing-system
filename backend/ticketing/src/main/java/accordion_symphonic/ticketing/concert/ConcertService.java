@@ -37,6 +37,11 @@ public class ConcertService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public ConcertResponse getConcertById(Long concertId) {
+        return ConcertResponse.fromEntity(this.concertRepository.getReferenceById(concertId));
+    }
+
     public ConcertResponse createConcert(ConcertRequest request) {
         Concert concert = new Concert(
                 request.title(),

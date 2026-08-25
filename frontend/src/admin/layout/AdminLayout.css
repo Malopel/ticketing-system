@@ -23,6 +23,36 @@
     font-size: 0.9rem;
 }
 
+.admin-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+}
+
+.admin-brand-link {
+    color: #222;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.admin-brand-link:hover {
+    text-decoration: none;
+}
+
+.admin-shop-link {
+    color: #444;
+    text-decoration: none;
+}
+
+.admin-shop-link:hover {
+    text-decoration: underline;
+}
+
 .admin-logout-button {
     padding: 8px 14px;
 

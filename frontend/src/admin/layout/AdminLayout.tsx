@@ -1,4 +1,5 @@
 import {
+    Link,
     NavLink,
     Outlet
 } from 'react-router-dom';
@@ -13,12 +14,27 @@ function AdminLayout() {
     return (
         <div className="admin-layout">
             <header className="admin-header">
-                <div>
-                    <strong>Accordion Symphonic</strong>
+                <div className="admin-brand">
+                    <Link
+                        to="/admin"
+                        className="admin-brand-link"
+                    >
+                        Accordion Symphonic
+                    </Link>
+
                     <span className="admin-header-label">
                         Administration
                     </span>
                 </div>
+
+                <a
+                    href="/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="admin-shop-link"
+                >
+                    Ticketshop öffnen ↗
+                </a>
 
                 <button
                     type="button"
@@ -35,6 +51,17 @@ function AdminLayout() {
                         <NavLink
                             to="/admin"
                             end
+                            className={({isActive}) =>
+                                isActive
+                                    ? 'admin-nav-link active'
+                                    : 'admin-nav-link'
+                            }
+                        >
+                            Dashboard
+                        </NavLink>
+
+                        <NavLink
+                            to="/admin/concerts"
                             className={({isActive}) =>
                                 isActive
                                     ? 'admin-nav-link active'

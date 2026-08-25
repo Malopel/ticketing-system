@@ -32,6 +32,13 @@ public class AdminConcertController {
         return concertService.getAllConcerts();
     }
 
+    @GetMapping("/{concertId}")
+    public ConcertResponse getConcert(
+            @PathVariable("concertId") Long concertId
+    ) {
+        return concertService.getConcertById(concertId);
+    }
+
     @PostMapping
     public ConcertResponse addConcert(
             @Valid @RequestBody ConcertRequest concertRequest

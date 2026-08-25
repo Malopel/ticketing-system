@@ -1,0 +1,115 @@
+.admin-detail-back {
+    margin-bottom: 20px;
+}
+
+.admin-detail-back a {
+    color: #555;
+    text-decoration: none;
+}
+
+.admin-detail-back a:hover {
+    text-decoration: underline;
+}
+
+.admin-secondary-button {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 9px 13px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    background: white;
+    color: #222;
+
+    text-decoration: none;
+}
+
+.admin-secondary-button:hover {
+    background: #f0f0f0;
+}
+
+.admin-detail-card {
+    padding: 24px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background: white;
+}
+
+.admin-detail-list {
+    margin: 0;
+
+    display: grid;
+    gap: 20px;
+}
+
+.admin-detail-list div {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 24px;
+}
+
+.admin-detail-list dt {
+    font-weight: 600;
+    color: #555;
+}
+
+.admin-detail-list dd {
+    margin: 0;
+}
+
+.admin-detail-section {
+    margin-top: 32px;
+}
+
+.admin-detail-section h2 {
+    margin-bottom: 12px;
+}
+
+.admin-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+}
+
+.admin-section-header h2 {
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.admin-section-header p {
+    margin: 0;
+    color: #666;
+}
+
+.admin-ticket-category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-ticket-category-row {
+    padding: 18px 20px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background: white;
+}
+
+.admin-ticket-category-row h3 {
+    margin: 0 0 6px;
+
+    font-size: 1rem;
+}
+
+.admin-ticket-category-row p {
+    margin: 0;
+
+    color: #666;
+}

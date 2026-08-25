@@ -47,3 +47,15 @@ export async function createAdminConcert(
         },
     );
 }
+
+export async function getAdminConcert(
+    concertId: number,
+    signal?: AbortSignal,
+): Promise<AdminConcert> {
+    return adminApiClient.request<AdminConcert>(
+        `/api/admin/concerts/${concertId}`,
+        {
+            signal,
+        },
+    );
+}

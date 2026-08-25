@@ -11,6 +11,7 @@ import AdminLayout from './layout/AdminLayout';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminConcertsPage from './pages/AdminConcertsPage';
+import AdminConcertDetailPage from './pages/AdminConcertDetailPage';
 import AdminOrdersPage from './pages/AdminOrdersPage';
 import AdminScannerPage from './pages/AdminScannerPage';
 import AdminConcertCreatePage
@@ -40,6 +41,11 @@ function AdminApp() {
                         <Route
                             path="concerts/new"
                             element={<AdminConcertCreatePage/>}
+                        />
+
+                        <Route
+                            path="concerts/:concertId"
+                            element={<AdminConcertDetailPage/>}
                         />
 
                         <Route

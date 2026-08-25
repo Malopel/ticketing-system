@@ -11,6 +11,7 @@ import {
     type AdminConcertStatus,
 } from '../api/adminConcertApi';
 
+
 import './AdminConcertsPage.css'
 
 const STATUS_LABELS: Record<AdminConcertStatus, string> = {
@@ -144,7 +145,10 @@ function ConcertRow({
         });
 
     return (
-        <article className="admin-concert-row">
+        <Link
+            to={`/admin/concerts/${concert.id}`}
+            className="admin-concert-row"
+        >
             <div className="admin-concert-main">
                 <div className="admin-concert-title-row">
                     <h2>{concert.title}</h2>
@@ -164,7 +168,11 @@ function ConcertRow({
                     {concert.location}
                 </p>
             </div>
-        </article>
+
+            <span className="admin-concert-chevron">
+                ›
+            </span>
+        </Link>
     );
 }
 
