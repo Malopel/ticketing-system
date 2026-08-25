@@ -15,11 +15,16 @@ import {
 } from '../api/adminConcertApi';
 
 import {
-    getAdminTicketCategories,
     type AdminTicketCategory,
 } from '../api/adminTicketCategoryApi';
 
-import './AdminConcertDetailPage.css';
+import {useAdminTicketCategories}
+    from '../hooks/useAdminTicketCategories';
+
+import TicketCategoryCreateForm
+    from '../components/TicketCategoryCreateForm';
+
+import './styles/AdminConcertDetailPage.css';
 
 const STATUS_LABELS: Record<AdminConcertStatus, string> = {
     DRAFT: 'Entwurf',
@@ -72,20 +77,14 @@ function AdminConcertDetailPage() {
     const [concert, setConcert] =
         useState<AdminConcert | null>(null);
 
-    const [ticketCategories, setTicketCategories] =
-        useState<AdminTicketCategory[]>([]);
-
     const [isLoading, setIsLoading] =
         useState(true);
 
     const [error, setError] =
         useState<string | null>(null);
 
-    const [areCategoriesLoading, setAreCategoriesLoading] =
-        useState(true);
-
-    const [categoriesError, setCategoriesError] =
-        useState<string | null>(null);
+    const [isCreatingCategory, setIsCreatingCategory] =
+        useState(false);
 
     useEffect(() => {
         if (routeError) {
@@ -127,45 +126,14 @@ function AdminConcertDetailPage() {
         };
     }, [parsedConcertId, routeError]);
 
-    useEffect(() => {
-        if (routeError) {
-            return;
-        }
-
-        const controller = new AbortController();
-
-        async function loadTicketCategories() {
-            try {
-                const data = await getAdminTicketCategories(
-                    parsedConcertId,
-                    controller.signal,
-                );
-
-                setTicketCategories(data);
-            } catch (error) {
-                if (
-                    error instanceof DOMException &&
-                    error.name === 'AbortError'
-                ) {
-                    return;
-                }
-
-                setCategoriesError(
-                    'Ticketkategorien konnten nicht geladen werden.',
-                );
-            } finally {
-                if (!controller.signal.aborted) {
-                    setAreCategoriesLoading(false);
-                }
-            }
-        }
-
-        void loadTicketCategories();
-
-        return () => {
-            controller.abort();
-        };
-    }, [parsedConcertId, routeError]);
+    const {
+        ticketCategories,
+        isLoading: areCategoriesLoading,
+        error: categoriesError,
+        reload: reloadTicketCategories,
+    } = useAdminTicketCategories(
+        routeError ? null : parsedConcertId,
+    );
 
     if (routeError) {
         return (
@@ -286,7 +254,28 @@ function AdminConcertDetailPage() {
                             Konzert.
                         </p>
                     </div>
+
+                    <button
+                        type="button"
+                        onClick={() => setIsCreatingCategory(true)}
+                        disabled={isCreatingCategory}
+                    >
+                        + Ticketkategorie
+                    </button>
                 </div>
+
+                {isCreatingCategory && (
+                    <TicketCategoryCreateForm
+                        concertId={parsedConcertId}
+                        onCancel={() =>
+                            setIsCreatingCategory(false)
+                        }
+                        onCreated={async () => {
+                            await reloadTicketCategories();
+                            setIsCreatingCategory(false);
+                        }}
+                    />
+                )}
 
                 {areCategoriesLoading ? (
                     <p>Ticketkategorien werden geladen...</p>

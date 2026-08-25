@@ -12,7 +12,7 @@ import {
 } from '../api/adminConcertApi';
 
 
-import './AdminConcertsPage.css'
+import './styles/AdminConcertsPage.css'
 
 const STATUS_LABELS: Record<AdminConcertStatus, string> = {
     DRAFT: 'Entwurf',

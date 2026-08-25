@@ -17,6 +17,8 @@ import AdminScannerPage from './pages/AdminScannerPage';
 import AdminConcertCreatePage
     from './pages/AdminConcertCreatePage';
 
+import './styles/AdminForms.css';
+
 function AdminApp() {
     return (
         <AdminAuthProvider>

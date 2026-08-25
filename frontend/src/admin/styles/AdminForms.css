@@ -1,0 +1,45 @@
+.admin-ticket-category-form {
+    display: grid;
+    gap: 16px;
+
+    margin-bottom: 20px;
+    padding: 20px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background: white;
+}
+
+.admin-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-form-field label {
+    font-weight: 600;
+}
+
+.admin-form-field input,
+.admin-form-field textarea {
+    padding: 10px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    font: inherit;
+    color: #222;
+    background: white;
+}
+
+.admin-form-field textarea {
+    resize: vertical;
+}
+
+.admin-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
