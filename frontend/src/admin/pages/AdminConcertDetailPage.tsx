@@ -9,7 +9,10 @@ import {
 } from 'react-router-dom';
 
 import {
+    archiveAdminConcert,
+    cancelAdminConcert,
     getAdminConcert,
+    publishAdminConcert,
     type AdminConcert,
     type AdminConcertStatus,
 } from '../api/adminConcertApi';
@@ -36,6 +39,11 @@ const STATUS_LABELS: Record<AdminConcertStatus, string> = {
 type TicketCategoryRowProps = {
     category: AdminTicketCategory;
 };
+
+type ConcertAction =
+    | 'publish'
+    | 'cancel'
+    | 'archive';
 
 function TicketCategoryRow({
                                category,
@@ -85,6 +93,12 @@ function AdminConcertDetailPage() {
 
     const [isCreatingCategory, setIsCreatingCategory] =
         useState(false);
+
+    const [pendingAction, setPendingAction] =
+        useState<ConcertAction | null>(null);
+
+    const [actionError, setActionError] =
+        useState<string | null>(null);
 
     useEffect(() => {
         if (routeError) {
@@ -176,6 +190,64 @@ function AdminConcertDetailPage() {
             minute: '2-digit',
         });
 
+    async function handleConcertAction(
+        action: ConcertAction,
+    ) {
+        if (!concert) {
+            return;
+        }
+
+        if (
+            action === 'cancel' &&
+            !window.confirm(
+                'Möchtest du dieses Konzert wirklich absagen?',
+            )
+        ) {
+            return;
+        }
+
+        if (
+            action === 'archive' &&
+            !window.confirm(
+                'Möchtest du dieses Konzert wirklich archivieren?',
+            )
+        ) {
+            return;
+        }
+
+        setActionError(null);
+        setPendingAction(action);
+
+        try {
+            let updatedConcert: AdminConcert;
+
+            switch (action) {
+                case 'publish':
+                    updatedConcert =
+                        await publishAdminConcert(concert.id);
+                    break;
+
+                case 'cancel':
+                    updatedConcert =
+                        await cancelAdminConcert(concert.id);
+                    break;
+
+                case 'archive':
+                    updatedConcert =
+                        await archiveAdminConcert(concert.id);
+                    break;
+            }
+
+            setConcert(updatedConcert);
+        } catch {
+            setActionError(
+                'Die Aktion konnte nicht ausgeführt werden.',
+            );
+        } finally {
+            setPendingAction(null);
+        }
+    }
+
     return (
         <section>
             <div className="admin-detail-back">
@@ -203,7 +275,8 @@ function AdminConcertDetailPage() {
                     </p>
                 </div>
 
-                {concert.status === 'PUBLISHED' && (
+                {(concert.status === 'PUBLISHED' ||
+                    concert.status === 'CANCELLED') && (
                     <a
                         href={`/concerts/${concert.id}`}
                         target="_blank"
@@ -243,6 +316,72 @@ function AdminConcertDetailPage() {
                     </div>
                 </dl>
             </div>
+
+            <section className="admin-detail-section">
+                <h2>Konzertstatus</h2>
+
+                {actionError && (
+                    <p
+                        className="admin-error-message"
+                        role="alert"
+                    >
+                        {actionError}
+                    </p>
+                )}
+
+                <div className="admin-concert-actions">
+                    {concert.status === 'DRAFT' && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                void handleConcertAction('publish')
+                            }
+                            disabled={pendingAction !== null}
+                        >
+                            {pendingAction === 'publish'
+                                ? 'Wird veröffentlicht...'
+                                : 'Veröffentlichen'}
+                        </button>
+                    )}
+
+                    {concert.status === 'PUBLISHED' && (
+                        <button
+                            type="button"
+                            className="admin-secondary-button"
+                            onClick={() =>
+                                void handleConcertAction('cancel')
+                            }
+                            disabled={pendingAction !== null}
+                        >
+                            {pendingAction === 'cancel'
+                                ? 'Wird abgesagt...'
+                                : 'Konzert absagen'}
+                        </button>
+                    )}
+
+                    {(concert.status === 'PUBLISHED' ||
+                        concert.status === 'CANCELLED') && (
+                        <button
+                            type="button"
+                            className="admin-secondary-button"
+                            onClick={() =>
+                                void handleConcertAction('archive')
+                            }
+                            disabled={pendingAction !== null}
+                        >
+                            {pendingAction === 'archive'
+                                ? 'Wird archiviert...'
+                                : 'Archivieren'}
+                        </button>
+                    )}
+
+                    {concert.status === 'ARCHIVED' && (
+                        <p className="admin-muted-text">
+                            Dieses Konzert ist archiviert.
+                        </p>
+                    )}
+                </div>
+            </section>
 
             <section className="admin-detail-section">
                 <div className="admin-section-header">

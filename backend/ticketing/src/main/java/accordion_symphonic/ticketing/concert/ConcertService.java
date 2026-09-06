@@ -17,15 +17,22 @@ public class ConcertService {
         this.concertRepository = concertRepository;
     }
 
-    public List<ConcertResponse> getPublishedConcerts() {
-        return this.concertRepository.findByStatus(ConcertStatus.PUBLISHED)
+    public List<ConcertResponse> getPublicConcerts() {
+        return this.concertRepository.
+                findByStatusIn(List.of(
+                        ConcertStatus.PUBLISHED,
+                        ConcertStatus.CANCELLED
+                ))
                 .stream()
                 .map(ConcertResponse::fromEntity)
                 .toList();
     }
 
-    public ConcertResponse getPublishedConcertById(Long concertId) {
-        return this.concertRepository.findByIdAndStatus(concertId, ConcertStatus.PUBLISHED)
+    public ConcertResponse getPublicConcertById(Long concertId) {
+        return this.concertRepository.findByIdAndStatusIn(
+                        concertId,
+                        List.of(ConcertStatus.PUBLISHED, ConcertStatus.CANCELLED)
+                )
                 .map(ConcertResponse::fromEntity)
                 .orElseThrow(() -> new ConcertNotFoundException(concertId));
     }

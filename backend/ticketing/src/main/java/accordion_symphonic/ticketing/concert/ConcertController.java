@@ -20,13 +20,13 @@ public class ConcertController {
 
     @GetMapping
     public List<ConcertResponse> getConcerts() {
-        return concertService.getPublishedConcerts();
+        return concertService.getPublicConcerts();
     }
 
     @GetMapping("/{concertId}")
-    public ConcertResponse getPublishedConcertById(
+    public ConcertResponse getPublicConcertById(
             @PathVariable("concertId") Long concertId
     ) {
-        return concertService.getPublishedConcertById(concertId);
+        return concertService.getPublicConcertById(concertId);
     }
 }

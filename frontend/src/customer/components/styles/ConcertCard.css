@@ -18,3 +18,27 @@
 .concert-card p {
     margin: 0;
 }
+
+.concert-card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+}
+
+.concert-card-title-row h2 {
+    margin: 0;
+}
+
+.concert-cancelled-badge {
+    padding: 0.25rem 0.6rem;
+
+    border-radius: 999px;
+
+    background: #f8e5e5;
+    color: #8a2020;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}

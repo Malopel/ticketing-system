@@ -37,6 +37,28 @@
     margin-top: 0.25rem;
 }
 
+.concert-cancelled-notice {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+
+    border: 1px solid #d92d20;
+    border-radius: var(--radius-md);
+
+    background: #fff5f5;
+    color: #8a2020;
+}
+
+.concert-cancelled-notice strong {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+
+    font-size: 1.05rem;
+}
+
+.concert-cancelled-notice p {
+    margin: 0;
+}
+
 @media (max-width: 600px) {
     .concert-header {
         padding: var(--spacing-md);

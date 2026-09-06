@@ -62,6 +62,10 @@ function ConcertPage() {
 
     useEffect(() => {
         async function loadTicketData() {
+            if (!concert || concert.status !== 'PUBLISHED') {
+                return;
+            }
+
             const id = Number(concertId);
 
             if (!Number.isInteger(id) || id <= 0) {
@@ -96,7 +100,7 @@ function ConcertPage() {
         }
 
         void loadTicketData();
-    }, [concertId]);
+    }, [concert, concertId]);
 
     if (loading) {
         return <p>Konzert wird geladen...</p>;
@@ -159,27 +163,47 @@ function ConcertPage() {
                 </div>
             </header>
 
-            {loadingTickets && (
-                <p>Ticketkategorien werden geladen...</p>
+            {concert.status === 'CANCELLED' && (
+                <div
+                    className="concert-cancelled-notice"
+                    role="status"
+                >
+                    <strong>
+                        Dieses Konzert wurde abgesagt.
+                    </strong>
+
+                    <p>
+                        Ein Ticketkauf ist für diese Veranstaltung
+                        nicht mehr möglich.
+                    </p>
+                </div>
             )}
 
-            {ticketError && (
-                <p className="error-message">
-                    Fehler: {ticketError}
-                </p>
-            )}
+            {concert.status === 'PUBLISHED' && (
+                <>
+                    {loadingTickets && (
+                        <p>Ticketkategorien werden geladen...</p>
+                    )}
 
-            {!ticketError &&
-                !loadingTickets &&
-                shopConfig && (
-                    <TicketSelection
-                        concertId={concert.id}
-                        ticketCategories={ticketCategories}
-                        maxTicketsPerOrder={
-                            shopConfig.maxTicketsPerOrder
-                        }
-                    />
-                )}
+                    {ticketError && (
+                        <p className="error-message">
+                            Fehler: {ticketError}
+                        </p>
+                    )}
+
+                    {!ticketError &&
+                        !loadingTickets &&
+                        shopConfig && (
+                            <TicketSelection
+                                concertId={concert.id}
+                                ticketCategories={ticketCategories}
+                                maxTicketsPerOrder={
+                                    shopConfig.maxTicketsPerOrder
+                                }
+                            />
+                        )}
+                </>
+            )}
         </main>
     );
 }

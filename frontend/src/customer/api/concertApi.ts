@@ -6,8 +6,12 @@ export type Concert = {
     description: string;
     startTime: string;
     location: string;
-    status: 'PUBLISHED';
+    status: PublicConcertStatus;
 };
+
+export type PublicConcertStatus =
+    | 'PUBLISHED'
+    | 'CANCELLED';
 
 export async function getConcerts(): Promise<Concert[]> {
     const response = await fetch('/api/concerts');

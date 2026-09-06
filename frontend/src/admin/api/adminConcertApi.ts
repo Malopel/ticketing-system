@@ -59,3 +59,36 @@ export async function getAdminConcert(
         },
     );
 }
+
+export async function publishAdminConcert(
+    concertId: number,
+): Promise<AdminConcert> {
+    return adminApiClient.request<AdminConcert>(
+        `/api/admin/concerts/${concertId}/publish`,
+        {
+            method: 'PATCH',
+        },
+    );
+}
+
+export async function cancelAdminConcert(
+    concertId: number,
+): Promise<AdminConcert> {
+    return adminApiClient.request<AdminConcert>(
+        `/api/admin/concerts/${concertId}/cancel`,
+        {
+            method: 'PATCH',
+        },
+    );
+}
+
+export async function archiveAdminConcert(
+    concertId: number,
+): Promise<AdminConcert> {
+    return adminApiClient.request<AdminConcert>(
+        `/api/admin/concerts/${concertId}/archive`,
+        {
+            method: 'PATCH',
+        },
+    );
+}

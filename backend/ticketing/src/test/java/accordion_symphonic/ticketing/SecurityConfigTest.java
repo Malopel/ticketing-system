@@ -36,7 +36,7 @@ class SecurityConfigTest {
 
     @Test
     void publicConcertEndpointIsAccessibleWithoutAuthentication() throws Exception {
-        when(concertService.getPublishedConcerts()).thenReturn(List.of());
+        when(concertService.getPublicConcerts()).thenReturn(List.of());
 
         mockMvc.perform(get("/api/concerts"))
                 .andExpect(status().isOk());

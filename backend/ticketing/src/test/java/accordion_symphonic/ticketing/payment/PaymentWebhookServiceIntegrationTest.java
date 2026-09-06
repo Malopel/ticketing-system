@@ -70,14 +70,16 @@ class PaymentWebhookServiceIntegrationTest {
 
     @Test
     void paidWebhookMarksOrderPaidCreatesTicketsAndIsIdempotent() {
-        Concert concert = concertRepository.save(
-                new Concert(
-                        "Testkonzert",
-                        "Beschreibung",
-                        LocalDateTime.now().plusDays(30),
-                        "Konzertsaal"
-                )
+        Concert concert = new Concert(
+                "Testkonzert",
+                "Beschreibung",
+                LocalDateTime.now().plusDays(30),
+                "Konzertsaal"
         );
+
+        concert.publish();
+
+        concert = concertRepository.save(concert);
 
         TicketCategory category = ticketCategoryRepository.save(
                 new TicketCategory(

@@ -59,7 +59,9 @@ public class Concert {
     public void archive() {
         if (status == ConcertStatus.ARCHIVED) return;
 
-        if (status != ConcertStatus.PUBLISHED) {
+        if ((status != ConcertStatus.PUBLISHED) &&
+                (status != ConcertStatus.CANCELLED))
+        {
             throw new ConcertCannotBeArchivedException(this.id);
         }
 

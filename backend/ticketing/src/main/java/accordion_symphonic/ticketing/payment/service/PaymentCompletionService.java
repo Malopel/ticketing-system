@@ -54,7 +54,7 @@ public class PaymentCompletionService {
         }
 
         if (order.getConcert().getStatus()
-                == ConcertStatus.CANCELLED) {
+                != ConcertStatus.PUBLISHED) {
             throw new OrderCannotBePaidException(orderId);
         }
 

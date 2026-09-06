@@ -22,9 +22,19 @@ function ConcertCard({concert}: ConcertCardProps) {
         minute: '2-digit',
     });
 
+    const isCancelled = concert.status === 'CANCELLED';
+
     return (
         <article className="concert-card">
-            <h2>{concert.title}</h2>
+            <div className="concert-card-title-row">
+                <h2>{concert.title}</h2>
+
+                {isCancelled && (
+                    <span className="concert-cancelled-badge">
+                        Abgesagt
+                    </span>
+                )}
+            </div>
 
             <p>{concert.description}</p>
 
@@ -39,8 +49,11 @@ function ConcertCard({concert}: ConcertCardProps) {
 
             <Link
                 className="button-link"
-                to={`/concerts/${concert.id}`}>
-                Tickets auswählen
+                to={`/concerts/${concert.id}`}
+            >
+                {isCancelled
+                    ? 'Details ansehen'
+                    : 'Tickets auswählen'}
             </Link>
         </article>
     );

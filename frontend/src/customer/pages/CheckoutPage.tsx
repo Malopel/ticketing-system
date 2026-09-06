@@ -68,11 +68,26 @@ function CheckoutPage() {
                 const parsedQuantities: Record<number, number> =
                     JSON.parse(storedQuantities);
 
-                const [loadedConcert, loadedCategories] =
-                    await Promise.all([
-                        getConcertById(id),
-                        getTicketCategories(id),
-                    ]);
+                const loadedConcert =
+                    await getConcertById(id);
+
+                if (loadedConcert.status !== 'PUBLISHED') {
+                    sessionStorage.removeItem(
+                        `checkout-${id}`,
+                    );
+
+                    navigate(
+                        `/concerts/${id}`,
+                        {
+                            replace: true,
+                        },
+                    );
+
+                    return;
+                }
+
+                const loadedCategories =
+                    await getTicketCategories(id);
 
                 setQuantities(parsedQuantities);
                 setConcert(loadedConcert);
@@ -87,7 +102,7 @@ function CheckoutPage() {
         }
 
         void loadCheckout();
-    }, [id]);
+    }, [id, navigate]);
 
     const selectedCategories = ticketCategories.filter(
         (category) => (quantities[category.id] ?? 0) > 0,

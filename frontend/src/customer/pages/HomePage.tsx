@@ -34,8 +34,8 @@ function HomePage() {
                 <h1>Accordion Symphonic</h1>
                 <h2>Konzerte</h2>
                 <p>
-                    Wähle ein Konzert aus und sichere dir
-                    deine Tickets.
+                    Hier findest du unsere Konzerte und aktuelle
+                    Informationen zu den Veranstaltungen.
                 </p>
             </header>
 
