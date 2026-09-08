@@ -287,6 +287,9 @@ function OrderStatusPage() {
         }
     }
 
+    const concertCancelled =
+        order.concertStatus === 'CANCELLED';
+
     return (
         <main className="order-status-page">
             <Link
@@ -300,6 +303,16 @@ function OrderStatusPage() {
                 <h1>Bestellung #{order.id}</h1>
                 <p>{order.concertTitle}</p>
             </header>
+
+            {concertCancelled && (
+                <section className="order-concert-warning">
+                    <strong>Konzert abgesagt</strong>
+                    <p>
+                        Dieses Konzert wurde abgesagt.
+                        Eine Zahlung ist nicht mehr möglich.
+                    </p>
+                </section>
+            )}
 
             <OrderStatusCard
                 order={order}

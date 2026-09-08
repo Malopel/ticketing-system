@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.order.dto;
 
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderStatus;
 
@@ -10,6 +11,7 @@ import java.util.List;
 public record OrderResponse(
         Long id,
         Long concertId,
+        ConcertStatus concertStatus,
         String concertTitle,
         String customerEmail,
         OrderStatus status,
@@ -24,6 +26,7 @@ public record OrderResponse(
         return new OrderResponse(
                 order.getId(),
                 order.getConcert().getId(),
+                order.getConcert().getStatus(),
                 order.getConcert().getTitle(),
                 order.getCustomerEmail(),
                 order.getStatus(),

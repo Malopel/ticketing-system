@@ -38,16 +38,18 @@ function OrderStatusCard({
         <section className="order-status-card">
             <OrderStatusBadge status={order.status}/>
 
-            {order.status === 'RESERVED' &&
-                formattedRemainingTime && (
-                    <p>
-                        Deine Tickets sind noch{' '}
-                        <strong>
-                            {formattedRemainingTime} Minuten
-                        </strong>{' '}
-                        für dich reserviert.
-                    </p>
-                )}
+            {order.concertStatus === 'CANCELLED' ? (
+                <p>
+                    Das zugehörige Konzert wurde abgesagt.
+                    Diese Bestellung kann nicht mehr bezahlt werden.
+                </p>
+            ) : (
+                <p>
+                    Deine Tickets sind noch{' '}
+                    <strong>{formattedRemainingTime}</strong>{' '}
+                    für dich reserviert.
+                </p>
+            )}
 
             {order.status === 'PAYMENT_PENDING' &&
                 formattedRemainingTime && (

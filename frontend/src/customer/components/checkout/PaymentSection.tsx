@@ -102,19 +102,28 @@ function PaymentSection({
         <section className="payment-section">
             <h2>Zahlung</h2>
 
-            <p>
-                Die Bestellung wurde reserviert und
-                wartet auf die Zahlung.
-            </p>
+            {order.concertStatus === 'PUBLISHED' ? (
+                <>
+                    <p>
+                        Die Bestellung wurde reserviert und
+                        wartet auf die Zahlung.
+                    </p>
 
-            <p>
-                Zu zahlen:{' '}
-                <strong>
-                    {currencyFormatter.format(
-                        order.totalAmount,
-                    )}
-                </strong>
-            </p>
+                    <p>
+                        Zu zahlen:{' '}
+                        <strong>
+                            {currencyFormatter.format(
+                                order.totalAmount,
+                            )}
+                        </strong>
+                    </p>
+                </>
+            ) : (
+                <p>
+                    Das Konzert wurde abgesagt.
+                    Diese Bestellung kann daher nicht mehr bezahlt werden.
+                </p>
+            )}
 
             {paymentError && (
                 <p className="error-message">
@@ -122,22 +131,24 @@ function PaymentSection({
                 </p>
             )}
 
-            <button
-                className="primary-button"
-                type="button"
-                onClick={handleStartPayment}
-                disabled={
-                    paymentDisabled ||
-                    startingPayment ||
-                    cancelingOrder
-                }
-            >
-                {startingPayment
-                    ? 'Zahlung wird gestartet...'
-                    : paymentDisabled
-                        ? 'Reservierung abgelaufen'
-                        : 'Jetzt bezahlen'}
-            </button>
+            {order.concertStatus === 'PUBLISHED' && (
+                <button
+                    className="primary-button"
+                    type="button"
+                    onClick={handleStartPayment}
+                    disabled={
+                        paymentDisabled ||
+                        startingPayment ||
+                        cancelingOrder
+                    }
+                >
+                    {startingPayment
+                        ? 'Zahlung wird gestartet...'
+                        : paymentDisabled
+                            ? 'Reservierung abgelaufen'
+                            : 'Jetzt bezahlen'}
+                </button>
+            )}
 
             <div className="cancel-section">
                 {!showCancelConfirmation && (

@@ -19,6 +19,12 @@ export type OrderItemResponse = {
     totalPrice: number;
 };
 
+export type ConcertStatus =
+    | 'DRAFT'
+    | 'PUBLISHED'
+    | 'CANCELLED'
+    | 'ARCHIVED'
+
 export type OrderStatus =
     | 'RESERVED'
     | 'PAYMENT_PENDING'
@@ -29,6 +35,7 @@ export type OrderStatus =
 export type OrderResponse = {
     id: number;
     concertId: number;
+    concertStatus: ConcertStatus;
     concertTitle: string;
     customerEmail: string;
 

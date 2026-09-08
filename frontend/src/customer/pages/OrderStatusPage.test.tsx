@@ -33,6 +33,7 @@ const mockedGetOrder = vi.mocked(getOrder);
 const paymentPendingOrder: OrderResponse = {
     id: 42,
     concertId: 7,
+    concertStatus: 'PUBLISHED',
     concertTitle: 'Accordion Night',
     customerEmail: 'kunde@example.com',
     status: 'PAYMENT_PENDING',
