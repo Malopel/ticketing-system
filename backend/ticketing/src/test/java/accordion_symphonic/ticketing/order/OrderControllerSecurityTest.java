@@ -12,6 +12,7 @@ import accordion_symphonic.ticketing.order.service.CustomerOrderService;
 import accordion_symphonic.ticketing.order.service.OrderCreationService;
 import accordion_symphonic.ticketing.order.web.OrderController;
 import accordion_symphonic.ticketing.security.SecurityConfig;
+import accordion_symphonic.ticketing.concert.ConcertStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -142,6 +143,7 @@ class OrderControllerSecurityTest {
         return new OrderResponse(
                 ORDER_ID,
                 CONCERT_ID,
+                ConcertStatus.PUBLISHED,
                 "Testkonzert",
                 "kunde@example.com",
                 OrderStatus.RESERVED,
@@ -158,6 +160,7 @@ class OrderControllerSecurityTest {
         return new OrderResponse(
                 ORDER_ID,
                 CONCERT_ID,
+                ConcertStatus.PUBLISHED,
                 "Testkonzert",
                 "kunde@example.com",
                 OrderStatus.CANCELLED,

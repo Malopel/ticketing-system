@@ -71,4 +71,16 @@ public class ConcertExceptionHandler {
                 exception.getMessage()
         );
     }
+
+    @ExceptionHandler(ConcertCannotBeUpdatedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConcertCannotBeUpdated(ConcertCannotBeUpdatedException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ErrorCode.CONCERT_CANNOT_BE_UPDATED,
+                exception.getMessage()
+        );
+    }
 }

@@ -26,6 +26,7 @@ public final class ErrorCode {
 
     public static final String INVALID_TICKET = "INVALID_TICKET";
     public static final String TICKET_NOT_FOUND = "TICKET_NOT_FOUND";
+    public static final String CONCERT_CANNOT_BE_UPDATED = "CONCERT_CANNOT_BE_UPDATED";
 
     private ErrorCode() {
     }

@@ -4,6 +4,7 @@ import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
 import accordion_symphonic.ticketing.concert.exception.ConcertCannotBeArchivedException;
 import accordion_symphonic.ticketing.concert.exception.ConcertCannotBeCancelledException;
 import accordion_symphonic.ticketing.concert.exception.ConcertCannotBePublishedException;
+import accordion_symphonic.ticketing.concert.exception.ConcertCannotBeUpdatedException;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -40,6 +41,10 @@ public class Concert {
     }
 
     public void updateConcert(ConcertRequest update) {
+        if (status != ConcertStatus.DRAFT) {
+            throw new ConcertCannotBeUpdatedException(id);
+        }
+
         this.title = update.title();
         this.description = update.description();
         this.startTime = update.startTime();
