@@ -22,4 +22,16 @@ public class TicketCategoryExceptionHandler {
                 exception.getMessage()
         );
     }
+
+    @ExceptionHandler(TicketCategoryCannotBeModifiedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleTicketCategoryCannotBeModified(TicketCategoryCannotBeModifiedException exception) {
+        return new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ErrorCode.TICKET_CATEGORY_CANNOT_BE_MODIFIED,
+                exception.getMessage()
+        );
+    }
 }

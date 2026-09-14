@@ -41,3 +41,20 @@ export async function createAdminTicketCategory(
         }
     )
 }
+
+export async function updateAdminTicketCategory(
+    concertId: number,
+    ticketCategoryId: number,
+    request: AdminTicketCategoryRequest,
+): Promise<AdminTicketCategory> {
+    return adminApiClient.request<AdminTicketCategory>(
+        `/api/admin/concerts/${concertId}/ticket-categories/${ticketCategoryId}`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+        },
+    );
+}

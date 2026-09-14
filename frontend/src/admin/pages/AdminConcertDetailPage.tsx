@@ -27,6 +27,9 @@ import {useAdminTicketCategories}
 import UpdateConcertForm
     from '../components/UpdateConcertForm';
 
+import TicketCategoryUpdateForm
+    from '../components/TicketCategoryUpdateForm';
+
 import TicketCategoryCreateForm
     from '../components/TicketCategoryCreateForm';
 
@@ -41,6 +44,8 @@ const STATUS_LABELS: Record<AdminConcertStatus, string> = {
 
 type TicketCategoryRowProps = {
     category: AdminTicketCategory;
+    editable: boolean;
+    onEdit: () => void;
 };
 
 type ConcertAction =
@@ -50,6 +55,8 @@ type ConcertAction =
 
 function TicketCategoryRow({
                                category,
+                               editable,
+                               onEdit,
                            }: TicketCategoryRowProps) {
     const formattedPrice =
         new Intl.NumberFormat('de-DE', {
@@ -69,6 +76,16 @@ function TicketCategoryRow({
                     {category.capacity} verfügbar
                 </p>
             </div>
+
+            {editable && (
+                <button
+                    type="button"
+                    className="admin-secondary-button"
+                    onClick={onEdit}
+                >
+                    Bearbeiten
+                </button>
+            )}
         </article>
     );
 }
@@ -99,6 +116,9 @@ function AdminConcertDetailPage() {
 
     const [isUpdatingConcert, setIsUpdatingConcert] =
         useState(false);
+
+    const [editingCategoryId, setEditingCategoryId] =
+        useState<number | null>(null);
 
     const [pendingAction, setPendingAction] =
         useState<ConcertAction | null>(null);
@@ -400,6 +420,19 @@ function AdminConcertDetailPage() {
                         </p>
                     )}
                 </div>
+
+                {isUpdatingConcert && (
+                    <UpdateConcertForm
+                        concert={concert}
+                        onCancel={() =>
+                            setIsUpdatingConcert(false)
+                        }
+                        onUpdated={(updatedConcert) => {
+                            setConcert(updatedConcert);
+                            setIsUpdatingConcert(false);
+                        }}
+                    />
+                )}
             </section>
 
             <section className="admin-detail-section">
@@ -413,13 +446,17 @@ function AdminConcertDetailPage() {
                         </p>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={() => setIsCreatingCategory(true)}
-                        disabled={isCreatingCategory}
-                    >
-                        + Ticketkategorie
-                    </button>
+                    {concert.status === 'DRAFT' && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setIsCreatingCategory(true)
+                            }
+                            disabled={isCreatingCategory}
+                        >
+                            + Ticketkategorie
+                        </button>
+                    )}
                 </div>
 
                 {isCreatingCategory && (
@@ -456,25 +493,34 @@ function AdminConcertDetailPage() {
                 ) : (
                     <div className="admin-ticket-category-list">
                         {ticketCategories.map((category) => (
-                            <TicketCategoryRow
+                            <div
                                 key={category.id}
-                                category={category}
-                            />
+                                className="admin-ticket-category-item"
+                            >
+                                <TicketCategoryRow
+                                    category={category}
+                                    editable={concert.status === 'DRAFT'}
+                                    onEdit={() =>
+                                        setEditingCategoryId(category.id)
+                                    }
+                                />
+
+                                {editingCategoryId === category.id && (
+                                    <TicketCategoryUpdateForm
+                                        concertId={concert.id}
+                                        category={category}
+                                        onCancel={() =>
+                                            setEditingCategoryId(null)
+                                        }
+                                        onUpdated={async () => {
+                                            await reloadTicketCategories();
+                                            setEditingCategoryId(null);
+                                        }}
+                                    />
+                                )}
+                            </div>
                         ))}
                     </div>
-                )}
-
-                {isUpdatingConcert && (
-                    <UpdateConcertForm
-                        concert={concert}
-                        onCancel={() =>
-                            setIsUpdatingConcert(false)
-                        }
-                        onUpdated={(updatedConcert) => {
-                            setConcert(updatedConcert);
-                            setIsUpdatingConcert(false);
-                        }}
-                    />
                 )}
             </section>
         </section>

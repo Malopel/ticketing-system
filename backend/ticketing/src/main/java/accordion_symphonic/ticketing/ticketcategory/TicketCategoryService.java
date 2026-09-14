@@ -7,6 +7,7 @@ import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.ticketcategory.dto.TicketCategoryRequest;
 import accordion_symphonic.ticketing.ticketcategory.dto.TicketCategoryResponse;
+import accordion_symphonic.ticketing.ticketcategory.exception.TicketCategoryCannotBeModifiedException;
 import accordion_symphonic.ticketing.ticketcategory.exception.TicketCategoryNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -69,8 +70,7 @@ public class TicketCategoryService {
     }
 
     public TicketCategoryResponse createCategory(Long concertId, TicketCategoryRequest request) {
-        Concert concert = concertRepository.findById(concertId)
-                .orElseThrow(() -> new ConcertNotFoundException(concertId));
+        Concert concert = getDraftConcert(concertId);
 
         TicketCategory category = new TicketCategory(
                 request.name(),
@@ -89,6 +89,8 @@ public class TicketCategoryService {
             Long categoryId,
             TicketCategoryRequest request
     ) {
+        getDraftConcert(concertId);
+
         TicketCategory category = ticketCategoryRepository
                 .findByIdAndConcertId(categoryId, concertId)
                 .orElseThrow(() -> new TicketCategoryNotFoundException(categoryId));
@@ -101,16 +103,39 @@ public class TicketCategoryService {
 
         TicketCategory savedCategory = ticketCategoryRepository.save(category);
 
-        int available = ticketAvailabilityService.getAvailableTickets(savedCategory.getId(), savedCategory.getCapacity());
+        int available = ticketAvailabilityService.getAvailableTickets(
+                savedCategory.getId(),
+                savedCategory.getCapacity()
+        );
 
-        return TicketCategoryResponse.fromEntity(savedCategory, available);
+        return TicketCategoryResponse.fromEntity(
+                savedCategory,
+                available
+        );
     }
 
     public void deleteCategory(Long concertId, Long categoryId) {
+        getDraftConcert(concertId);
+
         TicketCategory category = ticketCategoryRepository
                 .findByIdAndConcertId(categoryId, concertId)
                 .orElseThrow(() -> new TicketCategoryNotFoundException(categoryId));
 
         ticketCategoryRepository.delete(category);
+    }
+
+    private Concert getDraftConcert(Long concertId) {
+        Concert concert = concertRepository.findById(concertId)
+                .orElseThrow(
+                        () -> new ConcertNotFoundException(concertId)
+                );
+
+        if (concert.getStatus() != ConcertStatus.DRAFT) {
+            throw new TicketCategoryCannotBeModifiedException(
+                    concertId
+            );
+        }
+
+        return concert;
     }
 }

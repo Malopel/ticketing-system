@@ -10,8 +10,10 @@ public final class ErrorCode {
     public static final String CONCERT_IS_CANCELLED = "CONCERT_IS_CANCELLED";
     public static final String CONCERT_CANNOT_BE_PUBLISHED = "CONCERT_CANNOT_BE_PUBLISHED";
     public static final String CONCERT_CANNOT_BE_ARCHIVED = "CONCERT_CANNOT_BE_ARCHIVED";
+    public static final String CONCERT_CANNOT_BE_UPDATED = "CONCERT_CANNOT_BE_UPDATED";
 
     public static final String TICKET_CATEGORY_NOT_FOUND = "TICKET_CATEGORY_NOT_FOUND";
+    public static final String TICKET_CATEGORY_CANNOT_BE_MODIFIED = "TICKET_CATEGORY_CANNOT_BE_MODIFIED";
 
     public static final String ORDER_NOT_FOUND = "ORDER_NOT_FOUND";
     public static final String ORDER_CANNOT_BE_PAID = "ORDER_CANNOT_BE_PAID";
@@ -26,7 +28,7 @@ public final class ErrorCode {
 
     public static final String INVALID_TICKET = "INVALID_TICKET";
     public static final String TICKET_NOT_FOUND = "TICKET_NOT_FOUND";
-    public static final String CONCERT_CANNOT_BE_UPDATED = "CONCERT_CANNOT_BE_UPDATED";
+
 
     private ErrorCode() {
     }
