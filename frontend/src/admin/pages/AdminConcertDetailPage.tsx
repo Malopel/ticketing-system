@@ -24,6 +24,9 @@ import {
 import {useAdminTicketCategories}
     from '../hooks/useAdminTicketCategories';
 
+import UpdateConcertForm
+    from '../components/UpdateConcertForm';
+
 import TicketCategoryCreateForm
     from '../components/TicketCategoryCreateForm';
 
@@ -92,6 +95,9 @@ function AdminConcertDetailPage() {
         useState<string | null>(null);
 
     const [isCreatingCategory, setIsCreatingCategory] =
+        useState(false);
+
+    const [isUpdatingConcert, setIsUpdatingConcert] =
         useState(false);
 
     const [pendingAction, setPendingAction] =
@@ -344,6 +350,19 @@ function AdminConcertDetailPage() {
                         </button>
                     )}
 
+                    {concert.status === 'DRAFT' && (
+                        <button
+                            type="button"
+                            className="admin-secondary-button"
+                            onClick={() =>
+                                setIsUpdatingConcert(true)
+                            }
+                            disabled={isUpdatingConcert}
+                        >
+                            Bearbeiten
+                        </button>
+                    )}
+
                     {concert.status === 'PUBLISHED' && (
                         <button
                             type="button"
@@ -443,6 +462,19 @@ function AdminConcertDetailPage() {
                             />
                         ))}
                     </div>
+                )}
+
+                {isUpdatingConcert && (
+                    <UpdateConcertForm
+                        concert={concert}
+                        onCancel={() =>
+                            setIsUpdatingConcert(false)
+                        }
+                        onUpdated={(updatedConcert) => {
+                            setConcert(updatedConcert);
+                            setIsUpdatingConcert(false);
+                        }}
+                    />
                 )}
             </section>
         </section>

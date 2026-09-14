@@ -60,6 +60,22 @@ export async function getAdminConcert(
     );
 }
 
+export async function updateAdminConcert(
+    concertId: number,
+    request: AdminConcertRequest,
+): Promise<AdminConcert> {
+    return adminApiClient.request<AdminConcert>(
+        `/api/admin/concerts/${concertId}`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+        },
+    );
+}
+
 export async function publishAdminConcert(
     concertId: number,
 ): Promise<AdminConcert> {

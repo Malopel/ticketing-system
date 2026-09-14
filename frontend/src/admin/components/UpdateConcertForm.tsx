@@ -9,7 +9,7 @@ import {
 } from '../api/adminConcertApi';
 
 type UpdateConcertFormProps = {
-    concertId: AdminConcert,
+    concert: AdminConcert,
     onUpdated: (concert: AdminConcert) => void,
     onCancel: () => void,
 }
