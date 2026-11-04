@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 class FakePaymentProviderTest {
 
     private final FakePaymentProvider paymentProvider =
-            new FakePaymentProvider();
+            new FakePaymentProvider("http://localhost:5173");
 
     @Test
     void createPaymentCreatesPaymentSessionAndRemembersOrder() {

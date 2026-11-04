@@ -1,16 +1,26 @@
 services:
   postgres:
     image: postgres:16
+
     environment:
       POSTGRES_DB: ticketing
       POSTGRES_USER: ticketing
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-Shell", "pg_isready -U ticketing -d ticketing"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
       context: ../backend/ticketing
+
+    restart: unless-stopped
 
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ticketing
@@ -23,18 +33,28 @@ services:
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
 
-    ports:
-      - "8080:8080"
-
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
       context: ../frontend
 
+    restard: unless-stopped
+
     ports:
-      - "5173:80"
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

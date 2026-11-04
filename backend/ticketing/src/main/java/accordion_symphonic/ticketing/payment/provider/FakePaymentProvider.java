@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.payment.provider;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.payment.PaymentProvider;
 import accordion_symphonic.ticketing.payment.PaymentSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,14 @@ public class FakePaymentProvider implements PaymentProvider {
     private final Map<String, Long> paymentOrders =
             new ConcurrentHashMap<>();
 
+    private final String frontendBaseUrl;
+
+    public FakePaymentProvider(
+            @Value("${ticketing.frontend.base-url}")
+            String frontendBaseUrl) {
+        this.frontendBaseUrl = frontendBaseUrl;
+    }
+
     @Override
     public PaymentSession createPayment(Order order) {
         String providerPaymentId = UUID.randomUUID().toString();
@@ -31,8 +40,7 @@ public class FakePaymentProvider implements PaymentProvider {
         );
 
         String checkoutUrl =
-                "http://localhost:5173/fake-payment/"
-                        + providerPaymentId;
+                frontendBaseUrl + "/fake-payment/" + providerPaymentId;
 
         return new PaymentSession(
                 providerPaymentId,

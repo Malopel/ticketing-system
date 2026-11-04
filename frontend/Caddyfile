@@ -1,4 +1,4 @@
-:80 {
+accordion-symphonic.de {
   handle /api/* {
     reverse_proxy backend:8080
   }
@@ -8,4 +8,8 @@
     try_files {path} /index.html
     file_server
   }
+}
+
+www.accordion-symphonic.de {
+    redir https://accordion-symphonic.de{uri} permanent
 }
