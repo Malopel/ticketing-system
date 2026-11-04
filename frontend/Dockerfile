@@ -1,4 +1,16 @@
-FROM ubuntu:latest
-LABEL authors="marcel"
+FROM node:24-alpine AS build
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+FROM caddy:2-alpine
+
+COPY --from=build /app/dist /usr/share/caddy
+COPY Caddyfile /etc/caddy/Caddyfile
+
+EXPOSE 80

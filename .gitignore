@@ -16,3 +16,5 @@ dist/
 
 # Alter Frontend-Backup
 frontend-js-backup/
+
+deploy/.env
