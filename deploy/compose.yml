@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ticketing
+      POSTGRES_USER: ticketing
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ../backend/ticketing
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ticketing
+      SPRING_DATASOURCE_USERNAME: ticketing
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+
+      TICKETING_PAYMENT_PROVIDER: fake
+      PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET}
+
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ../frontend
+
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
