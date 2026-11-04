@@ -17,21 +17,11 @@ import {
     type AdminConcertStatus,
 } from '../api/adminConcertApi';
 
-import {
-    type AdminTicketCategory,
-} from '../api/adminTicketCategoryApi';
-
-import {useAdminTicketCategories}
-    from '../hooks/useAdminTicketCategories';
-
 import UpdateConcertForm
     from '../components/UpdateConcertForm';
 
-import TicketCategoryUpdateForm
-    from '../components/TicketCategoryUpdateForm';
-
-import TicketCategoryCreateForm
-    from '../components/TicketCategoryCreateForm';
+import TicketCategorySection
+    from './components/TicketCategorySection';
 
 import './styles/AdminConcertDetailPage.css';
 
@@ -42,53 +32,10 @@ const STATUS_LABELS: Record<AdminConcertStatus, string> = {
     ARCHIVED: 'Archiviert',
 };
 
-type TicketCategoryRowProps = {
-    category: AdminTicketCategory;
-    editable: boolean;
-    onEdit: () => void;
-};
-
 type ConcertAction =
     | 'publish'
     | 'cancel'
     | 'archive';
-
-function TicketCategoryRow({
-                               category,
-                               editable,
-                               onEdit,
-                           }: TicketCategoryRowProps) {
-    const formattedPrice =
-        new Intl.NumberFormat('de-DE', {
-            style: 'currency',
-            currency: 'EUR',
-        }).format(category.price);
-
-    return (
-        <article className="admin-ticket-category-row">
-            <div>
-                <h3>{category.name}</h3>
-
-                <p>
-                    {formattedPrice}
-                    {' · '}
-                    {category.available} von{' '}
-                    {category.capacity} verfügbar
-                </p>
-            </div>
-
-            {editable && (
-                <button
-                    type="button"
-                    className="admin-secondary-button"
-                    onClick={onEdit}
-                >
-                    Bearbeiten
-                </button>
-            )}
-        </article>
-    );
-}
 
 function AdminConcertDetailPage() {
     const {concertId} = useParams();
@@ -111,14 +58,8 @@ function AdminConcertDetailPage() {
     const [error, setError] =
         useState<string | null>(null);
 
-    const [isCreatingCategory, setIsCreatingCategory] =
-        useState(false);
-
     const [isUpdatingConcert, setIsUpdatingConcert] =
         useState(false);
-
-    const [editingCategoryId, setEditingCategoryId] =
-        useState<number | null>(null);
 
     const [pendingAction, setPendingAction] =
         useState<ConcertAction | null>(null);
@@ -165,15 +106,6 @@ function AdminConcertDetailPage() {
             controller.abort();
         };
     }, [parsedConcertId, routeError]);
-
-    const {
-        ticketCategories,
-        isLoading: areCategoriesLoading,
-        error: categoriesError,
-        reload: reloadTicketCategories,
-    } = useAdminTicketCategories(
-        routeError ? null : parsedConcertId,
-    );
 
     if (routeError) {
         return (
@@ -435,94 +367,10 @@ function AdminConcertDetailPage() {
                 )}
             </section>
 
-            <section className="admin-detail-section">
-                <div className="admin-section-header">
-                    <div>
-                        <h2>Ticketkategorien</h2>
-
-                        <p>
-                            Preise und verfügbare Plätze für dieses
-                            Konzert.
-                        </p>
-                    </div>
-
-                    {concert.status === 'DRAFT' && (
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setIsCreatingCategory(true)
-                            }
-                            disabled={isCreatingCategory}
-                        >
-                            + Ticketkategorie
-                        </button>
-                    )}
-                </div>
-
-                {isCreatingCategory && (
-                    <TicketCategoryCreateForm
-                        concertId={parsedConcertId}
-                        onCancel={() =>
-                            setIsCreatingCategory(false)
-                        }
-                        onCreated={async () => {
-                            await reloadTicketCategories();
-                            setIsCreatingCategory(false);
-                        }}
-                    />
-                )}
-
-                {areCategoriesLoading ? (
-                    <p>Ticketkategorien werden geladen...</p>
-                ) : categoriesError ? (
-                    <p
-                        className="admin-error-message"
-                        role="alert"
-                    >
-                        {categoriesError}
-                    </p>
-                ) : ticketCategories.length === 0 ? (
-                    <div className="admin-empty-state">
-                        <h3>Noch keine Ticketkategorien</h3>
-
-                        <p>
-                            Für dieses Konzert wurden noch keine
-                            Ticketkategorien angelegt.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="admin-ticket-category-list">
-                        {ticketCategories.map((category) => (
-                            <div
-                                key={category.id}
-                                className="admin-ticket-category-item"
-                            >
-                                <TicketCategoryRow
-                                    category={category}
-                                    editable={concert.status === 'DRAFT'}
-                                    onEdit={() =>
-                                        setEditingCategoryId(category.id)
-                                    }
-                                />
-
-                                {editingCategoryId === category.id && (
-                                    <TicketCategoryUpdateForm
-                                        concertId={concert.id}
-                                        category={category}
-                                        onCancel={() =>
-                                            setEditingCategoryId(null)
-                                        }
-                                        onUpdated={async () => {
-                                            await reloadTicketCategories();
-                                            setEditingCategoryId(null);
-                                        }}
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </section>
+            <TicketCategorySection
+                concertId={concert.id}
+                concertStatus={concert.status}
+            />
         </section>
     );
 }
