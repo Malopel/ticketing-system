@@ -35,6 +35,7 @@ services:
 
       FRONTEND_BASE_URL: ${FRONTEND_BASE_URL}
 
+      TZ: Europe/Berlin
     depends_on:
       postgres:
         condition: service_healthy
@@ -43,7 +44,7 @@ services:
     build:
       context: ../frontend
 
-    restard: unless-stopped
+    restart: unless-stopped
 
     ports:
       - "80:80"
