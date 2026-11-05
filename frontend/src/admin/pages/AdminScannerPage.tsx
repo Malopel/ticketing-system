@@ -1,4 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+    BrowserQRCodeReader,
+    type IScannerControls,
+} from '@zxing/browser';
 import {
     type TicketResponse,
     markTicketAsUsed,
@@ -11,6 +15,9 @@ export function AdminScannerPage() {
     const [ticket, setTicket] = useState<TicketResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+    const [scanning, setScanning] = useState(false);
+    const controlsRef = useRef<IScannerControls | null>(null);
 
     async function handleValidate() {
         setLoading(true);
@@ -49,6 +56,91 @@ export function AdminScannerPage() {
         }
     }
 
+    async function startScanner() {
+        if (!concertId) {
+            setError('Bitte zuerst eine Konzert-ID eingeben.');
+            return;
+        }
+
+        if (!videoRef.current) {
+            return;
+        }
+
+        setError(null);
+        setScanning(true);
+
+        const reader = new BrowserQRCodeReader();
+
+        try {
+            controlsRef.current = await reader.decodeFromConstraints(
+                {
+                    video: {
+                        facingMode: {
+                            ideal: 'environment',
+                        },
+                    },
+                },
+                videoRef.current,
+                (result) => {
+                    if (!result) {
+                        return;
+                    }
+                    const token = result.getText();
+
+                    controlsRef.current?.stop();
+                    controlsRef.current = null;
+                    setScanning(false);
+
+                    void validateScannedToken(token);
+                },
+            );
+        } catch {
+            controlsRef.current?.stop();
+            controlsRef.current = null;
+            setError('Kamera konnte nicht gestartet werden.');
+            setScanning(false);
+        }
+    }
+
+    async function validateScannedToken(token: string) {
+        const parsedConcertId = Number(concertId);
+
+        if (!Number.isInteger(parsedConcertId) || parsedConcertId <= 0) {
+            setError('Bitte eine gültige Konzert-ID eingeben.');
+            return;
+        }
+
+        setQrToken(token);
+        setLoading(true);
+        setError(null);
+
+        try {
+            const result = await validateTicket(
+                parsedConcertId,
+                token,
+            );
+
+            setTicket(result);
+        } catch {
+            setTicket(null);
+            setError('Ticket konnte nicht gefunden oder geprüft werden.');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function stopScanner() {
+        controlsRef.current?.stop();
+        controlsRef.current = null;
+        setScanning(false);
+    }
+
+    useEffect(() => {
+        return () => {
+            controlsRef.current?.stop();
+        };
+    }, []);
+
     return (
         <div>
             <h1>Einlasskontrolle</h1>
@@ -77,6 +169,26 @@ export function AdminScannerPage() {
                     }}
                 />
             </label>
+
+            <div>
+                <video
+                    ref={videoRef}
+                    style={{
+                        width: '100%',
+                        maxWidth: '500px',
+                    }}
+                />
+
+                {!scanning ? (
+                    <button onClick={startScanner}>
+                        QR-Code scannen
+                    </button>
+                ) : (
+                    <button onClick={stopScanner}>
+                        Scanner stoppen
+                    </button>
+                )}
+            </div>
 
             <button
                 onClick={handleValidate}
@@ -112,5 +224,7 @@ export function AdminScannerPage() {
         </div>
     );
 }
+
+
 
 export default AdminScannerPage;
