@@ -61,7 +61,8 @@ class PaymentWebhookServiceTest {
                 "kunde@example.com",
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(1)
+                LocalDateTime.now().plusHours(1),
+                "AS-TEST-0001"
         );
     }
 

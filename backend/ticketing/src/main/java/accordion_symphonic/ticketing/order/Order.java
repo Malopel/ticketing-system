@@ -55,6 +55,9 @@ public class Order {
     )
     private final List<OrderItem> items = new ArrayList<>();
 
+    @Column(name="public_id", nullable = false, unique = true, length = 20)
+    private String publicId;
+
     protected Order() { }
 
     public Order(
@@ -62,7 +65,8 @@ public class Order {
             String customerEmail,
             String accessTokenHash,
             LocalDateTime createdAt,
-            LocalDateTime expiresAt
+            LocalDateTime expiresAt,
+            String publicId
     ) {
         this.concert = concert;
         this.customerEmail = customerEmail;
@@ -72,6 +76,7 @@ public class Order {
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
         this.paymentExpiresAt = null;
+        this.publicId = publicId;
     }
 
     public void addItem(OrderItem item) {

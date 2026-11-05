@@ -142,6 +142,7 @@ class OrderControllerSecurityTest {
     private OrderResponse reservedOrderResponse() {
         return new OrderResponse(
                 ORDER_ID,
+                "AS-TEST-0001",
                 CONCERT_ID,
                 ConcertStatus.PUBLISHED,
                 "Testkonzert",
@@ -159,6 +160,7 @@ class OrderControllerSecurityTest {
     private OrderResponse cancelledOrderResponse() {
         return new OrderResponse(
                 ORDER_ID,
+                "AS-TEST-0001",
                 CONCERT_ID,
                 ConcertStatus.PUBLISHED,
                 "Testkonzert",

@@ -43,12 +43,15 @@ public class OrderCreationServiceTest {
     @Mock
     private TicketAvailabilityService ticketAvailabilityService;
 
+    @Mock
+    private PublicOrderIdGenerator publicOrderIdGenerator;
 
     private OrderCreationService orderCreationService;
 
     @BeforeEach
     void setUp() {
         orderCreationService = new OrderCreationService(
+                publicOrderIdGenerator,
                 orderRepository,
                 ticketCategoryRepository,
                 concertRepository,

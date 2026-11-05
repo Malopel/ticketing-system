@@ -2,17 +2,14 @@ package accordion_symphonic.ticketing.mail;
 
 import accordion_symphonic.ticketing.order.OrderPaidEvent;
 import accordion_symphonic.ticketing.ticket.service.TicketDeliveryService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+@Slf4j
 @Component
 public class OrderPaidEmailListener {
-
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(OrderPaidEmailListener.class);
 
     private final TicketDeliveryService ticketDeliveryService;
 
@@ -30,7 +27,7 @@ public class OrderPaidEmailListener {
                     event.orderId()
             );
         } catch (RuntimeException exception) {
-            LOGGER.error(
+            log.error(
                     "Ticket-E-Mail für Order {} konnte nach erfolgreicher Zahlung nicht versendet werden.",
                     event.orderId(),
                     exception

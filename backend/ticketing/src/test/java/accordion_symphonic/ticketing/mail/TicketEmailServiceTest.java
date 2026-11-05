@@ -21,8 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,7 +67,8 @@ class TicketEmailServiceTest {
                 "kunde@example.com",
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                 LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(7),
+                "AS-TEST-0001"
         );
 
         Ticket ticket = new Ticket(order, ticketCategory);
@@ -100,11 +100,11 @@ class TicketEmailServiceTest {
         );
 
         assertEquals(
-                "Your tickets for Accordion Night",
+                "Ihre Tickets für Accordion Night",
                 message.getSubject()
         );
 
-        assertTrue(message.getContent() instanceof Multipart);
+        assertInstanceOf(Multipart.class, message.getContent());
 
         Multipart multipart = (Multipart) message.getContent();
 

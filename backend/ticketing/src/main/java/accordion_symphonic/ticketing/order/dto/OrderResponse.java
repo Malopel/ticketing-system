@@ -10,6 +10,7 @@ import java.util.List;
 
 public record OrderResponse(
         Long id,
+        String publicId,
         Long concertId,
         ConcertStatus concertStatus,
         String concertTitle,
@@ -25,6 +26,7 @@ public record OrderResponse(
     public static  OrderResponse fromEntity(Order order) {
         return new OrderResponse(
                 order.getId(),
+                order.getPublicId(),
                 order.getConcert().getId(),
                 order.getConcert().getStatus(),
                 order.getConcert().getTitle(),

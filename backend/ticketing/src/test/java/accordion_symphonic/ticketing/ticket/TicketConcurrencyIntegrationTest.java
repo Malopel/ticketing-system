@@ -84,7 +84,8 @@ class TicketConcurrencyIntegrationTest {
                         "kunde@example.com",
                         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                         LocalDateTime.now(),
-                        LocalDateTime.now().plusMinutes(30)
+                        LocalDateTime.now().plusMinutes(30),
+                        "AS-TEST-0001"
                 )
         );
 

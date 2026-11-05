@@ -61,7 +61,8 @@ class CustomerOrderServiceTest {
                 "kunde@example.com",
                 "stored-token-hash",
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(1)
+                LocalDateTime.now().plusHours(1),
+                "AS-TEST-0001"
         );
 
         when(concertRepository.existsById(concertId))
@@ -114,7 +115,8 @@ class CustomerOrderServiceTest {
                 "kunde@example.com",
                 "stored-token-hash",
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(1)
+                LocalDateTime.now().plusHours(1),
+                "AS-TEST-0001"
         );
 
         when(concertRepository.existsById(concertId))
@@ -167,7 +169,8 @@ class CustomerOrderServiceTest {
                 "kunde@example.com",
                 "stored-token-hash",
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(1)
+                LocalDateTime.now().plusHours(1),
+                "AS-TEST-0001"
         );
 
         order.markAsPaymentPending(
@@ -225,7 +228,8 @@ class CustomerOrderServiceTest {
                 "kunde@example.com",
                 "stored-token-hash",
                 LocalDateTime.now().minusHours(2),
-                LocalDateTime.now().minusHours(1)
+                LocalDateTime.now().minusHours(1),
+                "AS-TEST-0001"
         );
 
         when(concertRepository.existsById(concertId))
@@ -278,7 +282,8 @@ class CustomerOrderServiceTest {
                 "kunde@example.com",
                 "stored-token-hash",
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(1)
+                LocalDateTime.now().plusHours(1),
+                "AS-TEST-0001"
         );
 
         when(concertRepository.existsById(concertId))

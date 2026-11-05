@@ -153,7 +153,8 @@ public class OrderTest {
                 "test@example.de",
                 "token-hash",
                 LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(30)
+                LocalDateTime.now().plusMinutes(30),
+                "AS-TEST-0001"
         );
     }
 }

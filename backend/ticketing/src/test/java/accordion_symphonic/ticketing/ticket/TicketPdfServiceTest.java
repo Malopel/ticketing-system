@@ -42,7 +42,8 @@ class TicketPdfServiceTest {
                 "kunde@example.com",
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                 LocalDateTime.now().plusMinutes(30),
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(7),
+                "AS-TEST-0001"
         );
 
         Ticket ticket = new Ticket(order, ticketCategory);

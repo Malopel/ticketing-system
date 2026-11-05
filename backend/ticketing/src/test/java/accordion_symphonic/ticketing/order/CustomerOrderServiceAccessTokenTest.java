@@ -66,7 +66,8 @@ class CustomerOrderServiceAccessTokenTest {
                 "kunde@example.com",
                 generatedToken.tokenHash(),
                 LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(7),
+                "AS-TEST-0001"
         );
 
         when(concertRepository.existsById(CONCERT_ID))
@@ -176,7 +177,8 @@ class CustomerOrderServiceAccessTokenTest {
                 "kunde@example.com",
                 order.getAccessTokenHash(),
                 LocalDateTime.now().minusHours(2),
-                LocalDateTime.now().minusHours(1)
+                LocalDateTime.now().minusHours(1),
+                "AS-TEST-0001"
         );
 
         when(orderRepository.findByIdAndConcertId(ORDER_ID, CONCERT_ID))

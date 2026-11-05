@@ -5,10 +5,7 @@ import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
-import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.order.OrderItem;
-import accordion_symphonic.ticketing.order.OrderProperties;
-import accordion_symphonic.ticketing.order.OrderRepository;
+import accordion_symphonic.ticketing.order.*;
 import accordion_symphonic.ticketing.order.dto.CreatedOrderResponse;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;
@@ -30,14 +27,19 @@ import java.util.Set;
 @Service
 public class OrderCreationService {
 
+    private final PublicOrderIdGenerator publicOrderIdGenerator;
+
     private final OrderRepository orderRepository;
     private final TicketCategoryRepository ticketCategoryRepository;
     private final ConcertRepository concertRepository;
     private final TicketAvailabilityService ticketAvailabilityService;
     private final OrderAccessTokenService orderAccessTokenService;
+
+
     private final OrderProperties orderProperties;
 
     public OrderCreationService(
+            PublicOrderIdGenerator publicOrderIdGenerator,
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
             ConcertRepository concertRepository,
@@ -45,11 +47,14 @@ public class OrderCreationService {
             OrderAccessTokenService orderAccessTokenService,
             OrderProperties orderProperties
     ) {
+        this.publicOrderIdGenerator = publicOrderIdGenerator;
+
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.concertRepository = concertRepository;
         this.ticketAvailabilityService = ticketAvailabilityService;
         this.orderAccessTokenService = orderAccessTokenService;
+
         this.orderProperties = orderProperties;
     }
 
@@ -81,7 +86,8 @@ public class OrderCreationService {
                 createdAt,
                 createdAt.plus(
                         orderProperties.reservationDuration()
-                )
+                ),
+                this.publicOrderIdGenerator.generate()
         );
 
         Set<Long> requestedCategoryIds = new HashSet<>();

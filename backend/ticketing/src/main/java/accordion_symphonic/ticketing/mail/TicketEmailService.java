@@ -45,7 +45,7 @@ public class TicketEmailService {
 
             helper.setFrom(mailProperties.from());
             helper.setTo(order.getCustomerEmail());
-            helper.setSubject("Your tickets for " + order.getConcert().getTitle());
+            helper.setSubject("Ihre Tickets für " + order.getConcert().getTitle());
             helper.setText(buildText(order, tickets), false);
 
             byte[] ticketPdf = ticketPdfService.createTicketPdf(order, tickets);
@@ -66,28 +66,32 @@ public class TicketEmailService {
         StringBuilder text = new StringBuilder();
 
         text.append("Vielen Dank für Ihre Bestellung.\n\n");
-        text.append("Ihre Tickets für ");
-        text.append(order.getConcert().getTitle());
-        text.append(" finden Sie im PDF-Anhang.\n\n");
+
+        text.append("Ihre Tickets für ")
+                .append(order.getConcert().getTitle())
+                .append(" finden Sie im PDF-Anhang.\n\n");
+
+        text.append("Bestellnummer: ")
+                .append(order.getPublicId())
+                .append("\n\n");
 
         text.append("Enthaltene Tickets:\n\n");
 
         for (TicketResponse ticket : tickets) {
-            text.append("- Ticket-ID: ").append(ticket.id()).append("\n");
-            text.append("  Kategorie: ").append(ticket.ticketCategoryName()).append("\n");
+            text.append("- Kategorie: ").append(ticket.ticketCategoryName()).append("\n");
         }
 
-        text.append("\nBitte bringen Sie die Ticket-PDFs oder die QR-Codes zum Einlass mit.\n\n");
-        text.append("Denken Sie bitte daran, im Kongresszentrum ist ausschließlich Kartenzahlung erlaubt.");
+        text.append("\nBitte bringen Sie das Ticket digital oder ausgedruckt zum Einlass mit.\n\n");
+        text.append("Hinweis: Im Kongresszentrum ist ausschließlich Kartenzahlung möglich.");
 
         return text.toString();
     }
 
     private String buildAttachmentFilename(Order order) {
-        if (order.getId() == null) {
+        if (order.getPublicId() == null) {
             return "tickets.pdf";
         }
 
-        return "tickets-order-" + order.getId() + ".pdf";
+        return "tickets-" + order.getPublicId() + ".pdf";
     }
 }
