@@ -300,7 +300,7 @@ function OrderStatusPage() {
             </Link>
 
             <header className="order-page-header">
-                <h1>Bestellung #{order.id}</h1>
+                <h1>Bestellung {order.publicId}</h1>
                 <p>{order.concertTitle}</p>
             </header>
 

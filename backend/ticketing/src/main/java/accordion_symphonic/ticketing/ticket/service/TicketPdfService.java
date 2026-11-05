@@ -2,7 +2,6 @@ package accordion_symphonic.ticketing.ticket.service;
 
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.ticket.TicketStatus;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -22,7 +21,7 @@ import java.util.List;
 public class TicketPdfService {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm 'Uhr'");
 
     private final QrCodeService qrCodeService;
 
@@ -74,36 +73,34 @@ public class TicketPdfService {
             writeText(contentStream, safeText(concert.getTitle()), normalFont, 12, 170, 680);
 
             writeText(contentStream, "Datum:", boldFont, 12, 70, 655);
-            writeText(contentStream, concert.getStartTime().format(DATE_TIME_FORMATTER), normalFont, 12, 170, 655);
+            writeText(
+                    contentStream,
+                    concert.getStartTime().format(DATE_TIME_FORMATTER),
+                    normalFont,
+                    12,
+                    170,
+                    655
+            );
 
             writeText(contentStream, "Ort:", boldFont, 12, 70, 630);
             writeText(contentStream, safeText(concert.getLocation()), normalFont, 12, 170, 630);
 
-            writeText(contentStream, "Kategorie:", boldFont, 12, 70, 580);
-            writeText(contentStream, safeText(ticket.ticketCategoryName()), normalFont, 12, 170, 580);
+            writeText(contentStream, "Kategorie:", boldFont, 12, 70, 590);
+            writeText(contentStream, safeText(ticket.ticketCategoryName()), normalFont, 12, 170, 590);
 
-            writeText(contentStream, "Ticket-ID:", boldFont, 12, 70, 555);
-            writeText(contentStream, String.valueOf(ticket.id()), normalFont, 12, 170, 555);
+            writeText(contentStream, "Bestellnummer:", boldFont, 12, 70, 565);
+            writeText(contentStream, order.getPublicId(), normalFont, 12, 170, 565);
 
-            writeText(contentStream, "Order-ID:", boldFont, 12, 70, 530);
-            writeText(contentStream, String.valueOf(ticket.orderId()), normalFont, 12, 170, 530);
+            contentStream.drawImage(qrCodeImage, 350, 545, 170, 170);
 
-            writeText(contentStream, "Status:", boldFont, 12, 70, 505);
-            writeText(contentStream, formatTicketStatus(ticket.status()), normalFont, 12, 170, 505);
-
-            contentStream.drawImage(qrCodeImage, 350, 520, 150, 150);
-
-            writeText(contentStream, "QR-Code / Ticket-Code:", boldFont, 11, 70, 450);
-            writeText(contentStream, ticket.qrToken(), normalFont, 9, 70, 430);
-
-            writeText(contentStream, "Hinweis:", boldFont, 11, 70, 370);
+            writeText(contentStream, "Einlasshinweis:", boldFont, 11, 70, 400);
             writeText(
                     contentStream,
-                    "Dieses Ticket ist nur einmal gueltig. Beim Einlass zaehlt der Status im Ticketsystem.",
+                    "Dieses Ticket ist nur einmal gültig und wird beim Einlass gescannt.",
                     normalFont,
                     10,
                     70,
-                    350
+                    380
             );
         }
     }
@@ -121,13 +118,6 @@ public class TicketPdfService {
         contentStream.newLineAtOffset(x, y);
         contentStream.showText(safeText(text));
         contentStream.endText();
-    }
-
-    private String formatTicketStatus(TicketStatus status) {
-        return switch (status) {
-            case VALID -> "Gueltig";
-            case USED -> "Bereits verwendet";
-        };
     }
 
     private String safeText(String text) {

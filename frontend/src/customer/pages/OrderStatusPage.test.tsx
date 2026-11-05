@@ -32,6 +32,7 @@ const mockedGetOrder = vi.mocked(getOrder);
 
 const paymentPendingOrder: OrderResponse = {
     id: 42,
+    publicId: 'AS-TEST-0001',
     concertId: 7,
     concertStatus: 'PUBLISHED',
     concertTitle: 'Accordion Night',

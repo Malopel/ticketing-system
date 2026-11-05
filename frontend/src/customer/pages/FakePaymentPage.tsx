@@ -85,7 +85,7 @@ function FakePaymentPage() {
                         </p>
 
                         <p>
-                            Bestellung #{order.id} wurde bezahlt.
+                            Bestellung {order.publicId} wurde bezahlt.
                         </p>
 
                         <Link

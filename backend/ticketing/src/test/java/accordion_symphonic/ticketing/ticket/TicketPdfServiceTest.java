@@ -9,6 +9,8 @@ import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +21,7 @@ import static org.mockito.Mockito.when;
 class TicketPdfServiceTest {
 
     @Test
-    void createTicketPdfReturnsPdfBytes() {
+    void createTicketPdfReturnsPdfBytes() throws Exception {
         QrCodeService qrCodeService = mock(QrCodeService.class);
         TicketPdfService ticketPdfService = new TicketPdfService(qrCodeService);
 
@@ -53,6 +55,11 @@ class TicketPdfServiceTest {
                 .thenReturn(new QrCodeService().generateQrCodePng(ticket.getQrToken()));
 
         byte[] pdf = ticketPdfService.createTicketPdf(order, List.of(response));
+
+        Files.write(
+                Path.of("build/test-ticket.pdf"),
+                pdf
+        );
 
         assertTrue(pdf.length > 0);
         assertTrue(startsWithPdfHeader(pdf));

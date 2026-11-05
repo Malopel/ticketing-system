@@ -34,6 +34,7 @@ export type OrderStatus =
 
 export type OrderResponse = {
     id: number;
+    publicId: string;
     concertId: number;
     concertStatus: ConcertStatus;
     concertTitle: string;
