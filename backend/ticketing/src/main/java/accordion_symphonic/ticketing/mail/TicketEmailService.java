@@ -5,7 +5,9 @@ import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.service.TicketPdfService;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
@@ -13,6 +15,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -37,15 +40,7 @@ public class TicketEmailService {
         MimeMessage message = mailSender.createMimeMessage();
 
         try {
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message,
-                    true,
-                    StandardCharsets.UTF_8.name()
-            );
-
-            helper.setFrom(mailProperties.from());
-            helper.setTo(order.getCustomerEmail());
-            helper.setSubject("Ihre Tickets für " + order.getConcert().getTitle());
+            MimeMessageHelper helper = createHelper(order, message);
             helper.setText(buildText(order, tickets), false);
 
             byte[] ticketPdf = ticketPdfService.createTicketPdf(order, tickets);
@@ -59,7 +54,27 @@ public class TicketEmailService {
             mailSender.send(message);
         } catch (MessagingException | MailException exception) {
             throw new IllegalStateException("Ticket-E-Mail konnte nicht versendet werden.", exception);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private @NonNull MimeMessageHelper createHelper(Order order, MimeMessage message) throws MessagingException, UnsupportedEncodingException {
+        MimeMessageHelper helper = new MimeMessageHelper(
+                message,
+                true,
+                StandardCharsets.UTF_8.name()
+        );
+
+        helper.setFrom(new InternetAddress(
+                mailProperties.from(),
+                "Accordion Symphonic Ticketing",
+                StandardCharsets.UTF_8.name()
+        ));
+
+        helper.setTo(order.getCustomerEmail());
+        helper.setSubject("Ihre Tickets für " + order.getConcert().getTitle());
+        return helper;
     }
 
     private String buildText(Order order, List<TicketResponse> tickets) {
