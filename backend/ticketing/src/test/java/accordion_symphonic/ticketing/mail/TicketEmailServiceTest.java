@@ -1,7 +1,6 @@
 package accordion_symphonic.ticketing.mail;
 
 import accordion_symphonic.ticketing.concert.Concert;
-import accordion_symphonic.ticketing.mail.dto.MailProperties;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.Ticket;
 import accordion_symphonic.ticketing.ticket.service.TicketPdfService;
@@ -33,9 +32,6 @@ class TicketEmailServiceTest {
         JavaMailSender mailSender = mock(JavaMailSender.class);
         TicketPdfService ticketPdfService = mock(TicketPdfService.class);
 
-        MailProperties mailProperties =
-                new MailProperties("noreply@accordion-symphonic.local");
-
         MimeMessage mimeMessage = new MimeMessage(
                 Session.getInstance(new Properties())
         );
@@ -44,7 +40,6 @@ class TicketEmailServiceTest {
 
         TicketEmailService ticketEmailService = new TicketEmailService(
                 mailSender,
-                mailProperties,
                 ticketPdfService
         );
 

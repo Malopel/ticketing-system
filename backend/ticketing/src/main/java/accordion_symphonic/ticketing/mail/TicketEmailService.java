@@ -1,6 +1,5 @@
 package accordion_symphonic.ticketing.mail;
 
-import accordion_symphonic.ticketing.mail.dto.MailProperties;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.ticket.service.TicketPdfService;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
@@ -8,6 +7,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
@@ -23,16 +23,19 @@ import java.util.List;
 public class TicketEmailService {
 
     private final JavaMailSender mailSender;
-    private final MailProperties mailProperties;
     private final TicketPdfService ticketPdfService;
+
+    @Value("${ticketing.mail.from}")
+    private String from;
+
+    @Value("${ticketing.mail.from-name}")
+    private String fromName;
 
     public TicketEmailService(
             JavaMailSender mailSender,
-            MailProperties mailProperties,
             TicketPdfService ticketPdfService
     ) {
         this.mailSender = mailSender;
-        this.mailProperties = mailProperties;
         this.ticketPdfService = ticketPdfService;
     }
 
@@ -67,8 +70,8 @@ public class TicketEmailService {
         );
 
         helper.setFrom(new InternetAddress(
-                mailProperties.from(),
-                "Accordion Symphonic Ticketing",
+                from,
+                fromName,
                 StandardCharsets.UTF_8.name()
         ));
 
