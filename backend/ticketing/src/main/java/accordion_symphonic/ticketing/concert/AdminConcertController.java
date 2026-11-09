@@ -2,6 +2,7 @@ package accordion_symphonic.ticketing.concert;
 
 import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
 import accordion_symphonic.ticketing.concert.dto.ConcertResponse;
+import accordion_symphonic.ticketing.concert.dto.TicketTemplateRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -73,5 +74,28 @@ public class AdminConcertController {
             @PathVariable("concertId") Long concertId
     ) {
         return concertService.cancelConcert(concertId);
+    }
+
+    @GetMapping("/ticket-templates")
+    public List<String> getAllTicketTemplates() {
+        return concertService.getAllTicketTemplates();
+    }
+
+    @GetMapping("/{concertId}/ticket-template")
+    public String getTicketTemplate(
+            @PathVariable("concertId") Long concertId
+    ) {
+        return concertService.getTicketTemplate(concertId);
+    }
+
+    @PatchMapping("/{concertId}/ticket-template")
+    public String updateTicketTemplate(
+            @PathVariable("concertId") Long concertId,
+            @RequestBody TicketTemplateRequest request
+    ) {
+        return concertService.updateTicketFileTemplate(
+                concertId,
+                request.ticketTemplateFile()
+        );
     }
 }

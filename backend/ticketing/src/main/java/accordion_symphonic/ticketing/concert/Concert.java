@@ -30,6 +30,12 @@ public class Concert {
     @Enumerated(EnumType.STRING)
     private ConcertStatus status;
 
+    @Column(
+            name = "ticket_template_file",
+            length = 255
+    )
+    private String ticketTemplateFile;
+
     protected Concert() {}
 
     public Concert(String title, String description, LocalDateTime startTime, String location) {
@@ -83,5 +89,9 @@ public class Concert {
         }
 
         status = ConcertStatus.CANCELLED;
+    }
+
+    public void updateTicketTemplateFile(String ticketTemplateFile) {
+        this.ticketTemplateFile = ticketTemplateFile;
     }
 }

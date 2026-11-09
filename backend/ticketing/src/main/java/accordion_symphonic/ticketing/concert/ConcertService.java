@@ -2,19 +2,32 @@ package accordion_symphonic.ticketing.concert;
 
 import accordion_symphonic.ticketing.concert.dto.ConcertRequest;
 import accordion_symphonic.ticketing.concert.dto.ConcertResponse;
+
 import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
+
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ConcertService {
 
     private final ConcertRepository concertRepository;
+    private final ResourcePatternResolver resourcePatternResolver;
 
-    public ConcertService(ConcertRepository concertRepository) {
+    public ConcertService(
+            ConcertRepository concertRepository,
+            ResourcePatternResolver resourcePatternResolver
+    ) {
         this.concertRepository = concertRepository;
+        this.resourcePatternResolver = resourcePatternResolver;
     }
 
     public List<ConcertResponse> getPublicConcerts() {
@@ -94,11 +107,55 @@ public class ConcertService {
 
     @Transactional
     public ConcertResponse cancelConcert(Long id) {
-        Concert concert = concertRepository.findById(id)
+        Concert concert = this.concertRepository.findById(id)
                 .orElseThrow(() -> new ConcertNotFoundException(id));
 
         concert.cancel();
 
         return ConcertResponse.fromEntity(concert);
+    }
+
+    public String getTicketTemplate(Long id) {
+        Concert concert = this.concertRepository.findById(id)
+                .orElseThrow(() -> new ConcertNotFoundException(id));
+
+        return concert.getTicketTemplateFile();
+    }
+
+    @Transactional
+    public String updateTicketFileTemplate(Long id, String fileName) {
+        Concert concert = this.concertRepository.findById(id)
+                .orElseThrow(() -> new ConcertNotFoundException(id));
+
+        if (!getAllTicketTemplates().contains(fileName)) {
+            throw new IllegalArgumentException(
+                    "Unknown ticket template: " + fileName
+            );
+        }
+
+        concert.updateTicketTemplateFile(fileName);
+
+        return concert.getTicketTemplateFile();
+    }
+
+    public List<String> getAllTicketTemplates() {
+        try {
+            Resource[] resources =
+                    resourcePatternResolver.getResources(
+                            "classpath*:pdf/tickets/*.pdf"
+                    );
+
+            return Arrays.stream(resources)
+                    .map(Resource::getFilename)
+                    .filter(Objects::nonNull)
+                    .sorted()
+                    .toList();
+
+        } catch (IOException exception) {
+            throw new IllegalStateException(
+                    "Ticketvorlagen konnten nicht geladen werden.",
+                    exception
+            );
+        }
     }
 }
