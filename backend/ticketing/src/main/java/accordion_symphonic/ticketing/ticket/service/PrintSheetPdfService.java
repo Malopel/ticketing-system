@@ -308,11 +308,12 @@ public class PrintSheetPdfService {
             float ticketHeight =
                     ticketForm.getBBox().getHeight();
 
+            // Wegen 90°-Drehung vertauscht
             float scaleX =
-                    cellWidth / ticketWidth;
+                    cellWidth / ticketHeight;
 
             float scaleY =
-                    cellHeight / ticketHeight;
+                    cellHeight / ticketWidth;
 
             float scale =
                     Math.min(scaleX, scaleY);
@@ -343,7 +344,15 @@ public class PrintSheetPdfService {
                 stream.transform(
                         Matrix.getTranslateInstance(
                                 x,
-                                y
+                                y + cellHeight
+                        )
+                );
+
+                stream.transform(
+                        Matrix.getRotateInstance(
+                                Math.toRadians(-90),
+                                0,
+                                0
                         )
                 );
 
