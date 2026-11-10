@@ -2,7 +2,7 @@ package accordion_symphonic.ticketing.ticket.service;
 
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.ticket.TicketPrintLayout;
+import accordion_symphonic.ticketing.ticket.batches.TicketBatchPrintLayout;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
 import accordion_symphonic.ticketing.ticket.renderer.TicketPdfRenderer;
 import accordion_symphonic.ticketing.ticket.renderer.TicketPdfRendererType;
@@ -40,11 +40,11 @@ public class TicketPdfService {
     public byte[] createTicketPdf(
             Order order,
             List<TicketResponse> tickets,
-            TicketPrintLayout layout
+            TicketBatchPrintLayout layout
     ) {
         TicketPdfRendererType rendererType = switch (layout) {
             case FOUR_UP -> TicketPdfRendererType.TEMPLATE;
-            case EIGHT_UP -> TicketPdfRendererType.LEGACY;
+            case ONE, EIGHT_UP -> TicketPdfRendererType.LEGACY;
         };
 
         return getRenderer(rendererType)

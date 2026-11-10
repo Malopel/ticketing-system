@@ -1,6 +1,6 @@
 package accordion_symphonic.ticketing.ticket.service;
 
-import accordion_symphonic.ticketing.ticket.TicketPrintLayout;
+import accordion_symphonic.ticketing.ticket.batches.TicketBatchPrintLayout;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.LayerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class PrintSheetPdfService {
 
-    public byte[] createPrintSheet(List<byte[]> ticketPdfs, TicketPrintLayout layout) {
+    public byte[] createPrintSheet(List<byte[]> ticketPdfs, TicketBatchPrintLayout layout) {
         if (ticketPdfs.isEmpty()) {
             throw new IllegalArgumentException(
                     "At least one ticket PDF is required."
@@ -28,6 +28,7 @@ public class PrintSheetPdfService {
         return switch (layout) {
             case FOUR_UP -> createFourUp(ticketPdfs);
             case EIGHT_UP -> createEightUp(ticketPdfs);
+            case ONE -> createOneUp(ticketPdfs);
         };
     }
 
@@ -120,6 +121,54 @@ public class PrintSheetPdfService {
         } catch (IOException exception) {
             throw new IllegalStateException(
                     "Eight-up print sheet could not be generated.",
+                    exception
+            );
+        }
+    }
+
+    private byte[] createOneUp(
+            List<byte[]> ticketPdfs
+    ) {
+        try (
+                PDDocument result = new PDDocument();
+                ByteArrayOutputStream output =
+                        new ByteArrayOutputStream()
+        ) {
+            LayerUtility layerUtility =
+                    new LayerUtility(result);
+
+            for (byte[] ticketPdfBytes : ticketPdfs) {
+                try (PDDocument ticketDocument =
+                             Loader.loadPDF(ticketPdfBytes)) {
+
+                    PDPage page =
+                            new PDPage(PDRectangle.A4);
+
+                    result.addPage(page);
+
+                    PDFormXObject ticketForm =
+                            layerUtility.importPageAsForm(
+                                    ticketDocument,
+                                    0
+                            );
+
+                    try (PDPageContentStream stream =
+                                 new PDPageContentStream(
+                                         result,
+                                         page
+                                 )) {
+
+                        stream.drawForm(ticketForm);
+                    }
+                }
+            }
+
+            result.save(output);
+            return output.toByteArray();
+
+        } catch (IOException exception) {
+            throw new IllegalStateException(
+                    "One-up print sheet could not be generated.",
                     exception
             );
         }

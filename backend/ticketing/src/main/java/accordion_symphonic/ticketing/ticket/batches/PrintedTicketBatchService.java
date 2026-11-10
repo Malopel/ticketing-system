@@ -1,4 +1,4 @@
-package accordion_symphonic.ticketing.ticket.service;
+package accordion_symphonic.ticketing.ticket.batches;
 
 import accordion_symphonic.ticketing.availability.TicketAvailabilityService;
 import accordion_symphonic.ticketing.concert.Concert;
@@ -10,15 +10,20 @@ import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.PublicOrderIdGenerator;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryException;
+import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
 import accordion_symphonic.ticketing.ticket.Ticket;
 import accordion_symphonic.ticketing.ticket.TicketRepository;
-import accordion_symphonic.ticketing.ticket.dto.TicketBatchRequest;
+import accordion_symphonic.ticketing.ticket.batches.dto.TicketBatchRequest;
+import accordion_symphonic.ticketing.ticket.batches.dto.TicketBatchResponse;
 import accordion_symphonic.ticketing.ticket.dto.TicketResponse;
+import accordion_symphonic.ticketing.ticket.service.PrintSheetPdfService;
+import accordion_symphonic.ticketing.ticket.service.TicketPdfService;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategory;
 import accordion_symphonic.ticketing.ticketcategory.TicketCategoryRepository;
 import accordion_symphonic.ticketing.ticketcategory.exception.TicketCategoryNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,6 +35,7 @@ public class PrintedTicketBatchService {
     private final OrderRepository orderRepository;
     private final TicketCategoryRepository ticketCategoryRepository;
     private final TicketRepository ticketRepository;
+    private final PrintedTicketBatchRepository printedTicketBatchRepository;
 
     private final TicketAvailabilityService ticketAvailabilityService;
     private final TicketPdfService ticketPdfService;
@@ -42,6 +48,7 @@ public class PrintedTicketBatchService {
             OrderRepository orderRepository,
             TicketCategoryRepository ticketCategoryRepository,
             TicketRepository ticketRepository,
+            PrintedTicketBatchRepository printedTicketBatchRepository,
             TicketAvailabilityService ticketAvailabilityService,
             TicketPdfService ticketPdfService,
             PrintSheetPdfService printSheetPdfService,
@@ -52,6 +59,7 @@ public class PrintedTicketBatchService {
         this.orderRepository = orderRepository;
         this.ticketCategoryRepository = ticketCategoryRepository;
         this.ticketRepository = ticketRepository;
+        this.printedTicketBatchRepository = printedTicketBatchRepository;
         this.ticketAvailabilityService = ticketAvailabilityService;
         this.ticketPdfService = ticketPdfService;
         this.printSheetPdfService = printSheetPdfService;
@@ -60,10 +68,50 @@ public class PrintedTicketBatchService {
     }
 
     @Transactional
-    public byte[] createPrintableBatch(
+    public byte[] getPrintableBatch(
             Long concertId,
-            TicketBatchRequest request
+            Long batchId,
+            TicketBatchPrintLayout layout
     ) {
+        PrintedTicketBatch batch =
+                printedTicketBatchRepository
+                        .findByIdAndConcertId(
+                                batchId,
+                                concertId
+                        )
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Printed ticket batch not found: " +
+                                                batchId
+                                )
+                        );
+
+        Order printOrder =
+                batch.getOrder();
+
+        List<Ticket> tickets = this.ticketRepository.findByOrderId(printOrder.getId());
+
+        List<byte[]> individualPdfs =
+                tickets.stream()
+                        .map(ticket ->
+                                ticketPdfService.createTicketPdf(
+                                        printOrder,
+                                        List.of(
+                                                TicketResponse.fromEntity(ticket)
+                                        ),
+                                        layout
+                                )
+                        )
+                        .toList();
+
+        return printSheetPdfService.createPrintSheet(
+                individualPdfs,
+                layout
+        );
+    }
+
+    @Transactional
+    public TicketBatchResponse createPrintableBatch(Long concertId, @Valid TicketBatchRequest ticketBatchRequest) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() ->
                         new ConcertNotFoundException(concertId)
@@ -83,7 +131,7 @@ public class PrintedTicketBatchService {
         Set<Long> requestedCategoryIds = new HashSet<>();
 
         List<OrderItemRequest> orderedItems =
-                request.items().stream()
+                ticketBatchRequest.items().stream()
                         .sorted(
                                 Comparator.comparing(
                                         OrderItemRequest::ticketCategoryId
@@ -137,27 +185,36 @@ public class PrintedTicketBatchService {
             }
         }
 
-        orderRepository.save(printOrder);
+        Order savedOrder =
+                orderRepository.save(printOrder);
 
         List<Ticket> savedTickets =
                 ticketRepository.saveAll(tickets);
 
-        List<byte[]> individualPdfs =
-                savedTickets.stream()
-                        .map(ticket ->
-                                ticketPdfService.createTicketPdf(
-                                        printOrder,
-                                        List.of(
-                                                TicketResponse.fromEntity(ticket)
-                                        ),
-                                        request.layout()
-                                )
-                        )
-                        .toList();
+        PrintedTicketBatch batch =
+                new PrintedTicketBatch(
+                        concert,
+                        savedOrder,
+                        ticketBatchRequest.label()
+                );
 
-        return printSheetPdfService.createPrintSheet(
-                individualPdfs,
-                request.layout()
+        PrintedTicketBatch savedBatch =
+                printedTicketBatchRepository.save(batch);
+
+        return new TicketBatchResponse(
+                savedBatch.getId(),
+                savedBatch.getLabel(),
+                savedTickets.size()
         );
+    }
+
+    @Transactional
+    public List<TicketBatchResponse> getAllBatches(Long concertId) {
+        concertRepository.findById(concertId)
+                .orElseThrow(() ->
+                        new ConcertNotFoundException(concertId)
+                );
+
+        return this.printedTicketBatchRepository.findByConcertId(concertId);
     }
 }
