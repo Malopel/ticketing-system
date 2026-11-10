@@ -39,7 +39,7 @@ public class AdminTicketController {
             value = "/print-tickets",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
-    public ResponseEntity<byte[]> createBatch(
+    public ResponseEntity<byte[]> createPrintableBatch(
             @PathVariable("concertId") Long concertId,
             @Valid @RequestBody TicketBatchRequest request
     ) {

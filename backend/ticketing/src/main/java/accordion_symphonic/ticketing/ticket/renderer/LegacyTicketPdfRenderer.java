@@ -37,6 +37,11 @@ public class LegacyTicketPdfRenderer implements TicketPdfRenderer{
     }
 
     @Override
+    public TicketPdfRendererType type() {
+        return TicketPdfRendererType.LEGACY;
+    }
+
+    @Override
     public byte[] createPdf(
             Order order,
             List<TicketResponse> tickets

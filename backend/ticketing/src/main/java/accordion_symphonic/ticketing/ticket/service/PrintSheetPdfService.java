@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.ticket.service;
 
+import accordion_symphonic.ticketing.ticket.TicketPrintLayout;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.LayerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -17,13 +18,22 @@ import java.util.List;
 @Service
 public class PrintSheetPdfService {
 
-    public byte[] createPrintSheet(List<byte[]> ticketPdfs) {
+    public byte[] createPrintSheet(List<byte[]> ticketPdfs, TicketPrintLayout layout) {
         if (ticketPdfs.isEmpty()) {
             throw new IllegalArgumentException(
                     "At least one ticket PDF is required."
             );
         }
 
+        return switch (layout) {
+            case FOUR_UP -> createFourUp(ticketPdfs);
+            case EIGHT_UP -> createEightUp(ticketPdfs);
+        };
+    }
+
+    private byte[] createFourUp(
+            List<byte[]> ticketPdfs
+    ) {
         try (
                 PDDocument result = new PDDocument();
                 ByteArrayOutputStream output = new ByteArrayOutputStream()
@@ -45,7 +55,7 @@ public class PrintSheetPdfService {
                     );
                 }
 
-                drawCutLines(result, a4Page);
+                drawFourUpCutMarks(result, a4Page);
             }
 
             result.save(output);
@@ -54,6 +64,62 @@ public class PrintSheetPdfService {
         } catch (IOException exception) {
             throw new IllegalStateException(
                     "Print sheet PDF could not be generated.",
+                    exception
+            );
+        }
+    }
+
+    private byte[] createEightUp(
+            List<byte[]> ticketPdfs
+    ) {
+        try (
+                PDDocument result = new PDDocument();
+                ByteArrayOutputStream output =
+                        new ByteArrayOutputStream()
+        ) {
+
+            for (
+                    int i = 0;
+                    i < ticketPdfs.size();
+                    i += 8
+            ) {
+                PDPage a4Page =
+                        new PDPage(PDRectangle.A4);
+
+                result.addPage(a4Page);
+
+                int ticketsOnPage =
+                        Math.min(
+                                8,
+                                ticketPdfs.size() - i
+                        );
+
+                for (
+                        int j = 0;
+                        j < ticketsOnPage;
+                        j++
+                ) {
+                    addLegacyTicketToEightUpSheet(
+                            result,
+                            a4Page,
+                            ticketPdfs.get(i + j),
+                            j
+                    );
+                }
+
+                drawEightUpCutMarks(
+                        result,
+                        a4Page
+                );
+            }
+
+            result.save(output);
+
+            return output.toByteArray();
+
+        } catch (IOException exception) {
+            throw new IllegalStateException(
+                    "Eight-up print sheet could not be generated.",
                     exception
             );
         }
@@ -153,13 +219,25 @@ public class PrintSheetPdfService {
         }
     }
 
-    private void drawCutLines(
+    private void drawFourUpCutMarks(
             PDDocument document,
             PDPage page
     ) throws IOException {
 
-        float width = PDRectangle.A4.getWidth();
-        float height = PDRectangle.A4.getHeight();
+        float width =
+                PDRectangle.A4.getWidth();
+
+        float height =
+                PDRectangle.A4.getHeight();
+
+        float centerX =
+                width / 2f;
+
+        float centerY =
+                height / 2f;
+
+        float mark =
+                22.7f;
 
         try (PDPageContentStream stream =
                      new PDPageContentStream(
@@ -169,15 +247,186 @@ public class PrintSheetPdfService {
                              true
                      )) {
 
-            stream.setLineWidth(0.5f);
+            stream.setLineWidth(0.4f);
+
+            // Vertikaler Schnitt:
+            // Marke oben
+            stream.moveTo(centerX, height);
+            stream.lineTo(centerX, height - mark);
+
+            // Marke unten
+            stream.moveTo(centerX, 0);
+            stream.lineTo(centerX, mark);
+
+            // Horizontaler Schnitt:
+            // Marke links
+            stream.moveTo(0, centerY);
+            stream.lineTo(mark, centerY);
+
+            // Marke rechts
+            stream.moveTo(width, centerY);
+            stream.lineTo(width - mark, centerY);
+
+            stream.stroke();
+        }
+    }
+
+    private void addLegacyTicketToEightUpSheet(
+            PDDocument targetDocument,
+            PDPage targetPage,
+            byte[] ticketPdfBytes,
+            int position
+    ) throws IOException {
+
+        try (PDDocument ticketDocument =
+                     Loader.loadPDF(ticketPdfBytes)) {
+
+            LayerUtility layerUtility =
+                    new LayerUtility(targetDocument);
+
+            PDFormXObject ticketForm =
+                    layerUtility.importPageAsForm(
+                            ticketDocument,
+                            0
+                    );
+
+            float pageWidth =
+                    PDRectangle.A4.getWidth();
+
+            float pageHeight =
+                    PDRectangle.A4.getHeight();
+
+            float cellWidth =
+                    pageWidth / 2f;
+
+            float cellHeight =
+                    pageHeight / 4f;
+
+            float ticketWidth =
+                    ticketForm.getBBox().getWidth();
+
+            float ticketHeight =
+                    ticketForm.getBBox().getHeight();
+
+            float scaleX =
+                    cellWidth / ticketWidth;
+
+            float scaleY =
+                    cellHeight / ticketHeight;
+
+            float scale =
+                    Math.min(scaleX, scaleY);
+
+            int column =
+                    position % 2;
+
+            int row =
+                    position / 2;
+
+            float x =
+                    column * cellWidth;
+
+            float y =
+                    pageHeight
+                            - (row + 1) * cellHeight;
+
+            try (PDPageContentStream stream =
+                         new PDPageContentStream(
+                                 targetDocument,
+                                 targetPage,
+                                 PDPageContentStream.AppendMode.APPEND,
+                                 true
+                         )) {
+
+                stream.saveGraphicsState();
+
+                stream.transform(
+                        Matrix.getTranslateInstance(
+                                x,
+                                y
+                        )
+                );
+
+                stream.transform(
+                        Matrix.getScaleInstance(
+                                scale,
+                                scale
+                        )
+                );
+
+                stream.drawForm(ticketForm);
+
+                stream.restoreGraphicsState();
+            }
+        }
+    }
+
+    private void drawEightUpCutMarks(
+            PDDocument document,
+            PDPage page
+    ) throws IOException {
+
+        float width =
+                PDRectangle.A4.getWidth();
+
+        float height =
+                PDRectangle.A4.getHeight();
+
+        float mark =
+                22.7f;
+
+        float centerX =
+                width / 2f;
+
+        try (PDPageContentStream stream =
+                     new PDPageContentStream(
+                             document,
+                             page,
+                             PDPageContentStream.AppendMode.APPEND,
+                             true
+                     )) {
+
+            stream.setLineWidth(0.4f);
 
             // Vertikale Mitte
-            stream.moveTo(width / 2f, 0);
-            stream.lineTo(width / 2f, height);
+            stream.moveTo(centerX, height);
+            stream.lineTo(
+                    centerX,
+                    height - mark
+            );
 
-            // Horizontale Mitte
-            stream.moveTo(0, height / 2f);
-            stream.lineTo(width, height / 2f);
+            stream.moveTo(centerX, 0);
+            stream.lineTo(
+                    centerX,
+                    mark
+            );
+
+            // 3 horizontale Schnittpositionen
+            for (int row = 1; row < 4; row++) {
+
+                float y =
+                        height * row / 4f;
+
+                stream.moveTo(
+                        0,
+                        y
+                );
+
+                stream.lineTo(
+                        mark,
+                        y
+                );
+
+                stream.moveTo(
+                        width,
+                        y
+                );
+
+                stream.lineTo(
+                        width - mark,
+                        y
+                );
+            }
 
             stream.stroke();
         }

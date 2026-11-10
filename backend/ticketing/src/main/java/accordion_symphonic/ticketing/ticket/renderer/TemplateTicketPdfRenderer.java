@@ -36,6 +36,11 @@ public class TemplateTicketPdfRenderer implements TicketPdfRenderer {
     }
 
     @Override
+    public TicketPdfRendererType type() {
+        return TicketPdfRendererType.TEMPLATE;
+    }
+
+    @Override
     public byte[] createPdf(Order order, List<TicketResponse> tickets) {
         try (
                 PDDocument template = loadTemplate(order.getConcert().getTicketTemplateFile());

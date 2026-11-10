@@ -128,7 +128,8 @@ class TicketPdfServiceTest {
                         ticketPdf,
                         ticketPdf,
                         ticketPdf
-                )
+                ),
+                TicketPrintLayout.FOUR_UP
         );
 
         Files.write(

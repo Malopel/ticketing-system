@@ -10,6 +10,8 @@ public interface TicketPdfRenderer {
 
     boolean supports(Concert concert);
 
+    TicketPdfRendererType type();
+
     byte[] createPdf(
             Order order,
             List<TicketResponse> tickets

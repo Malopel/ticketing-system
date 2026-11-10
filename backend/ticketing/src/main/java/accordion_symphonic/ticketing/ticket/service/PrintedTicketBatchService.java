@@ -149,13 +149,15 @@ public class PrintedTicketBatchService {
                                         printOrder,
                                         List.of(
                                                 TicketResponse.fromEntity(ticket)
-                                        )
+                                        ),
+                                        request.layout()
                                 )
                         )
                         .toList();
 
         return printSheetPdfService.createPrintSheet(
-                individualPdfs
+                individualPdfs,
+                request.layout()
         );
     }
 }
