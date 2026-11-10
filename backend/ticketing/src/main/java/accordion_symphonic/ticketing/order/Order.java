@@ -148,4 +148,24 @@ public class Order {
                 && this.paymentExpiresAt != null
                 && this.paymentExpiresAt.isBefore(LocalDateTime.now());
     }
+
+    public static Order createPrintOrder(
+            Concert concert,
+            String accessTokenHash,
+            String publicId
+    ) {
+        Order order = new Order(
+                concert,
+                "printed-tickets@internal",
+                accessTokenHash,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusYears(10),
+                publicId
+        );
+
+        order.status = OrderStatus.PAID;
+        order.paidAt = LocalDateTime.now();
+
+        return order;
+    }
 }

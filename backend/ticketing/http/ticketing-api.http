@@ -51,7 +51,7 @@ Authorization: Basic admin test-password
 Content-Type: application/json
 
 {
-  "name": "Normal",
+  "name": "2. Preiskategorie",
   "price": 30.00,
   "capacity": 1000
 }
