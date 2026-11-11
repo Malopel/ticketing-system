@@ -10,7 +10,6 @@ import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.PublicOrderIdGenerator;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
 import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryException;
-import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
 import accordion_symphonic.ticketing.ticket.Ticket;
 import accordion_symphonic.ticketing.ticket.TicketRepository;
@@ -215,6 +214,23 @@ public class PrintedTicketBatchService {
                         new ConcertNotFoundException(concertId)
                 );
 
-        return this.printedTicketBatchRepository.findByConcertId(concertId);
+        return printedTicketBatchRepository
+                .findByConcertId(concertId)
+                .stream()
+                .map(batch -> {
+                    int ticketCount =
+                            ticketRepository
+                                    .findByOrderId(
+                                            batch.getOrder().getId()
+                                    )
+                                    .size();
+
+                    return new TicketBatchResponse(
+                            batch.getId(),
+                            batch.getLabel(),
+                            ticketCount
+                    );
+                })
+                .toList();
     }
 }

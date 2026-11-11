@@ -10,6 +10,7 @@ import jakarta.mail.BodyPart;
 import jakarta.mail.Message;
 import jakarta.mail.Multipart;
 import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -38,10 +40,13 @@ class TicketEmailServiceTest {
 
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        TicketEmailService ticketEmailService = new TicketEmailService(
-                mailSender,
-                ticketPdfService
-        );
+        TicketEmailService ticketEmailService =
+                new TicketEmailService(
+                        mailSender,
+                        ticketPdfService,
+                        "noreply@accordion-symphonic.local",
+                        "Accordion Symphonic"
+                );
 
         Concert concert = new Concert(
                 "Accordion Night",
@@ -84,9 +89,25 @@ class TicketEmailServiceTest {
 
         MimeMessage message = messageCaptor.getValue();
 
+        System.out.println(
+                "TO: " + Arrays.toString(
+                        message.getRecipients(
+                                Message.RecipientType.TO
+                        )
+                )
+        );
+
+        InternetAddress fromAddress =
+                (InternetAddress) message.getFrom()[0];
+
         assertEquals(
                 "noreply@accordion-symphonic.local",
-                message.getFrom()[0].toString()
+                fromAddress.getAddress()
+        );
+
+        assertEquals(
+                "Accordion Symphonic",
+                fromAddress.getPersonal()
         );
 
         assertEquals(

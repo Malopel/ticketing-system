@@ -1,6 +1,5 @@
 package accordion_symphonic.ticketing.ticket.batches;
 
-import accordion_symphonic.ticketing.ticket.batches.dto.TicketBatchResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,5 +13,5 @@ public interface PrintedTicketBatchRepository
             Long concertId
     );
 
-    List<TicketBatchResponse> findByConcertId(Long concertId);
+    List<PrintedTicketBatch> findByConcertId(Long concertId);
 }

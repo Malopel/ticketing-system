@@ -25,18 +25,19 @@ public class TicketEmailService {
     private final JavaMailSender mailSender;
     private final TicketPdfService ticketPdfService;
 
-    @Value("${ticketing.mail.from}")
-    private String from;
-
-    @Value("${ticketing.mail.from-name}")
-    private String fromName;
+    private final String from;
+    private final String fromName;
 
     public TicketEmailService(
             JavaMailSender mailSender,
-            TicketPdfService ticketPdfService
+            TicketPdfService ticketPdfService,
+            @Value("${ticketing.mail.from}")String from,
+            @Value("${ticketing.mail.from-name}") String fromName
     ) {
         this.mailSender = mailSender;
         this.ticketPdfService = ticketPdfService;
+        this.from = from;
+        this.fromName = fromName;
     }
 
     public void sendEmail(Order order, List<TicketResponse> tickets) {

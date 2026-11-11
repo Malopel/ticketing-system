@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/{concertId}/print-ticket-batches")
+@RequestMapping("/api/admin/concerts/{concertId}/print-ticket-batches")
 public class AdminTicketBatchController {
 
     private final PrintedTicketBatchService printedTicketBatchService;
