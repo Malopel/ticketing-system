@@ -84,6 +84,12 @@ public class SecurityConfig {
                                 "/api/webhooks/payments")
                         .permitAll()
 
+                        // Mollie payment webhook
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/payments/mollie/webhook"
+                        ).permitAll()
+
                         // Fake-Payment-Callback für lokale Entwicklung
                         .requestMatchers(HttpMethod.POST,
                                 "/api/fake-payments/{providerPaymentId}/complete")
