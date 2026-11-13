@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.payment.service;
 
+import accordion_symphonic.ticketing.mollie.MollieRoutingService;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @ConditionalOnProperty(
@@ -29,11 +31,14 @@ public class MolliePaymentWebhookService {
     private final PaymentEventRepository paymentEventRepository;
     private final PaymentCompletionService paymentCompletionService;
 
+    private final Optional<MollieRoutingService> routingService;
+
     public MolliePaymentWebhookService(
             @Value("${mollie.api-key}") String apiKey,
             OrderRepository orderRepository,
             PaymentEventRepository paymentEventRepository,
-            PaymentCompletionService paymentCompletionService
+            PaymentCompletionService paymentCompletionService,
+            Optional<MollieRoutingService> routingService
     ) {
         this.orderRepository = orderRepository;
         this.paymentEventRepository = paymentEventRepository;
@@ -50,6 +55,8 @@ public class MolliePaymentWebhookService {
                         MediaType.APPLICATION_JSON_VALUE
                 )
                 .build();
+
+        this.routingService = routingService;
     }
 
     @Transactional
@@ -123,6 +130,13 @@ public class MolliePaymentWebhookService {
 
         Order paidOrder =
                 paymentCompletionService.completePayment(orderId);
+
+        routingService.ifPresent(service ->
+                service.routePayment50_50(
+                        payment.id(),
+                        paidOrder.getTotalAmount()
+                )
+        );
 
         LocalDateTime now = LocalDateTime.now();
 
