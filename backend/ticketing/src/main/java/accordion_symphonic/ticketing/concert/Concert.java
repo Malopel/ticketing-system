@@ -46,8 +46,9 @@ public class Concert {
         this.status = ConcertStatus.DRAFT;
     }
 
+    // TODO: Nach Sonntag ändern
     public void updateConcert(ConcertRequest update) {
-        if (status != ConcertStatus.DRAFT) {
+        if (status != ConcertStatus.DRAFT && status != ConcertStatus.PUBLISHED) {
             throw new ConcertCannotBeUpdatedException(id);
         }
 
