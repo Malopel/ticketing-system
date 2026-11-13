@@ -100,6 +100,12 @@ public class SecurityConfig {
                                 "/api/shop-config")
                         .permitAll()
 
+                        // Mollie Connect
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/mollie/connect/callback"
+                        ).permitAll()
+
                         // Admin-Bereich
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
