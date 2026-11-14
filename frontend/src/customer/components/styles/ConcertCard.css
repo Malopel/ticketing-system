@@ -19,6 +19,10 @@
     margin: 0;
 }
 
+.concert-description {
+    white-space: pre-line;
+}
+
 .concert-card-title-row {
     display: flex;
     align-items: center;

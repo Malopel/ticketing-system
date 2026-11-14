@@ -36,7 +36,7 @@ function ConcertCard({concert}: ConcertCardProps) {
                 )}
             </div>
 
-            <p>{concert.description}</p>
+            <p className="concert-description">{concert.description}</p>
 
             <p>
                 <strong>Ort:</strong> {concert.location}
