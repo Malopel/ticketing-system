@@ -1,0 +1,64 @@
+.countdown-page {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    padding: 2rem;
+}
+
+.countdown-logo {
+    width: 140px;
+    margin-bottom: 2rem;
+}
+
+.countdown-page h1 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    margin-bottom: 1rem;
+}
+
+.countdown {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(90px, 1fr));
+
+    gap: 1rem;
+
+    margin: 3rem 0;
+}
+
+.countdown > div {
+    padding: 1.5rem;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    background: white;
+}
+
+.countdown strong {
+    display: block;
+
+    font-size: clamp(2rem, 5vw, 4rem);
+}
+
+.countdown span {
+    display: block;
+    margin-top: 0.5rem;
+
+    opacity: 0.7;
+}
+
+.countdown-event {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .countdown {
+        grid-template-columns: repeat(2, minmax(100px, 1fr));
+    }
+}
