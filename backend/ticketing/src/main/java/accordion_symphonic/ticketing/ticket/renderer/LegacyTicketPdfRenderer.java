@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -70,6 +71,9 @@ public class LegacyTicketPdfRenderer implements TicketPdfRenderer{
 
         Concert concert = order.getConcert();
 
+        LocalDateTime entranceTime =
+                concert.getStartTime().minusHours(1);
+
         PDType1Font titleFont =
                 new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
         PDType1Font normalFont =
@@ -82,41 +86,96 @@ public class LegacyTicketPdfRenderer implements TicketPdfRenderer{
                 PDImageXObject.createFromByteArray(document, qrCodePng, "ticket-qr-code");
 
         try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-            writeText(contentStream, "Accordion Symphonic", titleFont, 22, 70, 760);
-            writeText(contentStream, "Eintrittskarte", boldFont, 16, 70, 730);
+            writeText(contentStream, "ACCORDION SYMPHONIC", titleFont, 24, 70, 770);
+            writeText(contentStream, "Eintrittskarte", boldFont, 15, 70, 742);
 
-            writeText(contentStream, "Konzert:", boldFont, 12, 70, 680);
-            writeText(contentStream, safeText(concert.getTitle()), normalFont, 12, 170, 680);
+            writeText(contentStream, "Konzert:", boldFont, 10, 70, 690);
+            writeText(contentStream, safeText(concert.getTitle()), normalFont, 14, 70, 670);
 
-            writeText(contentStream, "Datum:", boldFont, 12, 70, 655);
+            writeText(contentStream, "Datum:", boldFont, 10, 70, 625);
             writeText(
                     contentStream,
                     concert.getStartTime().format(DATE_TIME_FORMATTER),
                     normalFont,
                     12,
-                    170,
-                    655
+                    70,
+                    607
             );
 
-            writeText(contentStream, "Ort:", boldFont, 12, 70, 630);
-            writeText(contentStream, safeText(concert.getLocation()), normalFont, 12, 170, 630);
+            writeText(contentStream, "Einlass:", boldFont, 10, 250, 625);
+            writeText(
+                    contentStream,
+                    entranceTime.format(DateTimeFormatter.ofPattern("HH:mm 'Uhr'")),
+                    normalFont,
+                    12,
+                    250,
+                    607
+            );
 
-            writeText(contentStream, "Kategorie:", boldFont, 12, 70, 590);
-            writeText(contentStream, safeText(ticket.ticketCategoryName()), normalFont, 12, 170, 590);
+            writeText(contentStream, "Ort:", boldFont, 10, 70, 565);
 
-            writeText(contentStream, "Bestellnummer:", boldFont, 12, 70, 565);
-            writeText(contentStream, order.getPublicId(), normalFont, 12, 170, 565);
+            writeWrappedText(
+                    contentStream,
+                    safeText(concert.getLocation()),
+                    normalFont,
+                    12,
+                    70,
+                    547,
+                    240,
+                    16
+            );
 
-            contentStream.drawImage(qrCodeImage, 350, 545, 170, 170);
+            writeText(contentStream, "Kategorie:", boldFont, 10, 70, 500);
+            writeText(contentStream, safeText(ticket.ticketCategoryName()), normalFont, 12, 70, 482);
 
-            writeText(contentStream, "Einlasshinweis:", boldFont, 11, 70, 400);
+            writeText(contentStream, "Bestellnummer:", boldFont, 10, 70, 440);
+            writeText(contentStream, order.getPublicId(), normalFont, 11, 70, 422);
+
+            contentStream.drawImage(qrCodeImage, 340, 420, 180, 180);
+
+            writeText(
+                    contentStream,
+                    "Hinweise:",
+                    boldFont,
+                    11,
+                    70,
+                    350
+            );
+
+            writeText(
+                    contentStream,
+                    "Freie Platzwahl innerhalb der gebuchten Kategorie.",
+                    normalFont,
+                    10,
+                    70,
+                    330
+            );
+
+            writeText(
+                    contentStream,
+                    "Im Congress Center ist ausschließlich Kartenzahlung möglich.",
+                    normalFont,
+                    10,
+                    70,
+                    312
+            );
+
+            writeText(
+                    contentStream,
+                    "Bitte QR-Code am Einlass bereithalten.",
+                    normalFont,
+                    10,
+                    70,
+                    294
+            );
+
             writeText(
                     contentStream,
                     "Dieses Ticket ist nur einmal gültig und wird beim Einlass gescannt.",
                     normalFont,
                     10,
                     70,
-                    380
+                    276
             );
         }
     }
@@ -134,6 +193,60 @@ public class LegacyTicketPdfRenderer implements TicketPdfRenderer{
         contentStream.newLineAtOffset(x, y);
         contentStream.showText(safeText(text));
         contentStream.endText();
+    }
+
+    private void writeWrappedText(
+            PDPageContentStream contentStream,
+            String text,
+            PDType1Font font,
+            float fontSize,
+            float x,
+            float y,
+            float maxWidth,
+            float lineHeight
+    ) throws IOException {
+
+        String[] words = safeText(text).split(" ");
+        StringBuilder line = new StringBuilder();
+
+        for (String word : words) {
+            String candidate =
+                    line.isEmpty()
+                            ? word
+                            : line + " " + word;
+
+            float width =
+                    font.getStringWidth(candidate)
+                            / 1000f
+                            * fontSize;
+
+            if (width > maxWidth && !line.isEmpty()) {
+                writeText(
+                        contentStream,
+                        line.toString(),
+                        font,
+                        fontSize,
+                        x,
+                        y
+                );
+
+                y -= lineHeight;
+                line = new StringBuilder(word);
+            } else {
+                line = new StringBuilder(candidate);
+            }
+        }
+
+        if (!line.isEmpty()) {
+            writeText(
+                    contentStream,
+                    line.toString(),
+                    font,
+                    fontSize,
+                    x,
+                    y
+            );
+        }
     }
 
     private String safeText(String text) {

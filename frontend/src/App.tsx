@@ -5,33 +5,48 @@ import ConcertPage from './customer/pages/ConcertPage';
 import CheckoutPage from './customer/pages/CheckoutPage';
 import FakePaymentPage from './customer/pages/FakePaymentPage';
 import OrderStatusPage from './customer/pages/OrderStatusPage';
+import ImpressumPage from './customer/pages/ImpressumPage';
+import DatenschutzPage from './customer/pages/DatenschutzPage';
+import PublicLayout from './customer/layout/PublicLayout';
 
 import AdminApp from './admin/AdminApp';
 
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<HomePage/>}/>
+            <Route element={<PublicLayout/>}>
+                <Route path="/" element={<HomePage/>}/>
 
-            <Route
-                path="/concerts/:concertId"
-                element={<ConcertPage/>}
-            />
+                <Route
+                    path="/concerts/:concertId"
+                    element={<ConcertPage/>}
+                />
 
-            <Route
-                path="/concerts/:concertId/checkout"
-                element={<CheckoutPage />}
-            />
+                <Route
+                    path="/concerts/:concertId/checkout"
+                    element={<CheckoutPage/>}
+                />
 
-            <Route
-                path="/orders/:orderId"
-                element={<OrderStatusPage/>}
-            />
+                <Route
+                    path="/orders/:orderId"
+                    element={<OrderStatusPage/>}
+                />
 
-            <Route
-                path="/fake-payment/:providerPaymentId"
-                element={<FakePaymentPage/>}
-            />
+                <Route
+                    path="/fake-payment/:providerPaymentId"
+                    element={<FakePaymentPage/>}
+                />
+
+                <Route
+                    path="/impressum"
+                    element={<ImpressumPage/>}
+                />
+
+                <Route
+                    path="/datenschutz"
+                    element={<DatenschutzPage/>}
+                />
+            </Route>
 
             <Route
                 path="/admin/*"
