@@ -38,6 +38,7 @@ const paymentPendingOrder: OrderResponse = {
     concertTitle: 'Accordion Night',
     customerEmail: 'kunde@example.com',
     status: 'PAYMENT_PENDING',
+    paymentMethod: 'MOLLIE',
     totalAmount: 25,
     createdAt: '2026-08-20T18:00:00',
     expiresAt: '2026-08-20T18:30:00',

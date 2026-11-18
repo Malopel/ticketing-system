@@ -99,6 +99,10 @@ public class SecurityConfig {
                                 "/api/concerts/*/orders/*/bank-transfer"
                         ).permitAll()
 
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/orders/{publicId}/bank-transfer"
+                        ).permitAll()
+
                         //Shop-Config darf öffentlich abgerufen werden
                         .requestMatchers(HttpMethod.GET,
                                 "/api/shop-config")

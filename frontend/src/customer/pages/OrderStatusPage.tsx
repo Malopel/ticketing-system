@@ -14,6 +14,14 @@ import PaymentSection
 import OrderStatusCard from '../components/order/OrderStatusCard.tsx';
 import OrderDetails from '../components/order/OrderDetails.tsx';
 
+import BankTransferInstruction, {
+    type BankTransferInstructions,
+} from '../components/BankTransferInstructions.tsx';
+
+import {
+    getBankTransferInstructions,
+} from '../api/bankTransferApi.ts';
+
 type StoredOrderAccess = {
     concertId: number;
     accessToken: string;
@@ -39,6 +47,15 @@ function OrderStatusPage() {
     const [refreshing, setRefreshing] = useState(false);
     const [refreshError, setRefreshError] =
         useState<string | null>(null);
+
+    const [bankTransfer, setBankTransfer] =
+        useState<BankTransferInstructions | null>(null);
+
+    const [bankTransferError, setBankTransferError] =
+        useState<string | null>(null);
+
+    const [bankTransferRetry, setBankTransferRetry] =
+        useState(0);
 
     const expirationRefreshTriggered =
         useRef<string | null>(null);
@@ -239,6 +256,56 @@ function OrderStatusPage() {
         accessToken,
     ]);
 
+    const pendingBankReference =
+        order?.status === 'PAYMENT_PENDING' &&
+        order.paymentMethod === 'BANK_TRANSFER'
+            ? order.publicId
+            : null;
+
+    const loadedBankReference =
+        bankTransfer?.reference ?? null;
+
+    useEffect(() => {
+        if (
+            !pendingBankReference ||
+            !accessToken ||
+            loadedBankReference === pendingBankReference
+        ) {
+            return;
+        }
+
+        let active = true;
+
+        void getBankTransferInstructions(
+            pendingBankReference,
+            accessToken,
+        )
+            .then((payment) => {
+                if (!active) return;
+
+                setBankTransfer(payment);
+                setBankTransferError(null);
+            })
+            .catch((error: unknown) => {
+                if (!active) return;
+
+                setBankTransferError(
+                    error instanceof Error
+                        ? error.message
+                        : 'Überweisungsdaten konnten nicht geladen werden.',
+                );
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [
+        pendingBankReference,
+        accessToken,
+        loadedBankReference,
+        bankTransferRetry,
+    ]);
+
     if (loading) {
         return <p>Bestellung wird geladen...</p>;
     }
@@ -329,9 +396,45 @@ function OrderStatusPage() {
                     order={order}
                     accessToken={accessToken}
                     onOrderUpdated={setOrder}
+                    onBankTransferStarted={(payment) => {
+                        setBankTransfer(payment);
+                        setBankTransferError(null);
+                    }}
                     paymentDisabled={remainingSeconds === 0}
                 />
             )}
+
+            {order.status === 'PAYMENT_PENDING' &&
+                order.paymentMethod === 'BANK_TRANSFER' && (
+                    bankTransfer?.reference === order.publicId ? (
+                        <BankTransferInstruction payment={bankTransfer}/>
+                    ) : (
+                        <section className="bank-payment">
+                            {bankTransferError ? (
+                                <>
+                                    <p className="error-message">
+                                        {bankTransferError}
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setBankTransferError(null);
+                                            setBankTransferRetry(
+                                                current => current + 1
+                                            );
+                                        }}
+                                    >
+                                        Erneut laden
+                                    </button>
+                                </>
+                            ) : (
+                                <p>Überweisungsdaten werden geladen...</p>
+                            )}
+                        </section>
+                    )
+                )
+            }
 
             {order.status === 'PAID' && (
                 <section className="ticket-delivery-card">

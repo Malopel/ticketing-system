@@ -49,6 +49,8 @@ export type OrderResponse = {
     paidAt: string | null;
     paymentExpiresAt: string | null;
 
+    paymentMethod: 'MOLLIE' | 'BANK_TRANSFER' | null;
+
     items: OrderItemResponse[];
 };
 

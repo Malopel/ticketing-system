@@ -1,5 +1,7 @@
 import {useState} from "react";
 
+import { QRCodeSVG } from "qrcode.react";
+
 export type BankTransferInstructions = {
     recipient: string;
     iban: string;
@@ -66,6 +68,19 @@ Verwendungszweck: ${payment.reference}`;
             >
                 In Banking-App öffnen
             </a>
+
+            <div className="bank-payment__qr">
+                <QRCodeSVG
+                    value={payment.epcQrPayload}
+                    size={220}
+                    level="M"
+                />
+
+                <p>
+                    Mit einer kompatiblen Banking-App scannen,
+                    um die Überweisungsdaten zu übernehmen.
+                </p>
+            </div>
 
             <CopyButton value={paymentText}>
                 Alle Zahlungsdaten kopieren

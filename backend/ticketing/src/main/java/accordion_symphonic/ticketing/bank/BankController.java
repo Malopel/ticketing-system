@@ -45,36 +45,30 @@ public class BankController {
         );
     }
 
-    @GetMapping(
-            "/api/orders/{publicId}/bank-transfer"
-    )
+    @GetMapping("/api/orders/{publicId}/bank-transfer")
     public BankTransferInstructions getBankTransferInstructions(
             @PathVariable String publicId,
-            @RequestParam String accessToken
+            @RequestHeader("X-Order-Access-Token") String accessToken
     ) {
-        Order order =
-                orderService.getByPublicIdAndAccessToken(
-                        publicId,
-                        accessToken
-                );
+        Order order = orderService.getByPublicIdAndAccessToken(
+                publicId,
+                accessToken
+        );
 
-        if (order.getPaymentMethod()
-                != PaymentMethod.BANK_TRANSFER) {
+        if (order.getPaymentMethod() != PaymentMethod.BANK_TRANSFER) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Order is not a bank transfer order"
             );
         }
 
-        if (order.getStatus()
-                != OrderStatus.PAYMENT_PENDING) {
+        if (order.getStatus() != OrderStatus.PAYMENT_PENDING) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Order is not awaiting payment"
             );
         }
 
-        return bankTransferService
-                .createInstructions(order);
+        return bankTransferService.createInstructions(order);
     }
 }

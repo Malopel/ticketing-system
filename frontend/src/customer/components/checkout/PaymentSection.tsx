@@ -6,12 +6,19 @@ import {
     cancelOrder as cancelOrderRequest,
     type OrderResponse
 } from '../../api/orderApi.ts';
-import {startPayment} from '../../api/paymentApi.ts';
+
+import {startBankTransfer} from '../../api/bankTransferApi.ts';
+
+import type {BankTransferInstructions} from
+        '../BankTransferInstructions.tsx';
 
 type PaymentSectionProps = {
     order: OrderResponse;
     accessToken: string;
     onOrderUpdated: (orderResponse: OrderResponse) => void;
+    onBankTransferStarted: (
+        payment: BankTransferInstructions
+    ) => void;
     paymentDisabled: boolean;
 };
 
@@ -19,6 +26,7 @@ function PaymentSection({
                             order,
                             accessToken,
                             onOrderUpdated,
+                            onBankTransferStarted,
                             paymentDisabled,
                         }: PaymentSectionProps) {
     const [startingPayment, setStartingPayment] =
@@ -45,28 +53,33 @@ function PaymentSection({
     );
 
     async function handleStartPayment() {
-        if (paymentDisabled) return;
+        if (paymentDisabled || startingPayment) return;
 
         try {
             setStartingPayment(true);
             setPaymentError(null);
 
-            const paymentSession = await startPayment(
+            const bankTransfer = await startBankTransfer(
                 order.concertId,
                 order.id,
                 accessToken,
             );
 
-            window.location.href =
-                paymentSession.checkoutUrl;
+            onBankTransferStarted(bankTransfer);
+
+            onOrderUpdated({
+                ...order,
+                status: 'PAYMENT_PENDING',
+                paymentMethod: 'BANK_TRANSFER',
+                paymentExpiresAt: bankTransfer.expiresAt,
+            });
+
         } catch (error) {
-            if (error instanceof Error) {
-                setPaymentError(error.message);
-            } else {
-                setPaymentError(
-                    'Zahlung konnte nicht gestartet werden.',
-                );
-            }
+            setPaymentError(
+                error instanceof Error
+                    ? error.message
+                    : 'Banküberweisung konnte nicht gestartet werden.',
+            );
         } finally {
             setStartingPayment(false);
         }
@@ -117,6 +130,13 @@ function PaymentSection({
                             )}
                         </strong>
                     </p>
+
+                    <p>
+                        Nach dem nächsten Schritt erhältst du die
+                        Bankverbindung und einen QR-Code.
+                        Deine Tickets werden nach bestätigtem
+                        Zahlungseingang per E-Mail versendet.
+                    </p>
                 </>
             ) : (
                 <p>
@@ -143,10 +163,10 @@ function PaymentSection({
                     }
                 >
                     {startingPayment
-                        ? 'Zahlung wird gestartet...'
+                        ? 'Überweisung wird vorbereitet...'
                         : paymentDisabled
                             ? 'Reservierung abgelaufen'
-                            : 'Jetzt bezahlen'}
+                            : 'Überweisungsdaten anzeigen'}
                 </button>
             )}
 

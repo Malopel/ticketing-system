@@ -3,6 +3,7 @@ package accordion_symphonic.ticketing.order.dto;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.order.Order;
 import accordion_symphonic.ticketing.order.OrderStatus;
+import accordion_symphonic.ticketing.order.PaymentMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public record OrderResponse(
         LocalDateTime expiresAt,
         LocalDateTime paymentExpiresAt,
         LocalDateTime paidAt,
+        PaymentMethod paymentMethod,
         List<OrderItemResponse> items
 ) {
     public static  OrderResponse fromEntity(Order order) {
@@ -37,6 +39,7 @@ public record OrderResponse(
                 order.getExpiresAt(),
                 order.getPaymentExpiresAt(),
                 order.getPaidAt(),
+                order.getPaymentMethod(),
                 order.getItems().stream().map(OrderItemResponse::fromEntity).toList()
         );
     }
