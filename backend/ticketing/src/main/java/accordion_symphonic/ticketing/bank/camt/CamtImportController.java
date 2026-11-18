@@ -1,5 +1,6 @@
 package accordion_symphonic.ticketing.bank.camt;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/admin/bank-statements")
 public class CamtImportController {
@@ -43,17 +45,26 @@ public class CamtImportController {
             );
 
         } catch (IllegalArgumentException exception) {
+            log.error(
+                "CAMT-Import fehlgeschlagen",
+                exception
+            );
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    exception.getMessage(),
-                    exception
+                HttpStatus.BAD_REQUEST,
+                "CAMT-Datei konnte nicht verarbeitet werden.",
+                exception
             );
 
         } catch (IOException exception) {
+            log.error(
+                "CAMT-Datei konnte nicht gelesen werden",
+                exception
+            );
+
             throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "CAMT-Datei konnte nicht gelesen werden.",
-                    exception
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "CAMT-Datei konnte nicht gelesen werden.",
+                exception
             );
         }
     }
