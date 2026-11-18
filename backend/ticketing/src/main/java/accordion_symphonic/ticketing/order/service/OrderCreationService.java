@@ -8,6 +8,7 @@ import accordion_symphonic.ticketing.concert.exception.ConcertNotFoundException;
 import accordion_symphonic.ticketing.order.*;
 import accordion_symphonic.ticketing.order.dto.CreatedOrderResponse;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
+import accordion_symphonic.ticketing.order.dto.OrderProperties;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;
 import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryException;
 import accordion_symphonic.ticketing.order.exception.TooManyTicketsInOrderException;

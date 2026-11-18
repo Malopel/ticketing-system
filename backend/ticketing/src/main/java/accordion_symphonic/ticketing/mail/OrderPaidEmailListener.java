@@ -1,6 +1,6 @@
 package accordion_symphonic.ticketing.mail;
 
-import accordion_symphonic.ticketing.order.OrderPaidEvent;
+import accordion_symphonic.ticketing.order.dto.OrderPaidEvent;
 import accordion_symphonic.ticketing.ticket.service.TicketDeliveryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

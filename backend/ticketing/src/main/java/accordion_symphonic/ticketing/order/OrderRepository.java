@@ -37,4 +37,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByIdForUpdate(
             @Param("orderId") Long orderId
     );
+
+    Optional<Order> findByPublicId(String publicId);
 }

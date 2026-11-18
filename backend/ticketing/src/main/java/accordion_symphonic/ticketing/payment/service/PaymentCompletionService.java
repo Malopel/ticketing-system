@@ -2,7 +2,7 @@ package accordion_symphonic.ticketing.payment.service;
 
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.order.OrderPaidEvent;
+import accordion_symphonic.ticketing.order.dto.OrderPaidEvent;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;

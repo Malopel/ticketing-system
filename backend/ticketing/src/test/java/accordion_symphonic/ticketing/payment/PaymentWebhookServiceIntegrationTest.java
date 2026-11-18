@@ -108,6 +108,7 @@ class PaymentWebhookServiceIntegrationTest {
         );
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 

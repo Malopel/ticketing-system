@@ -174,6 +174,7 @@ class CustomerOrderServiceTest {
         );
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
         order.markAsPaid();

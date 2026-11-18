@@ -1,4 +1,4 @@
-package accordion_symphonic.ticketing.order;
+package accordion_symphonic.ticketing.order.dto;
 
 public record OrderPaidEvent(
         Long concertId,

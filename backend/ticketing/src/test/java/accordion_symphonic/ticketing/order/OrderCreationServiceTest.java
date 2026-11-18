@@ -5,6 +5,7 @@ import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.concert.ConcertRepository;
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.order.dto.OrderItemRequest;
+import accordion_symphonic.ticketing.order.dto.OrderProperties;
 import accordion_symphonic.ticketing.order.dto.OrderRequest;
 import accordion_symphonic.ticketing.order.exception.DuplicateTicketCategoryException;
 import accordion_symphonic.ticketing.order.exception.TooManyTicketsInOrderException;

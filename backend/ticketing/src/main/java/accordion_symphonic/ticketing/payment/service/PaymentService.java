@@ -2,8 +2,9 @@ package accordion_symphonic.ticketing.payment.service;
 
 import accordion_symphonic.ticketing.concert.ConcertStatus;
 import accordion_symphonic.ticketing.order.Order;
+import accordion_symphonic.ticketing.order.PaymentMethod;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
-import accordion_symphonic.ticketing.order.OrderProperties;
+import accordion_symphonic.ticketing.order.dto.OrderProperties;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
@@ -21,6 +22,7 @@ public class PaymentService {
 
     private final OrderRepository orderRepository;
     private final OrderAccessTokenService orderAccessTokenService;
+
     private final PaymentProvider paymentProvider;
     private final OrderProperties orderProperties;
 
@@ -59,7 +61,6 @@ public class PaymentService {
 
         if (order.shouldExpire()) {
             order.expire();
-
             throw new OrderCannotBePaidException(orderId);
         }
 
@@ -67,12 +68,12 @@ public class PaymentService {
             throw new OrderCannotBePaidException(orderId);
         }
 
-        if (order.getConcert().getStatus()
-                != ConcertStatus.PUBLISHED) {
+        if (order.getConcert().getStatus() != ConcertStatus.PUBLISHED) {
             throw new OrderCannotBePaidException(orderId);
         }
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plus(
                         orderProperties.paymentDuration()
                 )

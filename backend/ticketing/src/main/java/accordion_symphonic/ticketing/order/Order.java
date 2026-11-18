@@ -47,6 +47,10 @@ public class Order {
 
     private LocalDateTime paymentExpiresAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
+
     @Getter(AccessLevel.NONE)
     @OneToMany(
             mappedBy = "order",
@@ -97,14 +101,20 @@ public class Order {
     }
 
     public void markAsPaymentPending(
+            PaymentMethod paymentMethod,
             LocalDateTime paymentExpiresAt
     ) {
-        if (this.status == OrderStatus.PAYMENT_PENDING) return;
-
-        if (this.status != OrderStatus.RESERVED) {
-            throw new IllegalStateException("Only reserved orders can be marked as payment pending.");
+        if (this.status == OrderStatus.PAYMENT_PENDING) {
+            return;
         }
 
+        if (this.status != OrderStatus.RESERVED) {
+            throw new IllegalStateException(
+                    "Only reserved orders can be marked as payment pending."
+            );
+        }
+
+        this.paymentMethod = paymentMethod;
         this.paymentExpiresAt = paymentExpiresAt;
         this.status = OrderStatus.PAYMENT_PENDING;
     }

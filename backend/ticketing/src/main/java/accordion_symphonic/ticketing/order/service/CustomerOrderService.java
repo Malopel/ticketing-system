@@ -7,9 +7,10 @@ import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.order.dto.OrderResponse;
 import accordion_symphonic.ticketing.order.exception.*;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CustomerOrderService {
@@ -100,5 +101,24 @@ public class CustomerOrderService {
         ) {
             order.expire();
         }
+    }
+
+    @Transactional
+    public Order getByPublicIdAndAccessToken(
+            String publicId,
+            String accessToken
+    ) {
+        Order order = orderRepository
+                .findByPublicId(publicId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND
+                        )
+                );
+
+        ensureCustomerHasAccess(order, accessToken);
+        expireOrderIfNeeded(order);
+
+        return order;
     }
 }

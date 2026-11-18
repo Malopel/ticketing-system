@@ -27,6 +27,7 @@ public class OrderTest {
         Order order = createReservedOrder();
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 
@@ -68,6 +69,7 @@ public class OrderTest {
         Order order = createReservedOrder();
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 
@@ -94,6 +96,7 @@ public class OrderTest {
         Order order = createReservedOrder();
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 
@@ -107,6 +110,7 @@ public class OrderTest {
         Order order = createReservedOrder();
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 
@@ -126,6 +130,7 @@ public class OrderTest {
         Order order = createReservedOrder();
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
         order.markAsPaid();
@@ -133,6 +138,7 @@ public class OrderTest {
         assertThrows(
                 IllegalStateException.class,
                 () -> order.markAsPaymentPending(
+                        PaymentMethod.MOLLIE,
                         LocalDateTime.now().plusMinutes(20)
                 )
         );

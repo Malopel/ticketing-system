@@ -2,7 +2,8 @@ package accordion_symphonic.ticketing.payment;
 
 import accordion_symphonic.ticketing.concert.Concert;
 import accordion_symphonic.ticketing.order.Order;
-import accordion_symphonic.ticketing.order.OrderPaidEvent;
+import accordion_symphonic.ticketing.order.PaymentMethod;
+import accordion_symphonic.ticketing.order.dto.OrderPaidEvent;
 import accordion_symphonic.ticketing.order.OrderRepository;
 import accordion_symphonic.ticketing.order.OrderStatus;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
@@ -95,6 +96,7 @@ class PaymentCompletionServiceTest {
         Order order = createReservedOrder();
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().minusMinutes(1)
         );
 
@@ -158,6 +160,7 @@ class PaymentCompletionServiceTest {
         );
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 
@@ -200,6 +203,7 @@ class PaymentCompletionServiceTest {
         );
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 
@@ -224,6 +228,7 @@ class PaymentCompletionServiceTest {
         Order order = createReservedOrder();
 
         order.markAsPaymentPending(
+                PaymentMethod.MOLLIE,
                 LocalDateTime.now().plusMinutes(20)
         );
 

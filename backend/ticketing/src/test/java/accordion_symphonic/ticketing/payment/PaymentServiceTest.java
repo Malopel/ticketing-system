@@ -1,6 +1,7 @@
 package accordion_symphonic.ticketing.payment;
 
 import accordion_symphonic.ticketing.order.*;
+import accordion_symphonic.ticketing.order.dto.OrderProperties;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
 import accordion_symphonic.ticketing.payment.exception.OrderCannotBePaidException;
@@ -101,6 +102,7 @@ class PaymentServiceTest {
         assertEquals(expectedSession, result);
 
         verify(order).markAsPaymentPending(
+                eq(PaymentMethod.MOLLIE),
                 any(LocalDateTime.class)
         );
 
@@ -137,6 +139,7 @@ class PaymentServiceTest {
         verifyNoInteractions(paymentProvider);
 
         verify(order, never()).markAsPaymentPending(
+                eq(PaymentMethod.MOLLIE),
                 any()
         );
     }
@@ -180,6 +183,7 @@ class PaymentServiceTest {
         verifyNoInteractions(paymentProvider);
 
         verify(order, never()).markAsPaymentPending(
+                eq(PaymentMethod.MOLLIE),
                 any()
         );
     }
@@ -220,6 +224,7 @@ class PaymentServiceTest {
         verify(order).expire();
 
         verify(order, never()).markAsPaymentPending(
+                eq(PaymentMethod.MOLLIE),
                 any()
         );
 
@@ -269,7 +274,10 @@ class PaymentServiceTest {
         );
 
         verify(order, never())
-                .markAsPaymentPending(any());
+                .markAsPaymentPending(
+                        eq(PaymentMethod.MOLLIE),
+                        any()
+                );
 
         verifyNoInteractions(paymentProvider);
     }

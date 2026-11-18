@@ -1,4 +1,4 @@
-package accordion_symphonic.ticketing.order;
+package accordion_symphonic.ticketing.order.dto;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
