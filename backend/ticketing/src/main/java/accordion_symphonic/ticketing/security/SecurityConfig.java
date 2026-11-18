@@ -85,8 +85,7 @@ public class SecurityConfig {
                         .permitAll()
 
                         // Mollie payment webhook
-                        .requestMatchers(
-                                HttpMethod.POST,
+                        .requestMatchers(HttpMethod.POST,
                                 "/api/payments/mollie/webhook"
                         ).permitAll()
 
@@ -94,6 +93,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/fake-payments/{providerPaymentId}/complete")
                         .permitAll()
+
+                        // Permit Bank-payment
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/concerts/*/orders/*/bank-transfer"
+                        ).permitAll()
 
                         //Shop-Config darf öffentlich abgerufen werden
                         .requestMatchers(HttpMethod.GET,
