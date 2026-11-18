@@ -26,22 +26,22 @@ public class Camt053Parser {
             factory.setNamespaceAware(true);
 
             factory.setFeature(
-                    "https://apache.org/xml/features/disallow-doctype-decl",
+                    "http://apache.org/xml/features/disallow-doctype-decl",
                     true
             );
 
             factory.setFeature(
-                    "https://xml.org/sax/features/external-general-entities",
+                    "http://xml.org/sax/features/external-general-entities",
                     false
             );
 
             factory.setFeature(
-                    "https://xml.org/sax/features/external-parameter-entities",
+                    "http://xml.org/sax/features/external-parameter-entities",
                     false
             );
 
             factory.setFeature(
-                    "https://apache.org/xml/features/nonvalidating/load-external-dtd",
+                    "http://apache.org/xml/features/nonvalidating/load-external-dtd",
                     false
             );
 
