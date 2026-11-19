@@ -8,6 +8,11 @@ import {
     type CamtImportItemStatus,
 } from '../api/adminBankStatementApi';
 
+import {
+    previewVolksbankCsv,
+    type CsvPreviewResult,
+} from '../api/adminBankStatementApi';
+
 const STATUS_LABELS: Record<CamtImportItemStatus, string> = {
     PAID: 'Bezahlt',
     ALREADY_PAID: 'Bereits bezahlt – prüfen',
@@ -32,6 +37,12 @@ function AdminBankStatementsPage() {
     const [uploading, setUploading] = useState(false);
     const [result, setResult] = useState<CamtImportResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    const [csvFile, setCsvFile] = useState<File | null>(null);
+    const [csvPreview, setCsvPreview] =
+        useState<CsvPreviewResult | null>(null);
+    const [csvLoading, setCsvLoading] = useState(false);
+    const [csvError, setCsvError] = useState<string | null>(null);
 
     async function handleImport(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -69,6 +80,28 @@ function AdminBankStatementsPage() {
         }
     }
 
+    async function handleCsvPreview() {
+        if (!csvFile || csvLoading) return;
+
+        try {
+            setCsvLoading(true);
+            setCsvError(null);
+            setCsvPreview(null);
+
+            const preview = await previewVolksbankCsv(csvFile);
+            setCsvPreview(preview);
+        } catch (error) {
+            setCsvError(
+                error instanceof Error
+                    ? error.message
+                    : 'CSV-Datei konnte nicht geprüft werden.',
+            );
+        } finally {
+            setCsvLoading(false);
+        }
+    }
+
+
     return (
         <div className="admin-bank-page">
             <header className="admin-bank-header">
@@ -78,6 +111,132 @@ function AdminBankStatementsPage() {
                     Ticketbestellungen abgleichen.
                 </p>
             </header>
+
+
+            <section className="admin-bank-card">
+                <h2>Volksbank-CSV prüfen</h2>
+
+                <p>
+                    Lade einen CSV-Kontoumsatzexport hoch.
+                    Passende Ticketzahlungen werden erkannt,
+                    aber noch nicht verbucht.
+                </p>
+
+                <div className="admin-bank-upload">
+                    <label htmlFor="volksbank-csv">
+                        CSV-Datei auswählen
+                    </label>
+
+                    <input
+                        id="volksbank-csv"
+                        type="file"
+                        accept=".csv,text/csv"
+                        onChange={(event) => {
+                            setCsvFile(
+                                event.currentTarget.files?.[0] ?? null
+                            );
+                            setCsvPreview(null);
+                            setCsvError(null);
+                        }}
+                    />
+                </div>
+
+                <button
+                    type="button"
+                    className="admin-bank-submit"
+                    onClick={() => void handleCsvPreview()}
+                    disabled={!csvFile || csvLoading}
+                >
+                    {csvLoading
+                        ? 'CSV wird geprüft...'
+                        : 'CSV-Vorschau anzeigen'}
+                </button>
+
+                {csvError && (
+                    <p role="alert" className="admin-bank-error">
+                        {csvError}
+                    </p>
+                )}
+
+                {csvPreview && (
+                    <div className="admin-bank-preview">
+                        <h3>Erkannte Buchungen</h3>
+
+                        <div className="admin-bank-summary">
+                            <div>
+                                <span>Gelesen</span>
+                                <strong>{csvPreview.rowsRead}</strong>
+                            </div>
+                            <div>
+                                <span>Passende Zahlungen</span>
+                                <strong>{csvPreview.ready}</strong>
+                            </div>
+                            <div>
+                                <span>Zu prüfen</span>
+                                <strong>{csvPreview.reviewRequired}</strong>
+                            </div>
+                        </div>
+
+                        <p>
+                            {csvPreview.ignored} andere Vereinsumsätze
+                            wurden ignoriert.
+                        </p>
+
+                        {csvPreview.items.length === 0 ? (
+                            <p>
+                                Keine Ticketzahlungen mit AS-Bestellnummer
+                                gefunden.
+                            </p>
+                        ) : (
+                            <div className="admin-bank-table-wrapper">
+                                <table className="admin-bank-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Buchungstag</th>
+                                        <th>Bestellung</th>
+                                        <th>Betrag</th>
+                                        <th>Ergebnis</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {csvPreview.items.map((item) => (
+                                        <tr key={item.rowNumber}>
+                                            <td>{item.bookingDate}</td>
+                                            <td>
+                                                {item.orderReference ?? '—'}
+                                            </td>
+                                            <td>
+                                                {new Intl.NumberFormat(
+                                                    'de-DE', {
+                                                        style: 'currency',
+                                                        currency: 'EUR',
+                                                    }
+                                                ).format(item.amount)}
+                                            </td>
+                                            <td>
+                                                <strong
+                                                    className={
+                                                        item.status === 'READY'
+                                                            ? 'admin-bank-result-paid'
+                                                            : 'admin-bank-result-review'
+                                                    }
+                                                >
+                                                    {item.status === 'READY'
+                                                        ? 'Zuordnung möglich'
+                                                        : 'Prüfung nötig'}
+                                                </strong>
+                                                <small>{item.message}</small>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </section>
+
 
             <section className="admin-bank-card">
                 <h2>CAMT-Kontoauszug importieren</h2>
