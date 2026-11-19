@@ -1,0 +1,243 @@
+
+.bank-payment {
+    width: 100%;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-lg);
+
+    background: var(--background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+/* Header */
+
+.bank-payment__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+
+    margin-bottom: var(--spacing-lg);
+}
+
+.bank-payment__header h2 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.bank-payment__header p {
+    max-width: 400px;
+    margin: 0;
+}
+
+.bank-payment__amount {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+}
+
+.bank-payment__amount span {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+.bank-payment__amount strong {
+    font-size: 1.6rem;
+}
+
+/* Inhalt */
+
+.bank-payment__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: var(--spacing-lg);
+
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+.bank-payment__content h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.bank-payment__details {
+    min-width: 0;
+}
+
+.bank-payment__field {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bank-payment__label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+
+    font-size: 0.85rem;
+    opacity: 0.65;
+}
+
+.bank-payment__field-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-sm);
+
+    min-width: 0;
+}
+
+.bank-payment__field-content strong {
+    font-size: 0.95rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.bank-payment__reference {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Kopierbuttons */
+
+.bank-payment__copy-button {
+    flex-shrink: 0;
+    padding: 0.45rem 0.65rem;
+
+    background: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.bank-payment__copy-button:hover {
+    background: var(--border-color);
+}
+
+.bank-payment__details > .bank-payment__copy-button {
+    width: 100%;
+    margin-top: var(--spacing-md);
+    padding: 0.75rem;
+    font-size: 0.9rem;
+}
+
+/* QR-Code */
+
+.bank-payment__qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    text-align: center;
+
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.bank-payment__qr-section h3 {
+    margin-bottom: var(--spacing-md);
+}
+
+.bank-payment__qr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    padding: var(--spacing-sm);
+
+    background: #fff;
+    border-radius: var(--radius-md);
+}
+
+.bank-payment__qr svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.bank-payment__qr-section p {
+    margin: var(--spacing-md) 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0.75;
+}
+
+/* Banking-App-Link */
+
+.bank-payment__app-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    margin-top: auto;
+    padding: 0.75rem 1rem;
+
+    background: var(--text);
+    color: var(--background);
+    border-radius: var(--radius-md);
+
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.bank-payment__app-link:hover {
+    opacity: 0.85;
+}
+
+/* Hinweis */
+
+.bank-payment__footer {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+    .bank-payment {
+        padding: var(--spacing-md);
+    }
+
+    .bank-payment__header {
+        flex-direction: column;
+    }
+
+    .bank-payment__amount {
+        align-items: flex-start;
+    }
+
+    .bank-payment__content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .bank-payment__qr-section {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 380px) {
+    .bank-payment__field-content {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .bank-payment__copy-button {
+        align-self: flex-start;
+    }
+}

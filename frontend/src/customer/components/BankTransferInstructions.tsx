@@ -1,6 +1,8 @@
-import {useState} from "react";
 
-import { QRCodeSVG } from "qrcode.react";
+import './styles/BankTransferInstructions.css';
+
+import {useState, type ReactNode} from 'react';
+import {QRCodeSVG} from 'qrcode.react';
 
 export type BankTransferInstructions = {
     recipient: string;
@@ -17,99 +19,179 @@ type Props = {
     payment: BankTransferInstructions;
 };
 
-function CopyButton({
-                        value,
-                        children,
-                    }: {
+type CopyButtonProps = {
     value: string;
-    children: React.ReactNode;
-}) {
-    const [copied, setCopied] = useState(false);
+    children: ReactNode;
+};
+
+function CopyButton({value, children}: CopyButtonProps) {
+    const [feedback, setFeedback] =
+        useState<'idle' | 'copied' | 'error'>('idle');
 
     async function copy() {
-        await navigator.clipboard.writeText(value);
+        try {
+            await navigator.clipboard.writeText(value);
+            setFeedback('copied');
+        } catch {
+            setFeedback('error');
+        }
 
-        setCopied(true);
-
-        window.setTimeout(
-            () => setCopied(false),
-            1500
-        );
+        window.setTimeout(() => {
+            setFeedback('idle');
+        }, 2000);
     }
 
     return (
-        <button type="button" onClick={copy}>
-            {copied ? "Kopiert ✓" : children}
+        <button
+            type="button"
+            className="bank-payment__copy-button"
+            onClick={copy}
+        >
+            {feedback === 'copied'
+                ? 'Kopiert ✓'
+                : feedback === 'error'
+                    ? 'Kopieren fehlgeschlagen'
+                    : children}
         </button>
     );
 }
 
 function BankTransferInstruction({payment}: Props) {
-    const amount = payment.amount.toFixed(2);
+    const formattedAmount = new Intl.NumberFormat(
+        'de-DE',
+        {
+            style: 'currency',
+            currency: 'EUR',
+        }
+    ).format(payment.amount);
 
-    const paymentText =
-        `Empfänger: ${payment.recipient}
-IBAN: ${payment.iban}
-Betrag: ${amount} EUR
-Verwendungszweck: ${payment.reference}`;
+    const paymentText = [
+        `Empfänger: ${payment.recipient}`,
+        `IBAN: ${payment.iban}`,
+        ...(payment.bic ? [`BIC: ${payment.bic}`] : []),
+        `Betrag: ${payment.amount.toFixed(2)} EUR`,
+        `Verwendungszweck: ${payment.reference}`,
+    ].join('\n');
 
     return (
-        <div className="bank-payment">
-            <h2>Per Überweisung bezahlen</h2>
+        <section
+            className="bank-payment"
+            aria-labelledby="bank-payment-heading"
+        >
+            <header className="bank-payment__header">
+                <div>
+                    <h2 id="bank-payment-heading">
+                        Per Überweisung bezahlen
+                    </h2>
+                    <p>
+                        Überweise den folgenden Betrag möglichst
+                        per Echtzeitüberweisung.
+                    </p>
+                </div>
 
-            <p>
-                Bitte führen Sie die Zahlung möglichst als{" "}
-                <strong>Echtzeitüberweisung</strong> aus.
-            </p>
+                <div className="bank-payment__amount">
+                    <span>Zu überweisen</span>
+                    <strong>{formattedAmount}</strong>
+                </div>
+            </header>
 
-            <a
-                className="bank-app-button"
-                href={payment.paytoUri}
-            >
-                In Banking-App öffnen
-            </a>
+            <div className="bank-payment__content">
+                <div className="bank-payment__details">
+                    <h3>Überweisungsdaten</h3>
 
-            <div className="bank-payment__qr">
-                <QRCodeSVG
-                    value={payment.epcQrPayload}
-                    size={220}
-                    level="M"
-                />
+                    <div className="bank-payment__field">
+                        <span className="bank-payment__label">
+                            Empfänger
+                        </span>
 
-                <p>
-                    Mit einer kompatiblen Banking-App scannen,
-                    um die Überweisungsdaten zu übernehmen.
-                </p>
+                        <div className="bank-payment__field-content">
+                            <strong>{payment.recipient}</strong>
+                            <CopyButton value={payment.recipient}>
+                                Kopieren
+                            </CopyButton>
+                        </div>
+                    </div>
+
+                    <div className="bank-payment__field">
+                        <span className="bank-payment__label">
+                            IBAN
+                        </span>
+
+                        <div className="bank-payment__field-content">
+                            <strong className="bank-payment__reference">
+                                {payment.iban}
+                            </strong>
+                            <CopyButton value={payment.iban}>
+                                Kopieren
+                            </CopyButton>
+                        </div>
+                    </div>
+
+                    {payment.bic && (
+                        <div className="bank-payment__field">
+                            <span className="bank-payment__label">
+                                BIC
+                            </span>
+
+                            <div className="bank-payment__field-content">
+                                <strong>{payment.bic}</strong>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="bank-payment__field">
+                        <span className="bank-payment__label">
+                            Verwendungszweck
+                        </span>
+
+                        <div className="bank-payment__field-content">
+                            <strong className="bank-payment__reference">
+                                {payment.reference}
+                            </strong>
+                            <CopyButton value={payment.reference}>
+                                Kopieren
+                            </CopyButton>
+                        </div>
+                    </div>
+
+                    <CopyButton value={paymentText}>
+                        Alle Zahlungsdaten kopieren
+                    </CopyButton>
+                </div>
+
+                <div className="bank-payment__qr-section">
+                    <h3>Mit Banking-App bezahlen</h3>
+
+                    <div className="bank-payment__qr">
+                        <QRCodeSVG
+                            value={payment.epcQrPayload}
+                            size={214}
+                            level="M"
+                        />
+                    </div>
+
+                    <p>
+                        QR-Code mit einer kompatiblen
+                        Banking-App scannen und die
+                        Überweisungsdaten übernehmen.
+                    </p>
+
+                    <a
+                        className="bank-payment__app-link"
+                        href={payment.paytoUri}
+                    >
+                        In Banking-App öffnen
+                    </a>
+                </div>
             </div>
 
-            <CopyButton value={paymentText}>
-                Alle Zahlungsdaten kopieren
-            </CopyButton>
-
-            <p>
-                <strong>Empfänger:</strong>{" "}
-                {payment.recipient}
-            </p>
-
-            <p>
-                <strong>IBAN:</strong>{" "}
-                {payment.iban}
-            </p>
-
-            <p>
-                <strong>Betrag:</strong>{" "}
-                {amount} €
-            </p>
-
-            <p>
-                <strong>Verwendungszweck:</strong>{" "}
-                {payment.reference}
-            </p>
-
-            <CopyButton value={payment.reference}>
-                Verwendungszweck kopieren
-            </CopyButton>
-        </div>
+            <footer className="bank-payment__footer">
+                <strong>Wichtig:</strong> Bitte verwende den
+                angegebenen Verwendungszweck unverändert.
+                Deine Tickets werden nach bestätigtem
+                Zahlungseingang per E-Mail versendet.
+            </footer>
+        </section>
     );
 }
 
