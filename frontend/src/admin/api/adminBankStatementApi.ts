@@ -42,7 +42,43 @@ export type CsvPreviewResult = {
     ready: number;
     reviewRequired: number;
     items: CsvPreviewItem[];
+    fileSha256: string;
 };
+
+export type CsvConfirmResult = {
+    paid: number;
+    orderReferences: string[];
+};
+
+export async function confirmVolksbankCsv(
+    file: File,
+    preview: CsvPreviewResult,
+): Promise<CsvConfirmResult> {
+    const approvedReferences = preview.items
+        .filter((item) => item.status === 'READY')
+        .map((item) => item.orderReference)
+        .filter((reference): reference is string =>
+            reference !== null
+        )
+        .sort();
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+    formData.append('previewHash', preview.fileSha256);
+    formData.append(
+        'approvedReferences',
+        approvedReferences.join(',')
+    );
+
+    return adminApiClient.request<CsvConfirmResult>(
+        '/api/admin/bank-statements/csv/confirm',
+        {
+            method: 'POST',
+            body: formData,
+        }
+    );
+}
 
 export async function importCamtStatement(
     file: File,

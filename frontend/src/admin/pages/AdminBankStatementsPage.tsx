@@ -11,6 +11,8 @@ import {
 import {
     previewVolksbankCsv,
     type CsvPreviewResult,
+    confirmVolksbankCsv,
+    type CsvConfirmResult,
 } from '../api/adminBankStatementApi';
 
 const STATUS_LABELS: Record<CamtImportItemStatus, string> = {
@@ -43,6 +45,11 @@ function AdminBankStatementsPage() {
         useState<CsvPreviewResult | null>(null);
     const [csvLoading, setCsvLoading] = useState(false);
     const [csvError, setCsvError] = useState<string | null>(null);
+
+    const [confirmingCsv, setConfirmingCsv] = useState(false);
+
+    const [csvConfirmResult, setCsvConfirmResult] =
+        useState<CsvConfirmResult | null>(null);
 
     async function handleImport(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -101,6 +108,43 @@ function AdminBankStatementsPage() {
         }
     }
 
+    async function handleCsvConfirm() {
+        if (!csvFile || !csvPreview ||
+            csvPreview.ready === 0 || confirmingCsv) {
+            return;
+        }
+
+        const approved = window.confirm(
+            `${csvPreview.ready} Zahlungen verbindlich verbuchen?\n\n` +
+            'Die betreffenden Bestellungen werden als bezahlt ' +
+            'markiert und Ticket-E-Mails werden ausgelöst.'
+        );
+
+        if (!approved) return;
+
+        try {
+            setConfirmingCsv(true);
+            setCsvError(null);
+
+            const result = await confirmVolksbankCsv(
+                csvFile,
+                csvPreview
+            );
+
+            setCsvConfirmResult(result);
+            setCsvPreview(null);
+            setCsvFile(null);
+
+        } catch (error) {
+            setCsvError(
+                error instanceof Error
+                    ? error.message
+                    : 'Die Verbuchung ist fehlgeschlagen.'
+            );
+        } finally {
+            setConfirmingCsv(false);
+        }
+    }
 
     return (
         <div className="admin-bank-page">
@@ -136,6 +180,7 @@ function AdminBankStatementsPage() {
                                 event.currentTarget.files?.[0] ?? null
                             );
                             setCsvPreview(null);
+                            setCsvConfirmResult(null);
                             setCsvError(null);
                         }}
                     />
@@ -235,8 +280,41 @@ function AdminBankStatementsPage() {
                         )}
                     </div>
                 )}
-            </section>
 
+                {csvPreview && csvPreview.ready > 0 && (
+                    <div className="admin-bank-confirm-actions">
+                        <p>
+                            {csvPreview.ready} eindeutig zuordenbare
+                            Zahlungen können jetzt verbucht werden.
+                        </p>
+
+                        <button
+                            type="button"
+                            className="admin-bank-submit"
+                            disabled={confirmingCsv}
+                            onClick={() => void handleCsvConfirm()}
+                        >
+                            {confirmingCsv
+                                ? 'Zahlungen werden verbucht...'
+                                : `${csvPreview.ready} Zahlungen bestätigen`}
+                        </button>
+                    </div>
+                )}
+
+                {csvConfirmResult && (
+                    <div className="admin-bank-card" role="status">
+                        <h3>Verbuchung abgeschlossen</h3>
+                        <p>
+                            {csvConfirmResult.paid} Bestellungen
+                            wurden als bezahlt markiert.
+                        </p>
+                        <p>
+                            Die Ticket-E-Mails wurden zur
+                            Verarbeitung angestoßen.
+                        </p>
+                    </div>
+                )}
+            </section>
 
             <section className="admin-bank-card">
                 <h2>CAMT-Kontoauszug importieren</h2>

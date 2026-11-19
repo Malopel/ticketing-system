@@ -153,6 +153,7 @@ class OrderControllerSecurityTest {
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(14),
                 null,
+                PaymentMethod.MOLLIE,
                 List.of()
         );
     }
@@ -171,6 +172,7 @@ class OrderControllerSecurityTest {
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(14),
                 null,
+                PaymentMethod.MOLLIE,
                 List.of()
         );
     }

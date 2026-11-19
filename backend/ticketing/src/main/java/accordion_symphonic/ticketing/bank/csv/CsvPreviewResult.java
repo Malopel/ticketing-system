@@ -9,7 +9,8 @@ public record CsvPreviewResult(
         int ignored,
         int ready,
         int reviewRequired,
-        List<Item> items
+        List<Item> items,
+        String fileSha256
 ) {
     public record Item(
             long rowNumber,

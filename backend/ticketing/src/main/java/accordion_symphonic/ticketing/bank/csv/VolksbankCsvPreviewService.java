@@ -122,7 +122,8 @@ public class VolksbankCsvPreviewService {
                 ignored,
                 ready,
                 items.size() - ready,
-                items
+                items,
+                sha256(bytes)
         );
     }
 
@@ -369,6 +370,22 @@ public class VolksbankCsvPreviewService {
             return new String(
                     bytes,
                     Charset.forName("windows-1252")
+            );
+        }
+    }
+
+    private String sha256(byte[] bytes) {
+        try {
+            var digest = java.security.MessageDigest
+                    .getInstance("SHA-256");
+
+            return java.util.HexFormat.of()
+                    .formatHex(digest.digest(bytes));
+
+        } catch (java.security.NoSuchAlgorithmException exception) {
+            throw new IllegalStateException(
+                    "SHA-256 ist nicht verfügbar.",
+                    exception
             );
         }
     }
