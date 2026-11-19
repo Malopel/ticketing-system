@@ -92,6 +92,17 @@ function AdminLayout() {
                         >
                             Einlass
                         </NavLink>
+
+                        <NavLink
+                            to="/admin/bank-statements"
+                            className={({isActive}) =>
+                                isActive
+                                    ? 'admin-nav-link active'
+                                    : 'admin-nav-link'
+                            }
+                        >
+                            Zahlungsabgleich
+                        </NavLink>
                     </nav>
                 </aside>
 

@@ -16,6 +16,8 @@ import AdminOrdersPage from './pages/AdminOrdersPage';
 import AdminScannerPage from './pages/AdminScannerPage';
 import AdminConcertCreatePage
     from './pages/AdminConcertCreatePage';
+import AdminBankStatementsPage
+    from './pages/AdminBankStatementsPage';
 
 import './styles/AdminForms.css';
 
@@ -58,6 +60,11 @@ function AdminApp() {
                         <Route
                             path="scanner"
                             element={<AdminScannerPage/>}
+                        />
+
+                        <Route
+                            path="bank-statements"
+                            element={<AdminBankStatementsPage/>}
                         />
                     </Route>
                 </Route>

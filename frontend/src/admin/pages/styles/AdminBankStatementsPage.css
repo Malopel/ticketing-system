@@ -1,0 +1,185 @@
+
+.admin-bank-page {
+    width: 100%;
+    max-width: 1100px;
+}
+
+.admin-bank-header {
+    margin-bottom: 24px;
+}
+
+.admin-bank-header h1 {
+    margin-bottom: 8px;
+}
+
+.admin-bank-header p {
+    color: #666;
+}
+
+.admin-bank-card {
+    margin-bottom: 24px;
+    padding: 24px;
+
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.admin-bank-card h2 {
+    margin-bottom: 16px;
+}
+
+.admin-bank-card > p {
+    margin-bottom: 20px;
+}
+
+.admin-bank-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 24px 0;
+}
+
+.admin-bank-upload label {
+    font-weight: 600;
+}
+
+.admin-bank-upload input {
+    width: 100%;
+    max-width: 100%;
+}
+
+.admin-bank-filename {
+    color: #555;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.admin-bank-warning {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.admin-bank-warning p {
+    margin: 8px 0 16px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.admin-bank-confirmation {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.admin-bank-confirmation input {
+    width: auto;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.admin-bank-submit {
+    margin-top: 20px;
+    padding: 12px 20px;
+
+    background: #222;
+    color: white;
+    border: 1px solid #222;
+    border-radius: 6px;
+
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-bank-submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.admin-bank-error {
+    margin-top: 16px;
+    color: #ae3023;
+}
+
+.admin-bank-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.admin-bank-summary > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.admin-bank-summary span {
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.admin-bank-summary strong {
+    font-size: 1.75rem;
+}
+
+.admin-bank-review-notice {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.admin-bank-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-bank-table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+}
+
+.admin-bank-table th,
+.admin-bank-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    vertical-align: top;
+}
+
+.admin-bank-table th {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.admin-bank-table td small {
+    display: block;
+    margin-top: 5px;
+    color: #777;
+}
+
+.admin-bank-result-paid {
+    color: #237447;
+    font-weight: 600;
+}
+
+.admin-bank-result-review {
+    color: #9a4b18;
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+    .admin-bank-card {
+        padding: 16px;
+    }
+
+    .admin-bank-summary {
+        grid-template-columns: 1fr;
+    }
+}
