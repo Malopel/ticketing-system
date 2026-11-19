@@ -10,15 +10,12 @@ import DatenschutzPage from './customer/pages/DatenschutzPage';
 import PublicLayout from './customer/layout/PublicLayout';
 
 import AdminApp from './admin/AdminApp';
-import CountdownPage from "./customer/pages/CountdownPage.tsx";
 
 function App() {
     return (
         <Routes>
             <Route element={<PublicLayout/>}>
-                <Route path="/" element={<CountdownPage/>}/>
-
-                <Route path="/homepage" element={<HomePage/>}/>
+                <Route path="/" element={<HomePage/>}/>
 
                 <Route
                     path="/concerts/:concertId"

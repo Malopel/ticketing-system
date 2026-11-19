@@ -71,4 +71,7 @@ public class BankController {
 
         return bankTransferService.createInstructions(order);
     }
+
+    @PostMapping("/api/admin/bank-statements/csv/preview")
+    public void csvPreview(){ }
 }
