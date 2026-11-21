@@ -7,6 +7,7 @@ import accordion_symphonic.ticketing.order.*;
 import accordion_symphonic.ticketing.order.exception.OrderCannotBePaidException;
 import accordion_symphonic.ticketing.order.exception.OrderNotFoundException;
 import accordion_symphonic.ticketing.order.service.OrderAccessTokenService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,15 +21,18 @@ public class BankTransferService {
     private final BankTransferProperties properties;
     private final OrderRepository orderRepository;
     private final OrderAccessTokenService orderAccessTokenService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public BankTransferService(
             BankTransferProperties properties,
             OrderRepository orderRepository,
-            OrderAccessTokenService orderAccessTokenService
+            OrderAccessTokenService orderAccessTokenService,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.properties = properties;
         this.orderRepository = orderRepository;
         this.orderAccessTokenService = orderAccessTokenService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(
@@ -86,6 +90,18 @@ public class BankTransferService {
         order.markAsPaymentPending(
                 PaymentMethod.BANK_TRANSFER,
                 paymentExpiresAt
+        );
+
+        // Bestellbestätigung nach erfolgreichem Commit auslösen
+        eventPublisher.publishEvent(
+                new BankTransferStartedEvent(
+                        order.getId(),
+                        order.getCustomerEmail(),
+                        order.getConcert().getTitle(),
+                        order.getPublicId(),
+                        order.getTotalAmount(),
+                        order.getPaymentExpiresAt()
+                )
         );
 
         return createInstructions(order);
