@@ -173,29 +173,19 @@ function BankTransferInstruction({payment}: Props) {
                 </div>
 
 
-                <a
-                    className="bank-payment__app-link"
-                    href={payment.paytoUri}
-                >
-                    Banking-App öffnen (falls unterstützt)
-                </a>
 
-                <p className="bank-payment__hint">
-                    Nicht alle Banking-Apps unterstützen diesen Button.
-                    Falls sich nichts öffnet, verwende den QR-Code
-                    oder kopiere die Überweisungsdaten.
-                </p>
-
-                <div className="bank-payment__qr">
+                <div className="bank-payment__qr-section">
                     <h3>Mit Banking-App bezahlen</h3>
 
-                    <QRCodeCanvas
-                        ref={qrCanvasRef}
-                        value={payment.epcQrPayload}
-                        size={220}
-                        level="M"
-                        marginSize={4}
-                    />
+                    <div className="bank-payment__qr">
+                        <QRCodeCanvas
+                            ref={qrCanvasRef}
+                            value={payment.epcQrPayload}
+                            size={220}
+                            level="M"
+                            marginSize={4}
+                        />
+                    </div>
 
                     <p>
                         <strong>So funktioniert's:</strong>
@@ -209,10 +199,9 @@ function BankTransferInstruction({payment}: Props) {
                     </p>
 
                     <p className="bank-payment__hint">
-                        Die Überweisungsdaten werden automatisch
-                        vorausgefüllt, sofern deine Banking-App
-                        GiroCode unterstützt. Bitte überprüfe
-                        alle Angaben vor der Freigabe.
+                        Die Überweisungsdaten werden bei
+                        kompatiblen Banking-Apps vorausgefüllt.
+                        Bitte überprüfe alle Angaben vor der Freigabe.
                     </p>
 
                     <button
@@ -224,9 +213,22 @@ function BankTransferInstruction({payment}: Props) {
                     </button>
 
                     <p className="bank-payment__hint">
-                        Du bist am Smartphone? Speichere den QR-Code
-                        als Bild. Einige Banking-Apps ermöglichen
-                        das Einlesen eines gespeicherten QR-Codes.
+                        Am Smartphone kannst du den QR-Code
+                        speichern. Einige Banking-Apps können
+                        gespeicherte QR-Codes einlesen.
+                    </p>
+
+                    <a
+                        className="bank-payment__app-link"
+                        href={payment.paytoUri}
+                    >
+                        Banking-App öffnen (falls unterstützt)
+                    </a>
+
+                    <p className="bank-payment__hint">
+                        Nicht alle Banking-Apps unterstützen diesen
+                        Button. Falls sich nichts öffnet, nutze
+                        den QR-Code oder kopiere die Überweisungsdaten.
                     </p>
                 </div>
             </div>
