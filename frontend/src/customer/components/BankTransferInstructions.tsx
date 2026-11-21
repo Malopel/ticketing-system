@@ -174,7 +174,7 @@ function BankTransferInstruction({payment}: Props) {
 
 
                 <a
-                    className="bank-app-button"
+                    className="bank-payment__app-link"
                     href={payment.paytoUri}
                 >
                     Banking-App öffnen (falls unterstützt)

@@ -146,20 +146,64 @@
 
 .bank-payment__qr {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    gap: var(--spacing-md);
 
     width: 100%;
-    padding: var(--spacing-sm);
+    min-width: 0;
+    padding: var(--spacing-md);
 
+    text-align: center;
+}
+
+.bank-payment__qr canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+
+    padding: 10px;
     background: #fff;
     border-radius: var(--radius-md);
 }
 
-.bank-payment__qr svg {
-    display: block;
-    max-width: 100%;
-    height: auto;
+.bank-payment__qr h3 {
+    margin: 0;
+}
+
+.bank-payment__qr p {
+    width: 100%;
+    max-width: 340px;
+    margin: 0;
+
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.bank-payment__hint {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0.75;
+}
+
+.bank-payment__download {
+    width: 100%;
+    max-width: 300px;
+
+    padding: 0.75rem 1rem;
+
+    background: var(--background);
+    color: var(--text);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.bank-payment__download:hover {
+    background: var(--border-color);
 }
 
 .bank-payment__qr-section p {
